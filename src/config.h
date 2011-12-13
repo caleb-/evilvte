@@ -30,6 +30,7 @@
 // #define SHOW_WINDOW_BORDER  TRUE
 // #define SHOW_WINDOW_ICON    TRUE
 // #define SHOW_WINDOW_TITLE   "evilvte" /* Change window name as you like */
+// #define SHOW_WINDOW_VERSION TRUE /* Command line -v option */
 #define STATUS_BAR             TRUE
 #define SWITCH_ENCODING        TRUE /* Right click to switch encoding */
 #define TAB                    TRUE /* Yon can disable TAB if you want */

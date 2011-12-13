@@ -4,7 +4,7 @@ include src/config.o
 
 OBJ=src/sakura.o
 
-CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\"
+CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\" -DEVILVTE_VERSION=\"$(EVILVTE_VERSION)\"
 
 all: evilvte
 

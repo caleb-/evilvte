@@ -53,6 +53,12 @@
 #endif
 #endif
 
+#if SHOW_WINDOW_VERSION
+#ifndef SHOW_WINDOW_TITLE
+#define SHOW_WINDOW_TITLE "evilvte"
+#endif
+#endif
+
 #ifdef COLOR_BACKGROUND
 #define SET_DEFAULT_COLORS 1
 #endif
@@ -224,6 +230,7 @@ gint64 last_time_2 = 0;
 
 struct terminal {
   GtkWidget *vte;
+  int pid;
 #ifdef TAB_LABEL
   GtkWidget *label;
 #endif
@@ -392,7 +399,7 @@ void sakura_add_tab()
   gtk_box_pack_start(GTK_BOX(term.hbox), term.scrollbar, FALSE, FALSE, 0);
 #endif
 
-  vte_terminal_fork_command(VTE_TERMINAL(term.vte), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 
 #ifdef ALLOW_BOLD
   vte_terminal_set_allow_bold(VTE_TERMINAL(term.vte), ALLOW_BOLD);
@@ -547,12 +554,24 @@ void sakura_add_tab()
 void sakura_del_tab()
 {
   int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+
+#if TAB
+  term = g_array_index(terminals, struct terminal, npages);
+#endif
+
+  /* Dirty hack. Prevent background applications close with tab */
+  char pidstr[32];
+  sprintf(pidstr, "kill -KILL %d", term.pid);
+  system(pidstr);
+
 #if TAB
   g_array_remove_index(terminals, npages);
 #endif
+
   gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), npages);
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 1)
     gtk_main_quit();
+
 #if TAB
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), npages);
 #endif
@@ -585,8 +604,15 @@ void set_encoding(GtkWidget *widget, void *data)
 #endif
 }
 
-int main()
+int main(int argc, char **argv)
 {
+#if SHOW_WINDOW_VERSION
+  if (argc == 2 && !strcmp(argv[1], "-v")) {
+    printf("%s, version %s\n", SHOW_WINDOW_TITLE, EVILVTE_VERSION);
+    return 0;
+  }
+#endif
+
   gtk_init(NULL, NULL);
 
 #if TAB

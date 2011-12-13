@@ -1,3 +1,7 @@
+0.1.6
+ * Close a tab will not close background applications now
+ * Support command line -v option to show program version
+
 0.1.5
  * Support all VTE color settings
 
