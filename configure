@@ -10,14 +10,10 @@ fi
 
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
   echo
-  echo " * Options: --prefix=/usr/local (default)"
-  echo "            --prefix=/usr"
+  echo " Option: --prefix=/usr/local (default)"
+  echo "         --prefix=/usr"
   echo
-  echo "            --detect-xtst (default)"
-  echo "            --enable-xtst"
-  echo "            --disable-xtst (VIRTUAL_KEYBOARD option will be disabled.)"
-  echo
-  echo "   Please edit [1m[33msrc/config.h[m to customize your options."
+  echo " Please edit [1m[33msrc/config.h[m to customize your options."
   echo
   exit
 fi
@@ -32,22 +28,12 @@ fi
 
 prefix="/usr/local"
 
-PROCESS_XTST=2
-
 for opt do
   case "$opt" in
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
   ;;
-  --detect-xtst) PROCESS_XTST=$PROCESS_XTST:2
-  ;;
-  --enable-xtst) PROCESS_XTST=$PROCESS_XTST:1
-  ;;
-  --disable-xtst) PROCESS_XTST=$PROCESS_XTST:0
-  ;;
   esac
 done
-
-STATUS_XTST=`echo $PROCESS_XTST | fold -w 1 | tail -n 1`
 
 SUSE_GCC=`gcc -v 2>&1 | tr A-Z a-z | grep suse`
 
@@ -75,32 +61,6 @@ else
   fi
 fi
 
-if [ "$EVILVTE" = "min" ]; then
-  STATUS_XTST=0
-fi
-
-if [ "$STATUS_XTST" = "2" ]; then
-  XTSTLIB=`pkg-config --libs xtst`
-
-  if [ $? != 0 ]; then
-    echo [1m[32mIt is fine[m, but VIRTUAL_KEYBOARD option will be disabled automatically.
-    echo
-  fi
-
-  XTSTLIBTEST=`echo $XTSTLIB | grep Xtst`
-
-  if [ "$XTSTLIBTEST" != "" ]; then
-    XTST_DETECTED=TRUE
-  else
-    XTST_DETECTED=FALSE
-  fi
-fi
-
-if [ "$STATUS_XTST" = "1" ]; then
-  XTSTLIB="-L/usr/X11R6/lib -lXtst"
-  XTST_DETECTED=TRUE
-fi
-
 bindir=$prefix/bin
 mandir=$prefix/share/man/man1
 deskdir=$prefix/share/applications
@@ -121,8 +81,7 @@ echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
 echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
 echo "ICON_DIR=$ICON_DIR" >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
-echo "LDLIBS=-L/usr/local/lib -lvte $XTSTLIB" >> src/config.o
+echo "LDLIBS=-L/usr/local/lib -lvte" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> src/config.o
 echo "SUSE_DETECTED=$SUSE_DETECTED" >> src/config.o
-echo "XTST_DETECTED=$XTST_DETECTED" >> src/config.o

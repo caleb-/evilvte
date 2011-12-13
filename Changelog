@@ -1,3 +1,10 @@
+0.4.5~pre6
+ * Support TAB_LABEL_DYNAMIC to show current path dynamically
+   Thanks to Pavel Plesov
+ * Remove virtual keyboard
+ * Relicense icons to GNU General Public License version 2 with permission
+   from the author, Tetralet <tetralet AT gmail DOT com>
+
 0.4.5~pre5
  * Merge changes from 0.4.4.2
 
@@ -14,9 +21,7 @@
  * Limit font size range. Only 1 to 99 are accepted.
 
 0.4.5~pre2
- * Support virtual keyboard with libXtst
-   You may disable libXtst by "./configure --disable-xtst".
-   You may define VIRTUAL_KEYBOARD_MENU_KEY and VIRTUAL_KEYBOARD_WINDOW_KEY  
+ * Support virtual keyboard
  * Detect GTK+ version and disable unsupported options automatically.
  * Fix a displaying bug about toggling scrollbar or status bar.
  * Avoid an GTK+ warning message when TAB_LABEL is customized.

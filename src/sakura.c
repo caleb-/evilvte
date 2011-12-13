@@ -245,6 +245,7 @@
 #undef TAB_EXPANDED_WIDTH
 #undef COMMAND_TAB_NUMBERS
 #undef TAB_LABEL
+#undef TAB_LABEL_DYNAMIC
 #undef TAB_LABEL_POEM
 #undef TAB_LABEL_CUSTOM
 #undef TAB_NEW_PATH_EQUAL_OLD
@@ -1103,6 +1104,7 @@ void do_paste();
 void do_reset();
 void do_select_all();
 void do_select_font();
+void do_title_changed();
 void do_toggle_antialias();
 void do_toggle_bg();
 void do_toggle_decorated();
@@ -2181,6 +2183,34 @@ void do_select_font()
 }
 #endif /* MENU_FONT_SELECT */
 
+#if TAB_LABEL_DYNAMIC
+void do_title_changed()
+{
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#if TAB_CLOSE_BUTTON
+  term->label = gtk_hbox_new(0, 0);
+  term->button = gtk_button_new();
+  GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+  GtkRcStyle *rcstyle = gtk_rc_style_new();
+  gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+  rcstyle->xthickness = 0;
+  rcstyle->ythickness = 0;
+  gtk_widget_modify_style(term->button, rcstyle);
+  gtk_rc_style_unref(rcstyle);
+  term->label_edit = gtk_label_new(vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+  gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
+  gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
+  gtk_widget_show_all(term->label);
+  g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
+  gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), VTE_HBOX, term->label);
+#endif
+#if !TAB_CLOSE_BUTTON
+  gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(notebook), VTE_HBOX, vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+#endif
+}
+#endif
+
 #if MENU_TOGGLE_ANTI_ALIAS
 void do_toggle_antialias()
 {
@@ -2653,6 +2683,10 @@ void add_tab()
 #endif
 
   g_signal_connect(term->vte, "child-exited", G_CALLBACK(del_tab), (int*)DO_CLOSE_DIALOG);
+
+#if TAB_LABEL_DYNAMIC
+  g_signal_connect(term->vte, "window-title-changed", do_title_changed, NULL);
+#endif
 
 #if MENU
   g_signal_connect(term->vte, "button-press-event", G_CALLBACK(menu_popup), NULL);
@@ -3173,7 +3207,7 @@ int main(int argc, char **argv)
   gtk_container_add(GTK_CONTAINER(main_window), notebook);
 #endif
 
-  g_signal_connect(main_window, "delete_event", delete_event, NULL);
+  g_signal_connect(main_window, "delete_event", G_CALLBACK(delete_event), NULL);
 
 #if HOTKEY
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(key_press_event), NULL);
@@ -3648,15 +3682,6 @@ int main(int argc, char **argv)
   gtk_widget_hide(match_open);
   gtk_widget_hide(match_copy);
   gtk_widget_hide(match_item);
-#endif
-
-#if VIRTUAL_KEYBOARD && XTST_DETECTED
-  make_kbm();
-  g_signal_connect_after(main_window, "focus_in_event", move_kbm, NULL);
-  g_signal_connect_after(main_window, "focus_out_event", hide_kbm, NULL);
-  g_signal_connect_after(main_window, "size_request", move_kbm, NULL);
-  g_signal_connect_after(main_window, "style-set", move_kbm, NULL);
-  g_signal_connect_after(main_window, "window_state_event", move_kbm, NULL);
 #endif
 
   gtk_main();

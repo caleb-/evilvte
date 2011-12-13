@@ -57,7 +57,6 @@
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      TRUE
 #define    STATUS_BAR             TRUE
-// #define VIRTUAL_KEYBOARD       TRUE
 #define    WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 
 #define    MENU                   TRUE
@@ -84,6 +83,7 @@
 // #define TAB_CLOSE_BUTTON       TRUE
 // #define TAB_EXPANDED_WIDTH     TRUE
 // #define TAB_LABEL              "Page"
+// #define TAB_LABEL_DYNAMIC      TRUE   /* Display current path dynamically  */
 // #define TAB_LABEL_NUMBER       TRUE
 // #define TAB_LABEL_POEM         TRUE
 // #define TAB_LABEL_CUSTOM       "One", "Two", "Three", "Four", "Five", "Six"
@@ -159,5 +159,3 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "Character Encoding"
 // #define LABEL_SUBMENU_IME            "Input Methods"
-// #define VIRTUAL_KEYBOARD_MENU_KEY    "Menu" /* " 目 "                      */
-// #define VIRTUAL_KEYBOARD_WINDOW_KEY  "Win"  /* "ﾐ田"                       */
