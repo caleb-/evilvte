@@ -1,0 +1,78 @@
+#!/bin/sh
+
+PROGS="evilvte evilvtab"
+
+if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
+  echo
+  echo " * Valid option:"
+  echo "                 --prefix=/usr/local (default)"
+  echo "                 --prefix=/usr"
+  echo
+  echo "   Please edit [1m[33msrc/config.h[m to customize your options."
+  echo
+  exit
+fi
+
+rm -f config.mak
+
+MAKE=make
+which gmake > /dev/null 2> /dev/null
+if [ $? = 0 ]; then
+  MAKE=gmake
+fi
+
+SO_FLAGS="-shared"
+
+prefix="/usr/local"
+
+for opt do
+  case "$opt" in
+  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  esac
+done
+
+VTE=vte
+
+echo
+echo -n "VTE: "
+
+VTEINC=`pkg-config --cflags $VTE`
+
+if [ $? != 0 ]; then
+  exit -1;
+fi
+
+VTELDFLAGS=`pkg-config --libs $VTE`
+
+if [ $? != 0 ]; then
+  exit -1;
+else
+  echo [1m[32mOK[m
+  echo
+  echo Prefix: [1m[32m$prefix[m
+  echo
+  echo Configuration: [1m[32mOK[m
+  echo
+  echo Please edit [1m[33msrc/config.h[m to customize your options.
+  echo
+fi
+
+bindir=$prefix/bin
+
+EVILVTE_VERSION=`head -n 1 Changelog`
+
+if [ $prefix = /usr ]; then
+  echo OPTFLAGS=-O >> config.mak
+fi
+
+echo "CC=gcc" >> config.mak
+echo "MAKE=$MAKE" >> config.mak
+echo "VTEINC=$VTEINC" >> config.mak
+echo "prefix=$prefix" >> config.mak
+echo "bindir=\$(DESTDIR)$bindir" >> config.mak
+# echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> config.mak
+echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgobject-2.0 -lglib-2.0 >> config.mak
+echo "SO_FLAGS=$SO_FLAGS" >> config.mak
+echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> config.mak
+echo "PROGS=$PROGS" >> config.mak

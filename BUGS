@@ -1,0 +1,4 @@
+ * MANY options are not implemented yet.
+ * Toggle tabs with hotkey sometimes inputs "5~" or something to the terminal.
+   Respawn a new window often resolve this problem.
+   I have no clue about this.

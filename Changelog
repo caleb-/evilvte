@@ -1,0 +1,6 @@
+0.0.2
+ * Initial release
+
+0.0.1
+ * src/evilvtab.c is derived from termit 1.1.3, http://code.google.com/p/termit/
+   Thanks to <ratnikov.ev@gmail.com>
