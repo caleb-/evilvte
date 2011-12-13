@@ -1,3 +1,11 @@
+0.4.7~pre3
+ * Support vte_terminal_fork_command_full (VTE >= 0.25.1)
+ * Support all positive integer font size
+ * Drop gdk-pixbuf dependency because it is a standalone library now.
+   It was only used for an VTE 0.24.0 bug. VTE 0.24.1 and later ones had fixed
+   that bug.
+ * Code clean up
+
 0.4.7~pre2
  * Support BELL_URGENT, aka WM_URGENT hint
    Thanks to L29Ah

@@ -4,9 +4,12 @@ ifeq ($(CFLAGS),)
 	CFLAGS = -Os
 endif
 
+ifeq ($(LDFLAGS),)
+	LDFLAGS = -Wl,--as-needed
+endif
+
 ifeq ($(LDLIBS),)
-	LDLIBS = -L/usr/local/lib
-	LDLIBS += `pkg-config --libs vte`
+	LDLIBS = -L/usr/local/lib -lgdk-x11-2.0 -lglib-2.0 -lgobject-2.0 -lgtk-x11-2.0 -lvte
 endif
 
 CFLAGS += $(OPTFLAGS) $(VTEINC)
