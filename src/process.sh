@@ -177,8 +177,6 @@ COMMAND_SHOW_OPTIONS=`grep   COMMAND_SHOW_OPTIONS   src/custom.h | tr '\t' ' ' |
 COMMAND_SHOW_VERSION=`grep   COMMAND_SHOW_VERSION   src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
 COMMAND_TAB_NUMBERS=`grep    COMMAND_TAB_NUMBERS    src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
 PROGRAM_WM_CLASS=`grep       PROGRAM_WM_CLASS       src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
-TAB_ENABLE=`grep             ' TAB '                src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
-[ "$TAB_ENABLE" = "" ] && COMMAND_TAB_NUMBERS=
 
 head -n 10 misc/manpage.1 > misc/evilvte.1
 

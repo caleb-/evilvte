@@ -1,3 +1,10 @@
+0.4.9~pre2
+ * Minor tweaks in TABBAR_AUTOHIDE for GTK+ 3.x
+ * Hide VTE_FIXED color style which is merged in VTE version >= 0.17.1
+ * Drop !TAB codes since evilvte is GtkNotebook-only for a very long time.
+   For those who do not use tabs, the binary size will increase a little.
+ * Code clean up
+
 0.4.9~pre1
  * Support "Auto-click" when there is only one effective menu item.
    You can assign anything to right-click now.
@@ -37,7 +44,7 @@
  * Sync window state with window manager
  * Fix some cross-platform issues
    Thanks to Aragon Gouveia <aragon AT phat DOT za DOT net>
- * Initial support for new VTE resizing behavior
+ * Initial support for new resizing behavior of VTE
    If you are using GTK+ version >= 2.91.1 and VTE version >= 0.27.1,
    the window size of evilvte is not always correct currently.
 
@@ -65,7 +72,7 @@
  * Rename make target installstrip to install-strip
 
 0.4.7~pre3
- * Support vte_terminal_fork_command_full on VTE version >= 0.25.1
+ * Support vte_terminal_fork_command_full
  * Support all positive integer font size
  * Drop gdk-pixbuf dependency. It was used for a bug only exists in VTE 0.24.0.
  * Code clean up
@@ -79,7 +86,6 @@
 
  * Rename MATCH_STRING_EXEC to MATCH_STRING_L
  * Provide MATCH_STRING_M
-   You may middle-click an URL to open it without menu
  * Fix two MATCH_STRING_* bugs
  * Fix two WINDOW_TITLE_DYNAMIC bugs
  * Fix a cross-platform issue
@@ -102,9 +108,7 @@
 
 0.4.6~pre4
  * Support MATCH_STRING_EXEC
-   You may click an URL to open it without menu
  * Define TAB_LABEL when Arch Linux is detected, thanks to Ethan
- * Remove evilvte.xpm
 
 0.4.6~pre3
  * Respect CC
@@ -131,9 +135,8 @@
 0.4.5
  * Support -ls command line option to enable login shell in all tabs
  * Fix an CLOSE_SAFELY bug which was in 0.4.5~pre5 to 0.4.5~pre7
- * Make TAB_LABEL more customizable and support internationalization (i18n)
- * Remove TAB_LABEL_NUMBER
- * Remove TAB_LABEL_POEM since it can be replaced by TAB_LABEL_CUSTOM
+ * Make TAB_LABEL more customizable and support internationalization
+ * Drop TAB_LABEL_NUMBER and TAB_LABEL_POEM
  * Hide DEFAULT_ARGV and DEFAULT_ENVV
  * Fix build failure when linked by GNU gold linker
    Thanks to Peter Fritzsche <peter DOT fritzsche AT gmx DOT de>
@@ -183,7 +186,6 @@
 0.4.4~pre10
  * Support CTRL_ALT
    If you enable it, all hotkeys will become Ctrl + Alt + hotkey(s).
- * Cosmetic minor changes
 
 0.4.4~pre9
  * Support command line -f option to start evilvte in fullscreen mode
@@ -239,7 +241,6 @@
 
 0.4.3~pre1
  * Fix Segmentation fault when closing program
-   Please enable CLOSE_SAFELY or CLOSE_DIALOG
 
 0.4.2
  * Clarify licenses
@@ -277,10 +278,10 @@
 
 0.3.7
  * Support MOUSE_CTRL_SATURATION
-   Scroll left to decrease saturation, and scroll right to increase it.
+   Scroll left or right to change saturation
  * Support "Toggle scrollbar", "Toggle status bar", and "Toggle tabbar" items
    in menu
- * Disable menu when MENU_CUSTOM defines nothing or only separators.
+ * Disable menu when MENU_CUSTOM defines nothing or separators only.
  * Fix build failure when CTRL_TOGGLE_BACKGROUND is enabled without defining
    BACKGROUND_SATURATION
 
@@ -300,14 +301,13 @@
 
 0.3.4
  * Support MENU_MATCH_STRING_EXEC
-   You can right click to open an URL now.
  * Support "Select font" item in menu
  * Support CTRL_FONT_SELECT
  * Fix a bug when FONT_SIZE is defined without defining FONT
  * Support PROGRAM_VERSION for personal versioning
  * Simplify menu customization
- * Remove DOUBLE_PRESS_HOTKEY because its function can be replaced by menu
- * Remove DEFAULT_FONT_SIMPLE for a more readable config file
+ * Remove DOUBLE_PRESS_HOTKEY
+ * Remove DEFAULT_FONT_SIMPLE
 
 0.3.3
  * Remove an useless variable in the struct terminal.
