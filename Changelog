@@ -1,3 +1,8 @@
+0.1.0
+ * Support window title
+ * Support window icon
+ * Option to turn off tabs
+
 0.0.9
  * Remove switch_page_routine()
  * Set notebook borders only once
@@ -17,7 +22,6 @@
  * Remove an useless gtk_box_pack_start
 
 0.0.4
- * Let evilvtab support all options in src/config.h
  * Remove an useless hbox GtkWidget
 
 0.0.3
@@ -28,6 +32,5 @@
  * Initial release
 
 0.0.1
- * src/evilvte.c is derived from sakura 2.0.1,
-   http://www.pleyades.net/david/sakura.php
+ * Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
    Thanks to David Gómez <david@pleyades.net>

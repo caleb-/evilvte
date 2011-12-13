@@ -1,14 +1,24 @@
+OPTFLAGS=-g
+
+include src/config.o
+
+OBJ=src/sakura.o
+
+CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\"
+
 all: evilvte
 
-evilvte:
-	$(MAKE) -C src $@
+evilvte: $(OBJ)
+	$(CC) -o $(PROG) $(OBJ) $(LDFLAGS)
 
 install:
-	$(MAKE) -C src install
+	install -d $(bindir)
+	install -m 755 $(PROG) $(bindir)
+	install -d $(ICON_DIR_INSTALL)
+	install -m 644 src/evilvte.png $(ICON_DIR_INSTALL)
 
-clean: config.mak
-	$(MAKE) -C src clean
-	rm -f config.mak
+clean: src/config.o
+	rm -f $(PROG) src/*.o
 
-config.mak:
+src/config.o:
 	./configure

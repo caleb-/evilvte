@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PROGS=evilvte
+PROG=src/evilvte
 
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
   echo
@@ -13,15 +13,13 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
   exit
 fi
 
-rm -f config.mak
+rm -f src/config.o
 
 MAKE=make
 which gmake > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   MAKE=gmake
 fi
-
-SO_FLAGS="-shared"
 
 prefix="/usr/local"
 
@@ -59,17 +57,19 @@ else
 fi
 
 bindir=$prefix/bin
+ICON_DIR=$prefix/share/pixmaps
 
 if [ $prefix = /usr ]; then
-  echo OPTFLAGS=-O >> config.mak
+  echo OPTFLAGS=-O >> src/config.o
 fi
 
-echo "CC=gcc" >> config.mak
-echo "MAKE=$MAKE" >> config.mak
-echo "VTEINC=$VTEINC" >> config.mak
-echo "prefix=$prefix" >> config.mak
-echo "bindir=\$(DESTDIR)$bindir" >> config.mak
-# echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> config.mak
-echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgobject-2.0 -lglib-2.0 >> config.mak
-echo "SO_FLAGS=$SO_FLAGS" >> config.mak
-echo "PROGS=$PROGS" >> config.mak
+echo "CC=gcc" >> src/config.o
+echo "MAKE=$MAKE" >> src/config.o
+echo "VTEINC=$VTEINC" >> src/config.o
+echo "prefix=$prefix" >> src/config.o
+echo "bindir=\$(DESTDIR)$bindir" >> src/config.o
+echo "ICON_DIR=$ICON_DIR" >> src/config.o
+echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
+# echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> src/config.o
+echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgobject-2.0 -lglib-2.0 >> src/config.o
+echo "PROG=$PROG" >> src/config.o
