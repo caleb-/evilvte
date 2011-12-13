@@ -28,8 +28,29 @@
 #include <vte/vte.h>
 #include "config.h"
 
+#ifndef ENABLE_LASTLOG
+#define ENABLE_LASTLOG TRUE
+#endif
+
+#ifndef ENABLE_UTMP
+#define ENABLE_UTMP TRUE
+#endif
+
+#ifndef ENABLE_WTMP
+#define ENABLE_WTMP TRUE
+#endif
+
 #if SCROLLBAR_LEFT
 #undef SCROLLBAR_RIGHT
+#endif
+
+#ifdef BACKGROUND_IMAGE
+#define BACKGROUND_EXIST TRUE
+#endif
+
+#ifdef BACKGROUND_TRANSPARENT
+#undef BACKGROUND_EXIST /* undefine it here to prevent duplicated definition warning */
+#define BACKGROUND_EXIST TRUE
 #endif
 
 #if TAB
@@ -204,28 +225,44 @@ const GdkColor color_xterm[16] =
 #endif
 
 #ifdef DEFAULT_FONT_SIMPLE
-#undef DEFAULT_FONT_1
+#undef DEFAULT_FONT
 #endif
 
 #ifdef FONT_CHANGE_SIZE
-#ifndef DEFAULT_FONT_1
-#define DEFAULT_FONT_1 "Monospace"
+#ifndef DEFAULT_FONT
+#define DEFAULT_FONT "Monospace"
 #endif
 #undef DEFAULT_FONT_SIMPLE
 #undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
 #define ENABLE_KEY_PRESS TRUE
-  int width_f;
-  int height_f;
+int width_f;
+int height_f;
 #endif /* FONT_CHANGE_SIZE */
 
-#ifdef DEFAULT_FONT_1
-#ifndef DEFAULT_FONT_1_SIZE
-#define DEFAULT_FONT_1_SIZE 10
+#ifdef DEFAULT_FONT
+#ifndef DEFAULT_FONT_SIZE
+#define DEFAULT_FONT_SIZE 10
 #endif
-  char font1_font[32] = DEFAULT_FONT_1;
-  char font1str[32];
-  int font1_size = DEFAULT_FONT_1_SIZE;
-#endif /* DEFAULT_FONT_1 */
+char font1str[32];
+int font1_size = DEFAULT_FONT_SIZE;
+#endif /* DEFAULT_FONT */
+
+#ifdef ENCODING_LIST
+#if ENCODING_LIST_DEFAULT
+#define CHAR_ENCODING char
+#else
+#define CHAR_ENCODING static char
+#endif
+#define SHOW_MENU TRUE
+CHAR_ENCODING *encoding[] = {
+ENCODING_LIST
+};
+#endif /* ENCODING_LIST */
+
+#if MENU_INPUT_METHOD
+#undef SHOW_MENU /* undefine it here to prevent duplicated definition warning */
+#define SHOW_MENU TRUE
+#endif
 
 #if TAB
 GArray *terminals;
@@ -236,7 +273,7 @@ int width;
 int height;
 #endif
 
-#if SWITCH_ENCODING
+#if SHOW_MENU
 GtkWidget *menu;
 #endif
 
@@ -260,7 +297,7 @@ struct terminal {
   GtkWidget *vte;
 #if CLOSE_SAFE
   int pid;
-#endif 
+#endif
 #ifdef TAB_LABEL
   GtkWidget *label;
 #endif
@@ -299,12 +336,12 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
     }
 #endif /* CTRL_FONT_SMALLER */
 
-#ifdef CTRL_FONT_DEFAULT
-    if CTRL_FONT_DEFAULT {
-      font1_size = DEFAULT_FONT_1_SIZE;
+#ifdef CTRL_FONT_DEFAULT_SIZE
+    if CTRL_FONT_DEFAULT_SIZE {
+      font1_size = DEFAULT_FONT_SIZE;
       goto font_size_changed;
     }
-#endif /* CTRL_FONT_DEFAULT */
+#endif /* CTRL_FONT_DEFAULT_SIZE */
 #endif /* FONT_CHANGE_SIZE */
 
 #if TAB
@@ -393,7 +430,7 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 
 #if FONT_CHANGE_SIZE
 font_size_changed:
-  sprintf(font1str, "%s %d", font1_font, font1_size);
+  sprintf(font1str, "%s %d", DEFAULT_FONT, font1_size);
 #if TAB
   int i;
   for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
@@ -409,7 +446,7 @@ font_size_changed:
 }
 #endif /* ENABLE_KEY_PRESS */
 
-#if SWITCH_ENCODING
+#if SHOW_MENU
 gboolean sakura_popup(GtkWidget *widget, GdkEvent *event)
 {
   GdkEventButton *event_button;
@@ -500,19 +537,35 @@ void sakura_add_tab()
 #endif
 
 #ifdef BACKGROUND_IMAGE
-  char imgstr[128];
+  char imgstr[64];
   sprintf(imgstr, "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
   vte_terminal_set_background_image_file(VTE_TERMINAL(term.vte), imgstr);
 #endif
 
-#ifdef BACKGROUND_TINT
+#ifdef BACKGROUND_TINT_COLOR
+#if BACKGROUND_EXIST
   GdkColor color_tint;
-  gdk_color_parse(BACKGROUND_TINT, &color_tint);
+  gdk_color_parse(BACKGROUND_TINT_COLOR, &color_tint);
   vte_terminal_set_background_tint_color(VTE_TERMINAL(term.vte), &color_tint);
 #endif
+#endif
 
-#ifdef BACKGROUND_SATURATE
-  vte_terminal_set_background_saturation(VTE_TERMINAL(term.vte), BACKGROUND_SATURATE);
+#ifdef BACKGROUND_SATURATION
+#if BACKGROUND_EXIST
+  vte_terminal_set_background_saturation(VTE_TERMINAL(term.vte), BACKGROUND_SATURATION);
+#endif
+#endif
+
+#ifdef BACKGROUND_TRANSPARENT
+  vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), BACKGROUND_TRANSPARENT);
+#endif
+
+#ifdef BINDING_BACKSPACE_KEY
+  vte_terminal_set_backspace_binding(VTE_TERMINAL(term.vte), BINDING_BACKSPACE_KEY);
+#endif
+
+#ifdef BINDING_DELETE_KEY
+  vte_terminal_set_delete_binding(VTE_TERMINAL(term.vte), BINDING_DELETE_KEY);
 #endif
 
 #if COLOR_STYLE_LINUX
@@ -587,7 +640,7 @@ void sakura_add_tab()
 #endif
 #endif
 
-#ifdef DEFAULT_FONT_1
+#ifdef DEFAULT_FONT
 #ifdef ANTI_ALIAS
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term.vte), font1str, ANTI_ALIAS);
 #else
@@ -639,7 +692,7 @@ void sakura_add_tab()
 
   g_signal_connect(term.vte, "child-exited", sakura_del_tab, NULL);
 
-#if SWITCH_ENCODING
+#if SHOW_MENU
   g_signal_connect(term.vte, "button-press-event", G_CALLBACK(sakura_popup), NULL);
 #endif
 
@@ -728,8 +781,8 @@ int main(int argc, char **argv)
   }
 #endif
 
-#ifdef DEFAULT_FONT_1
-  sprintf(font1str, "%s %d", font1_font, font1_size);
+#ifdef DEFAULT_FONT
+  sprintf(font1str, "%s %d", DEFAULT_FONT, font1_size);
 #endif
 
   gtk_init(NULL, NULL);
@@ -803,13 +856,16 @@ int main(int argc, char **argv)
   gtk_window_get_size(GTK_WINDOW(main_window), &width_f, &height_f);
 #endif
 
-#if SWITCH_ENCODING
+#if SHOW_MENU
   menu = gtk_menu_new();
+#endif
+
+#ifdef ENCODING_LIST
   int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
   GtkWidget *encoding_item[encoding_size];
   int i = 0;
   for (i = 0 ; i < encoding_size ; i++) {
-#if MENU_PARSE_DEFAULT
+#if ENCODING_LIST_DEFAULT
     if (encoding[i] == "Default") {
       encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term.vte));
       encoding_item[i] = gtk_menu_item_new_with_label("Default");
@@ -819,10 +875,18 @@ int main(int argc, char **argv)
     gtk_menu_append(GTK_MENU(menu), encoding_item[i]);
     g_signal_connect(encoding_item[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
   }
+#endif /* ENCODING_LIST */
+
+#if SHOW_MENU
   gtk_widget_show_all(menu);
 #endif
 
   gtk_widget_show_all(main_window);
+
+#if MENU_INPUT_METHOD
+  vte_terminal_im_append_menuitems(VTE_TERMINAL(term.vte), GTK_MENU_SHELL(menu));
+#endif
+
   gtk_main();
   return 0;
 }

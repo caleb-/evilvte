@@ -1,3 +1,8 @@
+0.1.9
+ * Support transparent background
+ * Support MENU_INPUT_METHOD
+ * Support VteTerminalEraseBinding
+
 0.1.8
  * Support background image
  * Support cursor blinks
