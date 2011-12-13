@@ -15,7 +15,6 @@
 GArray *tabs;
 GtkWidget *main_window;
 GtkWidget *notebook;
-int current_page = 0;
 
 #if MENU_POPUP
 GtkWidget *menu;
@@ -56,7 +55,7 @@ gboolean kbd_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
     if (event->keyval == GDK_Page_Up) {
-      current_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+      int current_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
       if (current_page)
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), current_page - 1);
       else
@@ -64,7 +63,7 @@ gboolean kbd_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
       return TRUE;
     }
     if (event->keyval == GDK_Page_Down) {
-      current_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+      int current_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
       if (current_page == (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1))
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
       else
@@ -126,8 +125,42 @@ void add_tab()
   gtk_box_pack_start(GTK_BOX(tab.hbox), tab.scrollbar, FALSE, FALSE, 0);
 #endif
   vte_terminal_fork_command(VTE_TERMINAL(tab.vte_box), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+#ifdef ALLOW_BOLD
+  vte_terminal_set_allow_bold(VTE_TERMINAL(tab.vte_box), ALLOW_BOLD);
+#endif
+#ifdef BELL_AUDIBLE
+  vte_terminal_set_audible_bell(VTE_TERMINAL(tab.vte_box), BELL_AUDIBLE);
+#endif
+#ifdef BELL_VISIBLE
+  vte_terminal_set_visible_bell(VTE_TERMINAL(tab.vte_box), BELL_VISIBLE);
+#endif
+#ifdef DEFAULT_ENCODING
+  vte_terminal_set_encoding(VTE_TERMINAL(tab.vte_box), DEFAULT_ENCODING);
+#endif
+#ifdef TERMINAL_FONT
+#ifdef ANTI_ALIAS
+  vte_terminal_set_font_from_string_full(VTE_TERMINAL(tab.vte_box), TERMINAL_FONT, ANTI_ALIAS);
+#else
+  vte_terminal_set_font_from_string(VTE_TERMINAL(tab.vte_box), TERMINAL_FONT);
+#endif
+#endif
+#ifdef MOUSE_AUTOHIDE
+  vte_terminal_set_mouse_autohide(VTE_TERMINAL(tab.vte_box), MOUSE_AUTOHIDE);
+#endif
+#ifdef SCROLL_BACKGROUND
+  vte_terminal_set_scroll_background(VTE_TERMINAL(tab.vte_box), SCROLL_BACKGROUND);
+#endif
+#ifdef SCROLL_ON_KEYSTROKE
+  vte_terminal_set_scroll_on_keystroke(VTE_TERMINAL(tab.vte_box), SCROLL_ON_KEYSTROKE);
+#endif
+#ifdef SCROLL_ON_OUTPUT
+  vte_terminal_set_scroll_on_output(VTE_TERMINAL(tab.vte_box), SCROLL_ON_OUTPUT);
+#endif
 #if SCROLLBACK_LINES
   vte_terminal_set_scrollback_lines(VTE_TERMINAL(tab.vte_box), SCROLLBACK_LINES);
+#endif
+#if TERMINAL_COLS && TERMINAL_ROWS
+  vte_terminal_set_size(VTE_TERMINAL(tab.vte_box), TERMINAL_COLS, TERMINAL_ROWS);
 #endif
 #ifdef WORD_CHARS
   vte_terminal_set_word_chars(VTE_TERMINAL(tab.vte_box), WORD_CHARS);
@@ -229,9 +262,6 @@ int main()
   gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, 1, 0);
   statusbar = gtk_statusbar_new();
   change_statusbar_encoding(0);
-  GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(hbox), statusbar, TRUE, 1, 0);
-  gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, 1, 0);
   gtk_box_pack_start(GTK_BOX(vbox), statusbar, TRUE, 1, 0);
   g_signal_connect(notebook, "switch-page", G_CALLBACK(switch_page_routine), NULL);
 #else

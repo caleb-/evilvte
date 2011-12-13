@@ -1,3 +1,7 @@
+0.0.4
+ * Let evilvtab support all options in src/config.h
+ * Remove an useless hbox GtkWidget
+
 0.0.3
  * Fix a bug of toggle tabs with hotkey
    Thanks to Tetralet <tetralet@debian.org.tw>
