@@ -549,6 +549,12 @@ int antialias_status = VTE_ANTI_ALIAS_FORCE_ENABLE;
 #endif
 #endif
 
+#define ONLY_ONE_MENU_HANDLE
+#ifdef ONLY_ONE_MENU_ITEM
+#undef ONLY_ONE_MENU_HANDLE
+#define ONLY_ONE_MENU_HANDLE || (menu_item_success == 1)
+#endif
+
 #ifdef MENU_CUSTOM
 const char *menu_custom[] = { MENU_CUSTOM };
 int menu_item_success = 0;
@@ -763,13 +769,12 @@ const GdkColor color_style[16] = {
 #endif
 
 #if defined(FONT_ANTI_ALIAS) || MENU_FONT_BIGGER || MENU_FONT_SMALLER || MENU_FONT_SELECT || MENU_TOGGLE_ANTI_ALIAS || defined(HOTKEY_TOGGLE_ANTI_ALIAS) || defined(HOTKEY_FONT_BIGGER) || defined(HOTKEY_FONT_SMALLER) || defined(HOTKEY_FONT_SELECT) || COMMAND_FONT
-#define FONT_CHANGE_SIZE 1
 #ifndef FONT
 #define FONT "Monospace 10"
 #endif
 #endif
 
-#if !FONT_CHANGE_SIZE
+#if !MENU_FONT_BIGGER && !MENU_FONT_SMALLER && !MENU_FONT_SELECT && !defined(HOTKEY_FONT_BIGGER) && !defined(HOTKEY_FONT_SMALLER) && !defined(HOTKEY_FONT_SELECT)
 #undef MENU_FONT_DEFAULT_SIZE
 #undef HOTKEY_FONT_DEFAULT_SIZE
 #endif
@@ -823,6 +828,18 @@ int at_root_window = 0;
 
 #if MENU
 GtkWidget *menu;
+#endif
+
+#if MENU_COPY
+GtkWidget *menu_copy;
+#endif
+
+#if MENU_PASTE
+GtkWidget *menu_paste;
+#endif
+
+#if MENU_FONT_DEFAULT_SIZE
+GtkWidget *menu_zoom_100;
 #endif
 
 #ifdef MENU_MATCH_STRING_EXEC
@@ -894,7 +911,9 @@ void DEL_TAB(GtkWidget *widget, int do_close_dialog)
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if CLOSE_DIALOG
   GET_CURRENT_TAB(index);
+#if CLOSE_SAFELY
   int user_want_to_close = 0;
+#endif
   if (do_close_dialog) {
     /* Known to work on FreeBSD *with* linprocfs mounted */
     char *stat = NULL;
@@ -907,7 +926,9 @@ void DEL_TAB(GtkWidget *widget, int do_close_dialog)
         gtk_widget_show_all(dialog);
         if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_CLOSE) {
           gtk_widget_destroy(dialog);
+#if CLOSE_SAFELY
           user_want_to_close = 1;
+#endif
         } else {
           gtk_widget_destroy(dialog);
           return;
@@ -1032,6 +1053,8 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #ifdef ONLY_ONE_MENU_ITEM
   int x = 0;
   int y = 0;
+#endif
+#if defined(ONLY_ONE_MENU_ITEM) || MENU_PASTE
   GdkDisplay *display = gdk_display_get_default();
 #endif
 
@@ -1071,8 +1094,26 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 
 #if MENU
   if (event->button == 3) {
+    GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+#if MENU_COPY
+    if (vte_terminal_get_has_selection(VTE_TERMINAL(term->vte))ONLY_ONE_MENU_HANDLE)
+      gtk_widget_set_sensitive(menu_copy, 1);
+    else
+      gtk_widget_set_sensitive(menu_copy, 0);
+#endif
+#if MENU_PASTE
+    if (gtk_clipboard_wait_is_text_available(gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD))ONLY_ONE_MENU_HANDLE)
+      gtk_widget_set_sensitive(menu_paste, 1);
+    else
+      gtk_widget_set_sensitive(menu_paste, 0);
+#endif
+#if MENU_FONT_DEFAULT_SIZE
+    if ((font_size != font_size_default)ONLY_ONE_MENU_HANDLE)
+      gtk_widget_set_sensitive(menu_zoom_100, 1);
+    else
+      gtk_widget_set_sensitive(menu_zoom_100, 0);
+#endif
 #ifdef MENU_MATCH_STRING_EXEC
-      GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
       matched_url = vte_terminal_match_check(VTE_TERMINAL(term->vte), event->x / vte_terminal_get_char_width(VTE_TERMINAL(term->vte)), event->y / vte_terminal_get_char_height(VTE_TERMINAL(term->vte)), &tag);
       if (matched_url != NULL) {
         gtk_widget_show_all(menu);
@@ -2880,7 +2921,7 @@ int at_dock_mode = 0;
   {
 #if MENU_COPY
     if (!strncmp(menu_custom[j], "Copy", 5)) {
-      GtkWidget *menu_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
+      menu_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_copy);
       g_signal_connect(menu_copy, "activate", do_copy, NULL);
       menu_item_success++;
@@ -2889,7 +2930,7 @@ int at_dock_mode = 0;
 
 #if MENU_PASTE
     if (!strncmp(menu_custom[j], "Paste", 6)) {
-      GtkWidget *menu_paste = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, NULL);
+      menu_paste = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_paste);
       g_signal_connect(menu_paste, "activate", do_paste, NULL);
       menu_item_success++;
@@ -2970,7 +3011,7 @@ int at_dock_mode = 0;
 
 #if MENU_FONT_DEFAULT_SIZE
     if (!strncmp(menu_custom[j], "Zoom default", 13)) {
-      GtkWidget *menu_zoom_100 = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+      menu_zoom_100 = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_zoom_100);
       g_signal_connect(menu_zoom_100, "activate", do_zoom_100, NULL);
       menu_item_success++;
@@ -3238,6 +3279,12 @@ int at_dock_mode = 0;
   g_signal_connect(match_open, "activate", do_match_open, NULL);
 #endif
   gtk_widget_show_all(menu);
+#endif
+
+#ifdef CLIPBOARD_CLEAR
+  GtkClipboard *clipboard = gtk_clipboard_get_for_display(gdk_display_get_default(), GDK_SELECTION_CLIPBOARD);
+  gtk_clipboard_set_text(clipboard, "", 0);
+  gtk_clipboard_clear(clipboard);
 #endif
 
   gtk_main();

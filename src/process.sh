@@ -135,7 +135,7 @@ MENU_TOGGLE_ANTI_ALIAS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle anti-alias'`
 MENU_CHANGE_SATURATION=`echo $MENU_CUSTOM_DEFINE | grep 'Adjust saturation'`
 [ "$MENU_CHANGE_SATURATION" != "" ] && echo \#define MENU_CHANGE_SATURATION 1 >> $CONFFILE
 
-ONLY_ONE_MENU_ITEM=`echo $MENU_CUSTOM_DEFINE | grep Auto-click`
+ONLY_ONE_MENU_ITEM=`echo $MENU_CUSTOM_DEFINE | grep '"Auto-click"'`
 [ "$ONLY_ONE_MENU_ITEM" != "" ] && echo \#define ONLY_ONE_MENU_ITEM >> $CONFFILE
 
 mv $CONFFILE src/evilvte.h

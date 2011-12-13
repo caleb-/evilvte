@@ -1,3 +1,7 @@
+0.4.9~pre3
+ * Grayed out menu items according to their status:
+   "Copy", "Paste", "Zoom default"
+
 0.4.9~pre2
  * Minor tweaks in TABBAR_AUTOHIDE for GTK+ 3.x
  * Hide VTE_FIXED color style which is merged in VTE version >= 0.17.1
@@ -69,13 +73,11 @@
 0.4.7~pre4
  * Support HOTKEY_MIMIC_SCROLL_*, thanks to qotsa
  * New configure option: --with-gtk=2.0|3.0
- * Rename make target installstrip to install-strip
 
 0.4.7~pre3
  * Support vte_terminal_fork_command_full
  * Support all positive integer font size
  * Drop gdk-pixbuf dependency. It was used for a bug only exists in VTE 0.24.0.
- * Code clean up
 
 0.4.7~pre2
  * Support BELL_URGENT, aka WM_URGENT hint. Thanks to L29Ah.
@@ -91,8 +93,7 @@
  * Fix a cross-platform issue
 
 0.4.6
- * Apply a workaround for VTE 0.24.0 vte_terminal_set_background_image_file()
-   bug
+ * Workaround for VTE 0.24.0 vte_terminal_set_background_image_file() bug
 
 0.4.6~pre6
  * Support CURSOR_SHAPE
@@ -122,22 +123,19 @@
  * Support WINDOW_TITLE_DYNAMIC for xterm escape sequences, thanks to IllvilJa
  * Support personal configuration file other than src/config.h. For example:
    "make distclean ; ./configure --config=/dev/null ; make strip"
- * Drop useless option SHOW_WINDOW_TITLE and LABEL_DIALOG_SATURATION
 
 0.4.6~pre1
  * Support PROGRAM_ICON so users can put their own icons at $HOME
  * Respect CFLAGS and OPTFLAGS
  * Drop "Select_all" in MENU_CUSTOM. Use "Select all" instead.
- * Auto-detect GNU gold linker to avoid unnecessary libraries linking
  * Improve coloring of showvte and configure script
  * Improve man page description. Thanks to editors of http://freshmeat.net.
 
 0.4.5
- * Support -ls command line option to enable login shell in all tabs
+ * Support -ls command line option to enable login shell
  * Fix an CLOSE_SAFELY bug which was in 0.4.5~pre5 to 0.4.5~pre7
- * Make TAB_LABEL more customizable and support internationalization
- * Drop TAB_LABEL_NUMBER and TAB_LABEL_POEM
- * Hide DEFAULT_ARGV and DEFAULT_ENVV
+ * Make TAB_LABEL more customizable and support i18n
+ * Hide DEFAULT_ARGV
  * Fix build failure when linked by GNU gold linker
    Thanks to Peter Fritzsche <peter DOT fritzsche AT gmx DOT de>
 
@@ -153,32 +151,27 @@
  * Merge changes from 0.4.4.2
 
 0.4.5~pre4
- * New option DEFAULT_TERMINAL_SIZE, remove DEFAULT_COLUMNS and DEFAULT_ROWS
- * New option SCROLLBAR, remove SCROLLBAR_LEFT and SCROLLBAR_RIGHT
- * Remove FONT_SIZE
+ * New option DEFAULT_TERMINAL_SIZE
+ * New option SCROLLBAR
 
 0.4.5~pre3
  * Improve command line option support
  * Improve hotkey customization
- * Limit font size range. Only 1 to 99 are accepted.
 
 0.4.5~pre2
- * Detect GTK+ version and disable unsupported options automatically.
  * Fix a displaying bug about toggling scrollbar or status bar.
 
 0.4.5~pre1
- * Detect VTE version and disable unsupported options automatically.
  * Enable deprecated VTE functions that were disabled in evilvte 0.4.4.
 
 0.4.4.2
  * Fix an CLOSE_DIALOG bug which could destroy the program by accident.
    Thanks to an anonymous guest.
    (http://hyperrate.com/thread.php?tid=11916#11916)
- * Do not remove src/config.o in "make clean"
  * Support "make distclean"
 
 0.4.4.1
- * Support command line -T option to assign program title
+ * Support command line -T option
 
 0.4.4
  * Disable deprecated VTE functions if VTE version >= 0.19.4
@@ -188,9 +181,8 @@
    If you enable it, all hotkeys will become Ctrl + Alt + hotkey(s).
 
 0.4.4~pre9
- * Support command line -f option to start evilvte in fullscreen mode
+ * Support command line -f option
  * New COLOR_STYLE option: VTE_FIXED
-   This is default color setting of VTE with the fixed color ^[[1;30m
 
 0.4.4~pre8
 
@@ -212,10 +204,9 @@
  * Support CTRL_TOGGLE_FULLSCREEN and "Toggle fullscreen" item in menu
  * Fix a do-no-harm message when trying to rename a null tab label
    Thanks to Bernhard R. Link <brlink AT debian DOT org>
- * Fix number_char redefinition error if built with gcc 4.3.1
 
 0.4.4~pre4
- * Support command line -title option to assign program title
+ * Support command line -title option
  * Use g_get_current_dir() instead of g_getenv("PWD") to decide current path
    Thanks to Bruno Vieira <mail AT bmpvieira DOT com>
 
@@ -225,15 +216,14 @@
 0.4.4~pre2
  * Support TAB_REORDERABLE
  * Fix a switch-page bug
- * Always handle delete_event, aka program closing event
+ * Always handle delete_event signal
  * Disable tab label auto-resorting
 
 0.4.4~pre1
- * Support command line -r option to run in root window
- * Support command line -h option to show help messages
- * Support command line -2 to -9 options to set initial tab numbers
- * Make manpage of evilvte according to options in src/config.h
- * Simplify Makefile and configure
+ * Support command line -r option
+ * Support command line -h option
+ * Support command line -2 to -9 options
+ * Make manpage according to build-time options
 
 0.4.3
  * Support PROGRAM_ALWAYS_ON_TOP
@@ -278,7 +268,6 @@
 
 0.3.7
  * Support MOUSE_CTRL_SATURATION
-   Scroll left or right to change saturation
  * Support "Toggle scrollbar", "Toggle status bar", and "Toggle tabbar" items
    in menu
  * Disable menu when MENU_CUSTOM defines nothing or separators only.
@@ -297,17 +286,13 @@
  * Support CTRL_SELECT_ALL and "Select_all" item in menu
  * Support "Toggle background" item in menu
  * Remove "Quit" item in menu
- * Remove QT_STYLE button order
 
 0.3.4
  * Support MENU_MATCH_STRING_EXEC
  * Support "Select font" item in menu
  * Support CTRL_FONT_SELECT
- * Fix a bug when FONT_SIZE is defined without defining FONT
  * Support PROGRAM_VERSION for personal versioning
  * Simplify menu customization
- * Remove DOUBLE_PRESS_HOTKEY
- * Remove DEFAULT_FONT_SIMPLE
 
 0.3.3
  * Remove an useless variable in the struct terminal.
@@ -335,7 +320,7 @@
  * Support "Reset and clear" item in menu
  * Support CTRL_OPEN_NEW_WINDOW
  * Support CTRL_EDIT_ENCODING
- * Support QT_STYLE button order and gtk-alternative-button-order setting
+ * Support gtk-alternative-button-order setting
  * Fix a dialog title bug
  * Fix an CTRL_TAB_EDIT_LABEL hotkey bug
 
@@ -349,13 +334,11 @@
  * Support CTRL_TOGGLE_BACKGROUND
  * Support CTRL_TAB_FIRST and CTRL_TAB_LAST
  * Support CTRL_TAB_GO_TO_NUMBER
- * Add a manpage for showvte
 
 0.2.7
  * Support COMMAND_SHOW_OPTIONS
  * Add a script "showvte" to show build-time configuration
  * Show configuration status in configure script
- * Simplify src/config.h
 
 0.2.6
  * Support CTRL_SATURATION_MORE and CTRL_SATURATION_LESS
@@ -375,82 +358,40 @@
  * Support TAB_SHOW_INFO_AT_TITLE
  * Fix an CLOSE_SAFELY bug for i386 architecture
  * Fix a status bar size bug
- * Add a .desktop file
 
 0.2.2
  * Support TABBAR_MENU_SELECT_TAB
  * Support TABBAR_SCROLLABLE
  * Support tabbar at bottom, left, right, and top
- * Add a manpage
 
 0.2.1
  * Support DEFAULT_EMULATION_TYPE
- * Support a simple COMMAND_EXEC_PROGRAM function
+ * Support COMMAND_EXEC_PROGRAM
 
 0.2.0
  * Support hotkeys for copy and paste
-
-0.1.9
  * Support transparent background
  * Support "Input method" item in menu
  * Support VteTerminalEraseBinding
-
-0.1.8
  * Support background image
  * Support cursor blinks
-
-0.1.7
  * Support font size change with hotkey
  * Support "Default Encoding" in encoding switching menu
- * Support CLOSE_SAFELY option
-
-0.1.6
+ * Support CLOSE_SAFELY
  * Close a tab will not close background applications now
- * Support command line -v option to show program version
-
-0.1.5
+ * Support command line -v option
  * Support all VTE color settings
-
-0.1.4
  * Support foreground and background colors
-
-0.1.3
  * Configurable hotkeys
-
-0.1.2
- * Support DOUBLE_PRESS_HOTKEY
-
-0.1.1
- * Remove an useless g_signal_connect
 
 0.1.0
  * Support window title
  * Support window icon
  * Option to turn off tabs
-
-0.0.9
- * Remove switch_page_routine()
- * Set notebook borders only once
-
-0.0.8
- * Fix WINDOW_BORDER -> SHOW_WINDOW_BORDER
-
-0.0.7
  * Fix defining TAB_LABEL without scrollbar
  * Support SHOW_WINDOW_BORDER and TAB_BORDER
-
-0.0.6
  * Support color scheme
  * Support tabbar autohide
-
-0.0.5
- * Remove an useless gtk_box_pack_start
-
-0.0.4
- * Remove an useless hbox GtkWidget
-
-0.0.3
- * Fix a bug of toggle tabs with hotkey
 
 0.0.2
  * Initial release
