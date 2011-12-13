@@ -1,14 +1,26 @@
+0.3.2
+ * Fix the auto-detect-SUSE failure in openSUSE Build Service.
+   The openSUSE-release package is not installed in the service, so there is no
+   /etc/SuSE-release nor /etc/issue.
+   Thanks to swyear <swyear AT gmail DOT com> for reporting and testing the bug.
+ * Support MENU_TAB_EDIT_LABEL
+ * Support MENU_NEW_WINDOW
+ * Support MENU_FONT_ZOOM_*
+ * Remove useless variables and functions in TABBAR_AUTOHIDE and
+   FONT_CHANGE_SIZE
+
 0.3.1
  * Fix an openSUSE 10.3 KDE bug.
    When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
    crash.
    Fix this by defining TAB_LABEL when SUSE system is detected.
+   Thanks to swyear <swyear AT gmail DOT com> for reporting and testing the bug.
  * Support MENU_CUSTOM
  * Support MENU_RESET, MENU_QUIT, and MENU_SEPARATOR_*
 
 0.3.0
  * Support MENU_COPY and MENU_PASTE
- * Support MENU_TAB_ADD_TAB and MENU_TAB_CLOSE_TAB
+ * Support MENU_TAB_ADD_TAB and MENU_TAB_REMOVE_TAB
  * Support MENU_CLEAR
  * Support CTRL_OPEN_NEW_WINDOW
  * Support CTRL_EDIT_ENCODING

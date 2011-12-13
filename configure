@@ -40,7 +40,9 @@ fi
 
 VTELDFLAGS=`pkg-config --libs $VTE`
 
-if [ -e /etc/SuSE-release ]; then
+SUSE_GCC=`gcc -v 2>&1 | tr A-Z a-z | grep suse`
+
+if [ "$SUSE_GCC" != "" ]; then
   SUSE_DETECTED=TRUE
 else
   SUSE_DETECTED=FALSE

@@ -108,7 +108,12 @@ int background_status = 0;
 #undef MENU_COPY
 #undef MENU_PASTE
 #undef MENU_TAB_ADD_TAB
-#undef MENU_TAB_CLOSE_TAB
+#undef MENU_TAB_REMOVE_TAB
+#undef MENU_TAB_EDIT_LABEL
+#undef MENU_NEW_WINDOW
+#undef MENU_FONT_ZOOM_IN
+#undef MENU_FONT_ZOOM_OUT
+#undef MENU_FONT_ZOOM_100
 #undef MENU_RESET
 #undef MENU_RESET_AND_CLEAR
 #undef MENU_QUIT
@@ -128,7 +133,7 @@ int background_status = 0;
 #undef CTRL_TAB_EDIT_LABEL
 #undef DOUBLE_PRESS_HOTKEY
 #undef MENU_TAB_ADD_TAB
-#undef MENU_TAB_CLOSE_TAB
+#undef MENU_TAB_REMOVE_TAB
 #undef SHOW_WINDOW_BORDER
 #undef TAB_AT_BOTTOM
 #undef TAB_AT_LEFT
@@ -203,7 +208,12 @@ int background_status = 0;
 #undef MENU_COPY
 #undef MENU_PASTE
 #undef MENU_TAB_ADD_TAB
-#undef MENU_TAB_CLOSE_TAB
+#undef MENU_TAB_REMOVE_TAB
+#undef MENU_TAB_EDIT_LABEL
+#undef MENU_NEW_WINDOW
+#undef MENU_FONT_ZOOM_IN
+#undef MENU_FONT_ZOOM_OUT
+#undef MENU_FONT_ZOOM_100
 #undef MENU_RESET
 #undef MENU_RESET_AND_CLEAR
 #undef MENU_QUIT
@@ -211,7 +221,12 @@ int background_status = 0;
 #define MENU_COPY TRUE
 #define MENU_PASTE TRUE
 #define MENU_TAB_ADD_TAB TRUE
-#define MENU_TAB_CLOSE_TAB TRUE
+#define MENU_TAB_REMOVE_TAB TRUE
+#define MENU_TAB_EDIT_LABEL TRUE
+#define MENU_NEW_WINDOW TRUE
+#define MENU_FONT_ZOOM_IN TRUE
+#define MENU_FONT_ZOOM_OUT TRUE
+#define MENU_FONT_ZOOM_100 TRUE
 #define MENU_RESET TRUE
 #define MENU_RESET_AND_CLEAR TRUE
 #define MENU_QUIT TRUE
@@ -249,6 +264,12 @@ int menu_custom_size = sizeof(menu_custom) / sizeof(menu_custom[0]);
 #endif
 
 #ifdef CTRL_OPEN_NEW_WINDOW
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "evilvte"
+#endif
+#endif
+
+#if MENU_NEW_WINDOW
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "evilvte"
 #endif
@@ -444,13 +465,16 @@ const GdkColor color_xterm[16] =
 #define FONT_CHANGE_SIZE TRUE
 #endif
 
+#if MENU_FONT_ZOOM_IN || MENU_FONT_ZOOM_OUT
+#undef FONT_CHANGE_SIZE /* prevent duplicated definitions */
+#define FONT_CHANGE_SIZE TRUE
+#endif
+
 #if FONT_CHANGE_SIZE
 #ifndef DEFAULT_FONT
 #define DEFAULT_FONT "Monospace"
 #endif
 #undef DEFAULT_FONT_SIMPLE
-int width_f;
-int height_f;
 #endif
 
 #ifdef DEFAULT_FONT
@@ -502,11 +526,6 @@ double saturation_level = BACKGROUND_SATURATION;
 GArray *terminals;
 #endif
 
-#if TABBAR_AUTOHIDE
-int width;
-int height;
-#endif
-
 #if MENU
 GtkWidget *menu;
 #endif
@@ -549,8 +568,13 @@ void change_window_title();
 void delete_event();
 void do_clear();
 void do_copy();
+void do_edit_label();
+void do_new_window();
 void do_paste();
 void do_reset();
+void do_zoom_100();
+void do_zoom_in();
+void do_zoom_out();
 void sakura_add_tab();
 void sakura_del_tab();
 void scroll_event();
@@ -933,7 +957,7 @@ font_size_changed:
 #if TAB
   }
 #endif
-    gtk_window_resize(GTK_WINDOW(main_window), width_f, height_f);
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
     return TRUE;
 #endif /* FONT_CHANGE_SIZE */
 }
@@ -1009,6 +1033,44 @@ void do_clear()
 }
 #endif
 
+#if MENU_TAB_EDIT_LABEL
+void do_edit_label()
+{
+  char *label_name = (char*)gtk_label_get_text(GTK_LABEL(gtk_notebook_get_tab_label(GTK_NOTEBOOK(notebook), gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook))))));
+  if (label_name == NULL)
+    label_name = "";
+  GtkWidget *entry = gtk_entry_new();
+  GtkWidget *dialog;
+#ifdef BUTTON_ORDER
+  gboolean button_order = BUTTON_ORDER;
+#if BUTTON_ORDER_GTK_STYLE
+  g_object_get(gtk_settings_get_default(), "gtk-alternative-button-order", &button_order, NULL);
+#endif
+  if (button_order)
+    dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+  else
+#endif /* BUTTON_ORDER */
+    dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+  gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+  gtk_entry_set_text(GTK_ENTRY(entry), label_name);
+  gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+  gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), entry);
+  gtk_widget_show_all (dialog);
+  if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
+  gtk_widget_destroy(dialog);
+}
+#endif
+
+#if MENU_NEW_WINDOW
+void do_new_window()
+{
+  char new_window_str[32];
+  sprintf(new_window_str, "%s &", PROGRAM_NAME);
+  system(new_window_str);
+}
+#endif
+
 #if MENU_PASTE
 void do_paste()
 {
@@ -1020,6 +1082,60 @@ void do_paste()
 void do_reset()
 {
   vte_terminal_reset(VTE_TERMINAL(term.vte), 1,  0);
+}
+#endif
+
+#if MENU_FONT_ZOOM_100
+void do_zoom_100()
+{
+  font1_size = DEFAULT_FONT_SIZE;
+  sprintf(font1str, "%s %d", DEFAULT_FONT, font1_size);
+#if TAB
+  int i;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = g_array_index(terminals, struct terminal, i);
+#endif
+    vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), font1str);
+#if TAB
+  }
+#endif
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+}
+#endif
+
+#if MENU_FONT_ZOOM_IN
+void do_zoom_in()
+{
+  font1_size++;
+  sprintf(font1str, "%s %d", DEFAULT_FONT, font1_size);
+#if TAB
+  int i;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = g_array_index(terminals, struct terminal, i);
+#endif
+    vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), font1str);
+#if TAB
+  }
+#endif
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+}
+#endif
+
+#if MENU_FONT_ZOOM_OUT
+void do_zoom_out()
+{
+  font1_size--;
+  sprintf(font1str, "%s %d", DEFAULT_FONT, font1_size);
+#if TAB
+  int i;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = g_array_index(terminals, struct terminal, i);
+#endif
+    vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), font1str);
+#if TAB
+  }
+#endif
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
 }
 #endif
 
@@ -1265,10 +1381,9 @@ void sakura_add_tab()
 #if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_window_get_size(GTK_WINDOW(main_window), &width, &height);
   } else
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
-  gtk_window_resize(GTK_WINDOW(main_window), width, height);
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
 #endif
 
   gtk_widget_show_all(notebook);
@@ -1309,7 +1424,7 @@ void sakura_del_tab()
 #if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_window_resize(GTK_WINDOW(main_window), width, height);
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
   }
 #endif
 
@@ -1514,10 +1629,6 @@ int main(int argc, char **argv)
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(sakura_key_press), NULL);
 #endif
 
-#if FONT_CHANGE_SIZE
-  gtk_window_get_size(GTK_WINDOW(main_window), &width_f, &height_f);
-#endif
-
   gtk_widget_show_all(main_window);
 
 #if MENU
@@ -1571,11 +1682,66 @@ int main(int argc, char **argv)
 #ifdef MENU_CUSTOM
     if (menu_custom[m] == "Close tab")
 #endif
-#if MENU_TAB_CLOSE_TAB
+#if MENU_TAB_REMOVE_TAB
     {
-      GtkWidget *menu_close_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, NULL);
+      GtkWidget *menu_close_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_REMOVE, NULL);
       gtk_menu_append(menu, menu_close_tab);
       g_signal_connect(menu_close_tab, "activate", sakura_del_tab, NULL);
+    }
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Edit label")
+#endif
+#if MENU_TAB_EDIT_LABEL
+    {
+      GtkWidget *menu_edit_label = gtk_image_menu_item_new_from_stock(GTK_STOCK_EDIT, NULL);
+      gtk_menu_append(menu, menu_edit_label);
+      g_signal_connect(menu_edit_label, "activate", do_edit_label, NULL);
+    }
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "New window")
+#endif
+#if MENU_NEW_WINDOW
+    {
+      GtkWidget *menu_new_window = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+      gtk_menu_append(menu, menu_new_window);
+      g_signal_connect(menu_new_window, "activate", do_new_window, NULL);
+    }
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Zoom in")
+#endif
+#if MENU_FONT_ZOOM_IN
+    {
+      GtkWidget *menu_zoom_in = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+      gtk_menu_append(menu, menu_zoom_in);
+      g_signal_connect(menu_zoom_in, "activate", do_zoom_in, NULL);
+    }
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Zoom out")
+#endif
+#if MENU_FONT_ZOOM_OUT
+    {
+      GtkWidget *menu_zoom_out = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+      gtk_menu_append(menu, menu_zoom_out);
+      g_signal_connect(menu_zoom_out, "activate", do_zoom_out, NULL);
+    }
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Zoom 100")
+#endif
+#if MENU_FONT_ZOOM_100
+    {
+      GtkWidget *menu_zoom_100 = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+      gtk_menu_append(menu, menu_zoom_100);
+      g_signal_connect(menu_zoom_100, "activate", do_zoom_100, NULL);
     }
 #endif
 
