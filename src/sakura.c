@@ -19,7 +19,7 @@
  *
  *****************************************************************************/
 
-/* Copyright (C) 2008  Wen-Yen Chuang <caleb@calno.com>
+/* Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
  *
  * Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  */
@@ -60,14 +60,32 @@
 #undef SCROLLBAR_RIGHT
 #endif
 
+#if CLOSE_SAFE
+#define GET_VTE_CHILD_PID TRUE
+#endif
+
+#if TAB_NEW_TAB_OLD_PATH
+#undef GET_VTE_CHILD_PID /* prevent duplicated definitions */
+#define GET_VTE_CHILD_PID TRUE
+#define VTE_DEFAULT_DIRECTORY default_directory
+#else
+#define VTE_DEFAULT_DIRECTORY DEFAULT_DIRECTORY
+#endif
+
 #ifdef CTRL_TOGGLE_BACKGROUND
 #ifndef BACKGROUND_IMAGE
 #define BACKGROUND_IMAGE ".config/evilvte/background.png"
 #endif
-#undef BACKGROUND_TRANSPARENT /* prevent duplicated definitions */
-#define BACKGROUND_TRANSPARENT TRUE
-int background_status = 0;
+#ifndef BG_TOGGLE_ORDER
+#define BG_TOGGLE_ORDER "Image","Transparent","No background"
 #endif
+#define ENABLE_KEY_PRESS TRUE
+static char *background_order[] = {
+BG_TOGGLE_ORDER
+};
+int background_order_size = sizeof(background_order) / sizeof(background_order[0]);
+int background_status = 0;
+#endif /* CTRL_TOGGLE_BACKGROUND */
 
 #ifdef BACKGROUND_IMAGE
 #define BACKGROUND_EXIST TRUE
@@ -79,6 +97,12 @@ int background_status = 0;
 #endif
 
 #if TAB
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
+#define ENABLE_KEY_PRESS TRUE
+#endif
+
+#ifdef CTRL_EDIT_TAB_LABEL
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
 #define ENABLE_KEY_PRESS TRUE
 #endif
 
@@ -91,6 +115,7 @@ int background_status = 0;
 #undef CTRL_FIRST_TAB
 #undef CTRL_LAST_TAB
 #undef CTRL_JUMP_TAB_NUMBER
+#undef CTRL_EDIT_TAB_LABEL
 #undef TAB_AT_BOTTOM
 #undef TAB_AT_LEFT
 #undef TAB_AT_RIGHT
@@ -105,6 +130,7 @@ int background_status = 0;
 #undef TAB_LABEL_STYLE_POEM
 #undef TAB_MENU_SELECT_TAB
 #undef TAB_MOUSE_SCROLLABLE
+#undef TAB_NEW_TAB_OLD_PATH
 #undef TABBAR
 #undef TABBAR_AUTOHIDE
 #define SHOW_WINDOW_BORDER FALSE
@@ -441,7 +467,7 @@ gint64 last_time_2 = 0;
 
 struct terminal {
   GtkWidget *vte;
-#if CLOSE_SAFE
+#if GET_VTE_CHILD_PID
   int pid;
 #endif
 #ifdef TAB_LABEL_INIT
@@ -461,12 +487,30 @@ void change_window_title();
 void delete_event();
 void sakura_add_tab();
 void sakura_del_tab();
+void scroll_event();
 void set_encoding(GtkWidget *widget, void *data);
 
 #if ENABLE_KEY_PRESS
 gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
+
+#ifdef CTRL_EDIT_TAB_LABEL
+    if CTRL_EDIT_TAB_LABEL {
+      char *label_name = (char*)gtk_label_get_text(GTK_LABEL(gtk_notebook_get_tab_label(GTK_NOTEBOOK(notebook), gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook))))));
+      GtkWidget *entry = gtk_entry_new();
+      GtkWidget *dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+      gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+      if (label_name != NULL)
+        gtk_entry_set_text(GTK_ENTRY(entry), label_name);
+      gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+      gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), entry);
+      gtk_widget_show_all (dialog);
+      if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+        gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
+      gtk_widget_destroy(dialog);
+    }
+#endif /* CTRL_EDIT_TAB_LABEL */
 
 #if CTRL_JUMP_TAB_NUMBER
     if (event->keyval <= GDK_9 && event->keyval >= GDK_0) {
@@ -543,21 +587,25 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #ifdef CTRL_TOGGLE_BACKGROUND
     if CTRL_TOGGLE_BACKGROUND {
       background_status++;
-      if (background_status > 2)
+      if (background_status == background_order_size)
         background_status = 0;
-      if (background_status == 0)
-        vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), BACKGROUND_TRANSPARENT);
-      if (background_status == 1) {
+      if (background_order[background_status] == "Transparent") {
+        vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), TRUE);
+        return TRUE;
+      }
+      if (background_order[background_status] == "Image") {
         char imgstr[64];
         sprintf(imgstr, "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
         vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), FALSE);
         vte_terminal_set_background_image_file(VTE_TERMINAL(term.vte), imgstr);
+        return TRUE;
       }
-      if (background_status == 2) {
+      if (background_order[background_status] == "No background") {
         vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), FALSE);
         vte_terminal_set_background_image_file(VTE_TERMINAL(term.vte), "/dev/null");
+        return TRUE;
       }
-      return TRUE;
+      return FALSE;
     }
 #endif /* CTRL_TOGGLE_BACKGROUND */
 
@@ -870,10 +918,19 @@ void sakura_add_tab()
   gtk_box_pack_start(GTK_BOX(term.hbox), term.scrollbar, FALSE, FALSE, 0);
 #endif
 
-#if CLOSE_SAFE
-  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+#if TAB_NEW_TAB_OLD_PATH
+  char *default_directory = (char*)DEFAULT_DIRECTORY;
+  if  (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 0) {
+    struct terminal oldterm;
+    oldterm = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    default_directory = g_file_read_link(g_strdup_printf("/proc/%d/cwd", oldterm.pid), NULL);
+  }
+#endif
+
+#if GET_VTE_CHILD_PID
+  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, VTE_DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 #else
-  vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+  vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, VTE_DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 #endif
 
 #ifdef EMULATION_TYPE
@@ -1065,30 +1122,6 @@ void sakura_add_tab()
   gtk_window_resize(GTK_WINDOW(main_window), width, height);
 #endif
 
-#ifdef TAB_MOUSE_SCROLLABLE
-  gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TAB_MOUSE_SCROLLABLE);
-#endif
-
-#if TAB_MENU_SELECT_TAB
-  gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
-#endif
-
-#if TAB_AT_BOTTOM
-  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 3);
-#endif
-
-#if TAB_AT_LEFT
-  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 0);
-#endif
-
-#if TAB_AT_RIGHT
-  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 1);
-#endif
-
-#if TAB_AT_TOP
-  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 2);
-#endif
-
   gtk_widget_show_all(notebook);
 
 #if TAB
@@ -1169,6 +1202,14 @@ void sakura_del_tab()
   change_window_title();
 #endif
 }
+
+#ifdef TAB_MOUSE_SCROLLABLE
+#if !TAB_MOUSE_SCROLLABLE
+void scroll_event()
+{
+}
+#endif
+#endif
 
 void set_encoding(GtkWidget *widget, void *data)
 {
@@ -1258,6 +1299,36 @@ int main(int argc, char **argv)
 
 #ifdef TABBAR
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
+#endif
+
+#ifdef TAB_MOUSE_SCROLLABLE
+#if !TAB_MOUSE_SCROLLABLE
+  /* A work around to disable scrollable tabs */
+  g_signal_connect(notebook, "scroll-event", scroll_event, NULL);
+#endif
+#if 0 /* It is always scrollable in GTK+ 2.12.9, no matter what the value of TAB_MOUSE_SCROLLABLE is. */
+  gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TAB_MOUSE_SCROLLABLE);
+#endif
+#endif /* TAB_MOUSE_SCROLLABLE */
+
+#if TAB_MENU_SELECT_TAB
+  gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
+#endif
+
+#if TAB_AT_BOTTOM
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 3);
+#endif
+
+#if TAB_AT_LEFT
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 0);
+#endif
+
+#if TAB_AT_RIGHT
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 1);
+#endif
+
+#if TAB_AT_TOP
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 2);
 #endif
 
 #if !TAB

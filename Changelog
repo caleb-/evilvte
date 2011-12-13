@@ -1,3 +1,10 @@
+0.2.9
+ * Support CTRL_EDIT_TAB_LABEL
+ * Support BG_TOGGLE_ORDER
+ * Support new tab with current tab's working directory
+ * Fix a gtk_notebook_set_scrollable bug.
+   It is an GTK+ bug exists in version 2.12.9.
+
 0.2.8
  * Support TAB_LABEL_STYLE_*
    You may define some interesting tab labels, such as "天地玄黃宇宙洪荒".
@@ -26,7 +33,7 @@
 
 0.2.5
  * Support all arguments in -e option
-   Thanks to Tetralet <tetralet@gmail.com>
+   Thanks to Tetralet <tetralet AT gmail DOT com>
  * Support CTRL_RESET_TERMINAL
  * Support CTRL_RESET_AND_CLEAR 
 
@@ -124,11 +131,11 @@
 
 0.0.3
  * Fix a bug of toggle tabs with hotkey
-   Thanks to Tetralet <tetralet@gmail.com>
+   Thanks to Tetralet <tetralet AT gmail DOT com>
 
 0.0.2
  * Initial release
 
 0.0.1
  * Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
-   Thanks to David Gómez <david@pleyades.net>
+   Thanks to David Gómez <david AT pleyades DOT net>

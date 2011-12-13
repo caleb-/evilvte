@@ -59,7 +59,7 @@
 #define    SCROLLBAR_RIGHT        TRUE
 #define    SHOW_BUILDTIME_OPTION  TRUE      /* Command line -o option */
 #define    SHOW_VERSION           TRUE      /* Command line -v option */
-// #define SHOW_WINDOW_BORDER     TRUE 
+// #define SHOW_WINDOW_BORDER     TRUE
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      "evilvte"
 #define    STATUS_BAR             TRUE
@@ -80,6 +80,7 @@
 // #define TAB_LABEL_STYLE_CUSTOM "One","Two","Three","Four","Five","Six"
 // #define TAB_MENU_SELECT_TAB    TRUE
 // #define TAB_MOUSE_SCROLLABLE   TRUE
+// #define TAB_NEW_TAB_OLD_PATH   TRUE /* New tab with current working path */
 // #define TABBAR                 TRUE
 // #define TABBAR_AUTOHIDE        TRUE
 
@@ -89,7 +90,7 @@
  *
  * GDK_A = "Shift + a", so hotkey will be "Ctrl + Shift + a"
  *
- * You can use || to define multiple keys
+ * You may use || to define multiple keys
  * For example: (event->keyval == GDK_a || event->keyval == GDK_A)
  */
 
@@ -100,6 +101,7 @@
 // #define CTRL_FIRST_TAB         (event->keyval == GDK_Home)
 // #define CTRL_LAST_TAB          (event->keyval == GDK_End)
 // #define CTRL_JUMP_TAB_NUMBER   TRUE /* Ctrl + number -> goto tab number */
+// #define CTRL_EDIT_TAB_LABEL    (event->keyval == GDK_E)
 // #define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
 // #define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
 // #define CTRL_FONT_DEFAULT_SIZE (event->keyval == GDK_KP_Insert)
@@ -110,6 +112,15 @@
 // #define CTRL_MORE_SATURATION   (event->keyval == GDK_KP_Multiply)
 // #define CTRL_LESS_SATURATION   (event->keyval == GDK_KP_Divide)
 // #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
+// #define BG_TOGGLE_ORDER        "Image","Transparent","No background"
+// #define BG_TOGGLE_ORDER        "Image"
+                                  /* Define only one "Image" means reload image.
+                                   * Notice: Background image can be changed
+                                   *         only when there is only one tab.
+                                   *         When multiple tab is opened,
+                                   *         background image is not changeable.
+                                   *         It is an VTE problem, not my fault.
+                                   */
 
 /* If you enable DOUBLE_PRESS_HOTKEY,
  * press CTRL_NEW_TAB or CTRL_REMOVE_TAB twice quickly to add or remove a tab
@@ -125,6 +136,7 @@
 // #undef G_CALLBACK
 // #undef GTK_BOX
 // #undef GTK_CONTAINER
+// #undef GTK_ENTRY
 // #undef GTK_MENU
 // #undef GTK_MENU_SHELL
 // #undef GTK_NOTEBOOK
@@ -134,6 +146,7 @@
 // #define G_CALLBACK
 // #define GTK_BOX
 // #define GTK_CONTAINER
+// #define GTK_ENTRY
 // #define GTK_MENU
 // #define GTK_MENU_SHELL
 // #define GTK_NOTEBOOK

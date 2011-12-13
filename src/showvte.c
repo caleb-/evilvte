@@ -1,5 +1,5 @@
 #!/bin/sh
-# This is not C program text
+# This is not an C program text
 SHOWVTE_PROG_NAME=`grep SHOW_WINDOW_TITLE src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | sed 's/"//g'`
 if [ "$SHOWVTE_PROG_NAME" = "" ]; then
   SHOWVTE_PROG_NAME="evilvte"
