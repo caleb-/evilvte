@@ -1,3 +1,6 @@
+0.0.5
+ * Remove an useless gtk_box_pack_start
+
 0.0.4
  * Let evilvtab support all options in src/config.h
  * Remove an useless hbox GtkWidget

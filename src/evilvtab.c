@@ -118,8 +118,6 @@ void add_tab()
 #endif
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   gtk_box_pack_start(GTK_BOX(tab.hbox), tab.vte_box, TRUE, TRUE, 0);
-#else
-  gtk_box_pack_start(GTK_BOX(notebook), tab.vte_box, TRUE, TRUE, 0);
 #endif
 #if SCROLLBAR_RIGHT && !SCROLLBAR_LEFT
   gtk_box_pack_start(GTK_BOX(tab.hbox), tab.scrollbar, FALSE, FALSE, 0);
