@@ -38,15 +38,15 @@
 #define VTE_CHECK_VERSION(x,y,z) FALSE
 #endif
 
+#ifndef VTE_ERASE_TTY
+#define VTE_ERASE_TTY VTE_ERASE_AUTO
+#endif
+
 #define AUTO            VTE_ERASE_AUTO
 #define BACKSPACE       VTE_ERASE_ASCII_BACKSPACE
 #define DELETE          VTE_ERASE_ASCII_DELETE
 #define DELETE_SEQUENCE VTE_ERASE_DELETE_SEQUENCE
 #define ERASE_TTY       VTE_ERASE_TTY
-#if !VTE_CHECK_VERSION(0,20,4)
-#undef ERASE_TTY
-#define ERASE_TTY       VTE_ERASE_AUTO
-#endif
 
 #define BLOCK     VTE_CURSOR_SHAPE_BLOCK
 #define IBEAM     VTE_CURSOR_SHAPE_IBEAM
@@ -71,6 +71,10 @@
 
 #include "custom.h"
 #include "evilvte.h"
+
+#if GTK_CHECK_VERSION(3,3,4) && !defined(USE_GTK_GRID) && defined(GTK_DISABLE_DEPRECATED)
+#define USE_GTK_GRID
+#endif
 
 #if RULE_THEM_ALL
 #ifndef GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
@@ -333,10 +337,6 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_scale_new_with_range(w,x,y,z) gtk_hscale_new_with_range(x,y,z)
 #endif
 
-#ifndef GTK_DIALOG_NO_SEPARATOR
-#define GTK_DIALOG_NO_SEPARATOR 0
-#endif
-
 #ifndef GTK_FONT_SELECTION_DIALOG
 #define GTK_FONT_SELECTION_DIALOG
 #endif
@@ -353,6 +353,7 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #endif
 
 #if !RULE_THEM_ALL && !GTK_CHECK_VERSION(2,91,2)
+#undef GTK_SCROLLABLE
 #define GTK_SCROLLABLE VTE_TERMINAL
 #define gtk_scrollable_get_vadjustment vte_terminal_get_adjustment
 #endif
@@ -389,15 +390,12 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #undef HOTKEY_SEARCH_NEXT
 #endif
 
-#if !defined(INNER_BORDER_H) || !defined(INNER_BORDER_W)
-#if !GTK_CHECK_VERSION(2,91,6)
-#define INNER_BORDER_H (inner_border ? (inner_border->top + inner_border->bottom) : 0)
-#define INNER_BORDER_W (inner_border ? (inner_border->left + inner_border->right) : 0)
-#endif
-#if GTK_CHECK_VERSION(2,91,6)
+#ifndef INNER_BORDER_H
 #define INNER_BORDER_H 2
-#define INNER_BORDER_W 2
 #endif
+
+#ifndef INNER_BORDER_W
+#define INNER_BORDER_W 2
 #endif
 
 #ifndef VTE_FUNNY
@@ -438,7 +436,6 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define VTE_WINDOW_RESIZE(x,y,z)
 #endif
 #endif
-GtkBorder *inner_border;
 #ifndef VTE_COLUMNS
 #define VTE_COLUMNS 80
 #endif
@@ -1392,10 +1389,10 @@ GtkWidget* make_close_dialog()
   GtkWidget *dialog_hbox;
 #if BUTTON_ORDER_BY_RCFILE
   if (button_order)
-    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
   else
 #endif
-    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
   gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
   dialog_hbox = gtk_hbox_new(FALSE, 0);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), dialog_hbox);
@@ -1559,6 +1556,9 @@ void do_beep()
 #if MENU || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
 bool menu_popup(GtkWidget *widget, GdkEventButton *event)
 {
+#if BELL_URGENT
+  gtk_window_set_urgency_hint(GTK_WINDOW(main_window), FALSE);
+#endif
 #ifdef ONLY_ONE_MENU_ITEM
   int x = 0;
   int y = 0;
@@ -2073,7 +2073,12 @@ void add_tab()
 #if RULE_THEM_ALL
   if (with_gtk == 3)
 #endif
+  {
     gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
+#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
+  }
 #endif
 
   gtk_widget_show_all(notebook);
@@ -2143,10 +2148,10 @@ void do_edit_search()
   GtkWidget *dialog;
 #if BUTTON_ORDER_BY_RCFILE
   if (button_order)
-    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SEARCH, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SEARCH, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
   else
 #endif
-    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SEARCH, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SEARCH, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
   gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
   if (strlen(gtk_entry_get_text(GTK_ENTRY(term->search_string))))
     gtk_entry_set_text(GTK_ENTRY(entry), gtk_entry_get_text(GTK_ENTRY(term->search_string)));
@@ -2187,10 +2192,10 @@ void do_edit_label()
   GtkWidget *dialog;
 #if BUTTON_ORDER_BY_RCFILE
   if (button_order)
-    dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+    dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
   else
 #endif
-    dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    dialog = gtk_dialog_new_with_buttons(label_name, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
   gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
   gtk_entry_set_text(GTK_ENTRY(entry), label_name);
   gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
@@ -2217,10 +2222,10 @@ void do_menu_saturation()
   GtkWidget *dialog;
 #if BUTTON_ORDER_BY_RCFILE
   if (button_order)
-    dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+    dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
   else
 #endif
-    dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
 #if RULE_THEM_ALL
   if (with_gtk == 2)
     adjustment = gtk_hscale_new_with_range(0.0, 1.0, 0.01);
@@ -2288,7 +2293,12 @@ void do_zoom_routine()
 #if RULE_THEM_ALL
     if (with_gtk == 3)
 #endif
+    {
       gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
+#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
+      gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
+    }
 #endif
   }
 #ifndef VTE_FUNNY
@@ -2653,10 +2663,10 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
         GtkWidget *dialog;
 #if BUTTON_ORDER_BY_RCFILE
         if (button_order)
-          dialog = gtk_dialog_new_with_buttons(encoding_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+          dialog = gtk_dialog_new_with_buttons(encoding_name, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
         else
 #endif
-          dialog = gtk_dialog_new_with_buttons(encoding_name, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+          dialog = gtk_dialog_new_with_buttons(encoding_name, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
         gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
         gtk_entry_set_text(GTK_ENTRY(encoding_entry), encoding_name);
         gtk_entry_set_activates_default(GTK_ENTRY(encoding_entry), TRUE);
@@ -3696,15 +3706,15 @@ bool at_dock_mode = FALSE;
   if (with_gtk == 3)
 #endif
   {
-#if RULE_THEM_ALL || (VTE_CHECK_VERSION(0,27,1) && GTK_CHECK_VERSION(2,91,1))
-    gtk_widget_style_get(term->vte, "inner-border", &inner_border, NULL);
-#endif
 #ifdef VTE_FUNNY
 #if COMMAND_TAB_NUMBERS
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
       GET_CURRENT_TAB(i);
 #endif
       gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
+#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
+      gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
 #if COMMAND_TAB_NUMBERS
     }
 #endif
