@@ -14,14 +14,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ >> src/showvte
+sed 's/\t/ /g' $1 | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define >> src/showvte
 
-SHOWVTE_PROG_NAME=`grep PROGRAM_NAME src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | sed 's/"//g'`
+SHOWVTE_PROG_NAME=`grep PROGRAM_NAME $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | sed 's/"//g'`
 if [ "$SHOWVTE_PROG_NAME" = "" ]; then
   SHOWVTE_PROG_NAME="evilvte"
 fi
 
-SHOWVTE_PROG_VERSION=`grep PROGRAM_VERSION src/config.h | grep -v ^\/\/ | awk '{print $3}'`
+SHOWVTE_PROG_VERSION=`grep PROGRAM_VERSION $1 | grep -v ^\/\/ | awk '{print $3}'`
 if [ "$SHOWVTE_PROG_VERSION" = "" ]; then
   SHOWVTE_VERSION=`head -n 1 Changelog`
 else

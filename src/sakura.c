@@ -42,20 +42,15 @@
 
 #define CTRL event->keyval ==
 
-#if !EVILVTE_MAXIMUM
+#if !EVILVTE_CUSTOM
 #include "config.h"
+#endif
+
+#if EVILVTE_CUSTOM
+#include "custom.h"
+#endif
+
 #include "evilvte.h"
-#endif
-
-#if EVILVTE_MAXIMUM
-#include "maximum.h"
-#include "max.h"
-#endif
-
-#if EVILVTE_TESTING
-#include "testing.h"
-#include "test.h"
-#endif
 
 #ifndef VTE_CHECK_VERSION
 #define VTE_CHECK_VERSION(major,minor,micro) \
@@ -149,10 +144,6 @@
 #define LABEL_DIALOG_CLOSE "Do you really want to close it?"
 #endif
 
-#ifndef LABEL_DIALOG_SATURATION
-#define LABEL_DIALOG_SATURATION "Saturation level"
-#endif
-
 #ifndef LABEL_MENU_SATURATION
 #define LABEL_MENU_SATURATION "Adjust saturation"
 #endif
@@ -233,6 +224,7 @@
 #undef TAB_BORDER
 #undef TAB_BORDER_HORIZONTAL
 #undef TAB_BORDER_VERTICAL
+#undef TAB_CLOSE_BUTTON
 #undef TAB_EXPANDED_WIDTH
 #undef COMMAND_TAB_NUMBERS
 #undef TAB_LABEL
@@ -508,12 +500,7 @@ int tabbar_status = 0;
 #define VTE_ANTI_ALIAS VTE_ANTI_ALIAS_USE_DEFAULT
 #endif
 
-#if TAB_SHOW_INFO_AT_TITLE
-#undef SHOW_WINDOW_TITLE
-#define SHOW_WINDOW_TITLE 1
-#endif
-
-#if SHOW_WINDOW_TITLE || PROGRAM_WM_CLASS || MENU_OPEN_NEW_WINDOW || COMMAND_SHOW_VERSION || COMMAND_SHOW_HELP || defined(HOTKEY_OPEN_NEW_WINDOW) || COMMAND_SET_TITLE
+#if PROGRAM_WM_CLASS || MENU_OPEN_NEW_WINDOW || COMMAND_SHOW_VERSION || COMMAND_SHOW_HELP || defined(HOTKEY_OPEN_NEW_WINDOW) || COMMAND_SET_TITLE || TAB_SHOW_INFO_AT_TITLE
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "evilvte"
 #endif
@@ -891,9 +878,10 @@ void button_clicked(GtkWidget *widget, void *data)
 }
 #endif
 
-#if TAB_LABEL_DYNAMIC
+#if WINDOW_TITLE_DYNAMIC || TAB_LABEL_DYNAMIC
 void do_title_changed()
 {
+#if TAB_LABEL_DYNAMIC
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
   term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #if TAB_CLOSE_BUTTON
@@ -915,6 +903,11 @@ void do_title_changed()
 #endif
 #if !TAB_CLOSE_BUTTON
   gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(notebook), VTE_HBOX, vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+#endif
+#endif
+#if WINDOW_TITLE_DYNAMIC
+  gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+  gtk_window_set_icon_name(GTK_WINDOW(main_window), vte_terminal_get_icon_title(VTE_TERMINAL(term->vte)));
 #endif
 }
 #endif
@@ -1268,8 +1261,12 @@ void add_tab()
 
   g_signal_connect(term->vte, "child-exited", G_CALLBACK(del_tab), (int*)CLOSE_DIALOG);
 
-#if TAB_LABEL_DYNAMIC
+#if WINDOW_TITLE_DYNAMIC || TAB_LABEL_DYNAMIC
   g_signal_connect(term->vte, "window-title-changed", do_title_changed, NULL);
+#endif
+
+#if WINDOW_TITLE_DYNAMIC
+  g_signal_connect(term->vte, "icon-title-changed", do_title_changed, NULL);
 #endif
 
 #if MENU
@@ -1475,10 +1472,10 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         GtkWidget *saturation_dialog;
 #if BUTTON_ORDER_BY_RCFILE
         if (button_order)
-          saturation_dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+          saturation_dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
         else
 #endif
-          saturation_dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+          saturation_dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
         adjustment = gtk_hscale_new_with_range(0, 1, 0.01);
         gtk_range_set_value(GTK_RANGE(adjustment), saturation_level_old);
         g_signal_connect_after(adjustment, "change-value", do_change_saturation, NULL);
@@ -2236,10 +2233,10 @@ void do_menu_saturation()
   GtkWidget *saturation_dialog;
 #if BUTTON_ORDER_BY_RCFILE
   if (button_order)
-    saturation_dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+    saturation_dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
   else
 #endif
-    saturation_dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    saturation_dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
   adjustment = gtk_hscale_new_with_range(0, 1, 0.001);
   gtk_range_set_value(GTK_RANGE(adjustment), saturation_level_old);
   g_signal_connect_after(adjustment, "change-value", do_change_saturation, NULL);
@@ -2600,18 +2597,26 @@ void switch_page()
     gtk_window_set_title(GTK_WINDOW(main_window), tabtitle);
   }
 #endif
+#if WINDOW_TITLE_DYNAMIC
+  gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+  gtk_window_set_icon_name(GTK_WINDOW(main_window), vte_terminal_get_icon_title(VTE_TERMINAL(term->vte)));
+#endif
 }
 
 int main(int argc, char **argv)
 {
+#if COMMAND_DOCK_MODE
+int at_dock_mode = 0;
+#endif
+
 #ifdef TAB_LABEL
   textdomain("gtk20");
 #endif
 
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
   int i;
 #endif
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_CUSTOM)
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_CUSTOM)
   int j;
 #endif
 
@@ -2633,7 +2638,7 @@ int main(int argc, char **argv)
   }
 #endif
 
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
   i = 1;
   j = 1;
   while ((j < argc) && strncmp(argv[j], "-e", 3)) {
@@ -2659,11 +2664,14 @@ int main(int argc, char **argv)
 #if COMMAND_SHOW_HELP
     if (!strncmp(argv[j], "-h", 3)) {
       printf("%s, version %s\n\nUsage:\n\t%s [option%s]\n\nOption%s:\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME,
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
              "s", "s");
 #endif
-#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
+#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_DOCK_MODE && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
              "", "");
+#endif
+#if COMMAND_DOCK_MODE
+      printf("\t-d                    \tstart %s as a dock\n", PROGRAM_NAME);
 #endif
 #if COMMAND_EXEC_PROGRAM
       printf("\t-e [program] [options]\tspecify the program to be run in %s\n", PROGRAM_NAME);
@@ -2711,6 +2719,11 @@ int main(int argc, char **argv)
       at_root_window = 1;
 #endif
 
+#if COMMAND_DOCK_MODE
+    if (!strncmp(argv[j], "-d", 3))
+      at_dock_mode = 1;
+#endif
+
 #if COMMAND_TAB_NUMBERS
     if (!strncmp(argv[j], "-2", 3))
       i = 2;
@@ -2732,7 +2745,7 @@ int main(int argc, char **argv)
 
     j++;
   }
-#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS */
+#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS */
 
 #ifdef BACKGROUND_IMAGE
   g_snprintf(imgstr, sizeof(imgstr), "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
@@ -2796,7 +2809,7 @@ int main(int argc, char **argv)
   gtk_window_set_decorated(GTK_WINDOW(main_window), SHOW_WINDOW_DECORATED);
 #endif
 
-#if SHOW_WINDOW_TITLE
+#if COMMAND_SET_TITLE
   gtk_window_set_title(GTK_WINDOW(main_window), VTE_PROGRAM_NAME);
 #endif
 
@@ -2922,6 +2935,11 @@ int main(int argc, char **argv)
   if (!at_root_window)
 #endif
     gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
+#endif
+
+#if COMMAND_DOCK_MODE
+  if (at_dock_mode)
+    gtk_window_set_type_hint(GTK_WINDOW(main_window), GDK_WINDOW_TYPE_HINT_DOCK);
 #endif
 
   gtk_widget_show_all(main_window);

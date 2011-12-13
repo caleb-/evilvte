@@ -20,6 +20,7 @@
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"
 // #define COMMAND_AT_ROOT_WINDOW TRUE  /* -r option, run in root window      */
+// #define COMMAND_DOCK_MODE      TRUE  /* -d option, run as a dock           */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
 // #define COMMAND_FULLSCREEN     TRUE  /* -f option, init in fullscreen mode */
 // #define COMMAND_LOGIN_SHELL    TRUE  /* -ls option, to enable login shell  */
@@ -55,8 +56,8 @@
 // #define SHOW_WINDOW_BORDER     TRUE
 // #define SHOW_WINDOW_DECORATED  TRUE
 #define    SHOW_WINDOW_ICON       TRUE
-#define    SHOW_WINDOW_TITLE      TRUE
 #define    STATUS_BAR             TRUE
+// #define WINDOW_TITLE_DYNAMIC   TRUE  /* for xterm escape sequences         */
 #define    WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 
 #define    MENU                   TRUE
@@ -83,8 +84,8 @@
 // #define TAB_CLOSE_BUTTON       TRUE
 // #define TAB_EXPANDED_WIDTH     TRUE
 // #define TAB_LABEL              "Page %u" /* %u will be replaced by numbers */
+// #define TAB_LABEL_DYNAMIC      TRUE      /* for xterm escape sequences     */
 // #define TAB_LABEL_CUSTOM       "One", "Two", "Three", "Four", "Five", "Six"
-// #define TAB_LABEL_DYNAMIC      TRUE   /* Display current path dynamically  */
 // #define TAB_NEW_PATH_EQUAL_OLD TRUE
 // #define TAB_REORDERABLE        TRUE
 // #define TAB_SHOW_INFO_AT_TITLE TRUE
@@ -139,12 +140,11 @@
 // #define HOTKEY_TOGGLE_STATUS_BAR     CTRL GDK_Down
 // #define HOTKEY_TOGGLE_TABBAR         CTRL GDK_Up
 // #define HOTKEY_TOGGLE_BACKGROUND     CTRL GDK_KP_Delete
-// #define        TOGGLE_BG_ORDER       "Image", "Transparent", "No background", "Opacity"
+// #define TOGGLE_BG_ORDER    "Image", "Transparent", "No background", "Opacity"
 
 // #define LABEL_DEFAULT_ENCODING       "Default Encoding"
 // #define LABEL_DIALOG_BACKGROUND_TINT "Background tint color"
 // #define LABEL_DIALOG_CLOSE           "Do you really want to close it?"
-// #define LABEL_DIALOG_SATURATION      "Saturation level"
 // #define LABEL_MENU_SATURATION        "Adjust saturation"
 // #define LABEL_MENU_TOGGLE_ANTI_ALIAS "Toggle anti-alias"
 // #define LABEL_MENU_TOGGLE_BG         "Toggle background"

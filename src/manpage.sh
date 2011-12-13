@@ -14,23 +14,33 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-COMMAND_ENABLED=`grep COMMAND_ src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | grep -v FALSE | grep -v 0 | tail -n 1`
+COMMAND_ENABLED=`grep COMMAND_ $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | grep -v FALSE | grep -v 0 | tail -n 1`
 if [ "$COMMAND_ENABLED" = "" ]; then
   grep -v -i option misc/manpage.1 > misc/evilvte.1
   exit
 fi
 
-COMMAND_AT_ROOT_WINDOW=`grep COMMAND_AT_ROOT_WINDOW src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_EXEC_PROGRAM=`grep   COMMAND_EXEC_PROGRAM   src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_FULLSCREEN=`grep     COMMAND_FULLSCREEN     src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_LOGIN_SHELL=`grep    COMMAND_LOGIN_SHELL    src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_SET_TITLE=`grep      COMMAND_SET_TITLE      src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_SHOW_HELP=`grep      COMMAND_SHOW_HELP      src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_SHOW_OPTIONS=`grep   COMMAND_SHOW_OPTIONS   src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_SHOW_VERSION=`grep   COMMAND_SHOW_VERSION   src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
-COMMAND_TAB_NUMBERS=`grep    COMMAND_TAB_NUMBERS    src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_TAB_NUMBERS=`grep    COMMAND_TAB_NUMBERS    $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+TAB_ENABLE=`grep             ' TAB '                $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+if [ "$TAB_ENABLE" = "" ]; then
+  COMMAND_TAB_NUMBERS=
+fi
+
+COMMAND_AT_ROOT_WINDOW=`grep COMMAND_AT_ROOT_WINDOW $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_DOCK_MODE=`grep      COMMAND_DOCK_MODE      $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_EXEC_PROGRAM=`grep   COMMAND_EXEC_PROGRAM   $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_FULLSCREEN=`grep     COMMAND_FULLSCREEN     $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_LOGIN_SHELL=`grep    COMMAND_LOGIN_SHELL    $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SET_TITLE=`grep      COMMAND_SET_TITLE      $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SHOW_HELP=`grep      COMMAND_SHOW_HELP      $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SHOW_OPTIONS=`grep   COMMAND_SHOW_OPTIONS   $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SHOW_VERSION=`grep   COMMAND_SHOW_VERSION   $1 | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 
 head -n 10 misc/manpage.1 > misc/evilvte.1
+
+if [ "$COMMAND_DOCK_MODE" != "" ]; then
+  grep '^.\\" D ' misc/manpage.1 | sed 's/^.\\" D //' >> misc/evilvte.1
+fi
 
 if [ "$COMMAND_EXEC_PROGRAM" != "" ]; then
   grep '^.\\" E ' misc/manpage.1 | sed 's/^.\\" E //' >> misc/evilvte.1
@@ -71,7 +81,11 @@ fi
 tail -n 4 misc/manpage.1 >> misc/evilvte.1
 
 COMMAND_NUMBERS=`grep '^.B..-' misc/evilvte.1 | wc | awk '{print $1}'`
+if [ "$COMMAND_NUMBERS" = "0" ]; then
+  grep -v -i option misc/manpage.1 > misc/evilvte.1
+  exit
+fi
 if [ "$COMMAND_NUMBERS" != "1" ]; then
-  sed -e 's/option/options/'  -e 's/OPTION/OPTIONS/' misc/evilvte.1 > misc/evilvte.2
+  sed -e 's/option/options/' -e 's/OPTION/OPTIONS/' misc/evilvte.1 > misc/evilvte.2
   mv misc/evilvte.2 misc/evilvte.1
 fi

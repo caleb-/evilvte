@@ -14,29 +14,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-if [ "$0" = "src/evilvte.sh" ]; then
-  OLDCONFFILE=src/config.h
-  NEWCONFFILE=src/evilvte.h
-  if [ -e src/maximum.h ] && [ -e src/maximum.sh ]; then
-    sh src/maximum.sh
-  fi
-  if [ -e src/testing.h ] && [ -e src/testing.sh ]; then
-    sh src/testing.sh
-  fi
-fi
-
-if [ "$0" = "src/maximum.sh" ]; then
-  OLDCONFFILE=src/maximum.h
-  NEWCONFFILE=src/max.h
-fi
-
-if [ "$0" = "src/testing.sh" ]; then
-  OLDCONFFILE=src/testing.h
-  NEWCONFFILE=src/test.h
-fi
+OLDCONFFILE=$1
+NEWCONFFILE=src/evilvte.h
 
 cat /dev/null > $NEWCONFFILE
-rm -f src/evilvte src/sakura.o
+rm -f $2 src/sakura.o
 
 MENU_DEFAULT_ENCODING=`grep MENU_ENCODING_LIST $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
 if [ "$MENU_DEFAULT_ENCODING" != "" ]; then

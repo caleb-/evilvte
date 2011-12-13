@@ -1,3 +1,10 @@
+0.4.6~pre2
+ * Support -d command line option to run as a dock
+ * Support WINDOW_TITLE_DYNAMIC for xterm escape sequences
+ * Support personal configuration file other than src/config.h. For example:
+   "make distclean ; ./configure --config=/dev/null ; make strip"
+ * Drop useless option SHOW_WINDOW_TITLE and LABEL_DIALOG_SATURATION
+
 0.4.6~pre1
  * Support PROGRAM_ICON so users can put their own icons at $HOME
  * Respect CFLAGS and OPTFLAGS
@@ -7,8 +14,7 @@
  * Auto-detect GNU gold linker to avoid unnecessary libraries linking
  * Improve coloring of showvte and configure script
  * Improve man page description. Thanks to editors of http://freshmeat.net.
- * Drop environment variable EVILVTE=min. For a minimal terminal, just run:
-   "> src/config.h ; make distclean ; make strip"
+ * Drop environment variable EVILVTE=min
 
 0.4.5
  * Support -ls command line option to enable login shell in all tabs
@@ -26,7 +32,7 @@
  * Fix gcc -Wall -Wextra warnings
 
 0.4.5~pre6
- * Support TAB_LABEL_DYNAMIC to show current path dynamically
+ * Support TAB_LABEL_DYNAMIC for xterm escape sequences
    Thanks to Pavel Plesov
  * Relicense icons to GNU General Public License version 2 with permission
    from the author, Tetralet <tetralet AT gmail DOT com>
@@ -96,20 +102,20 @@
 
 0.4.4~pre6
  * Support PROGRAM_WM_CLASS
-   Thanks to Bruno Vieira <mail AT bmpvieira DOT com> for reporting this issue.
+   Thanks to Bruno Vieira <mail AT bmpvieira DOT com>
 
 0.4.4~pre5
  * Support CTRL_TOGGLE_FULLSCREEN and "Toggle fullscreen" item in menu
    I tested this feature in jwm and kwin.
  * Fix a do-no-harm message when trying to rename a null tab label
-   Thanks to Bernhard R. Link <brlink AT debian DOT org> for reporting it.
+   Thanks to Bernhard R. Link <brlink AT debian DOT org>
  * Fix number_char redefinition error if built with gcc 4.3.1
  * Rename shell scripts to the .sh scheme, and update the LICENSE file
 
 0.4.4~pre4
  * Support command line -title option to assign program title
  * Use g_get_current_dir() instead of g_getenv("PWD") to decide current path
-   Thanks to Bruno Vieira <mail AT bmpvieira DOT com> for reporting this issue.
+   Thanks to Bruno Vieira <mail AT bmpvieira DOT com>
 
 0.4.4~pre3
  * Support TAB_CLOSE_BUTTON
@@ -151,7 +157,7 @@
 
 0.4.0
  * Support CTRL_TOGGLE_HOTKEYS and "Toggle hotkeys locking" item in menu
-   When hotkeys are locked, all evilvte hotkeys will be disabled, execpt
+   When hotkeys are locked, all evilvte hotkeys will be disabled, except
    CTRL_TOGGLE_HOTKEYS.
    Default CTRL_TOGGLE_HOTKEYS is "Ctrl + `" (left quote).
  * Fix a focus bug
@@ -214,7 +220,6 @@
 
 0.3.3
  * Remove an useless variable in the struct terminal.
-   This is inspired from nicevte 0.1.
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
  * Fix a TABBAR_SCROLLABLE bug
    I misunderstood gtk_notebook_set_scrollable. :-P
@@ -226,7 +231,7 @@
  * Fix the auto-detect-SUSE failure in openSUSE Build Service.
    The openSUSE-release package is not installed in the service, so there is no
    /etc/SuSE-release nor /etc/issue.
-   Thanks to swyear <swyear AT gmail DOT com> for reporting and testing the bug.
+   Thanks to swyear <swyear AT gmail DOT com>
  * Support "New window" and "Edit label" items in menu
  * Support "Zoom in", "Zoom out", and "Zoom default" items in menu
  * Remove useless variables and functions in TABBAR_AUTOHIDE and
@@ -237,7 +242,7 @@
    When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
    crash.
    Fix this by defining TAB_LABEL when SUSE system is detected.
-   Thanks to swyear <swyear AT gmail DOT com> for reporting and testing the bug.
+   Thanks to swyear <swyear AT gmail DOT com>
  * Support MENU_CUSTOM
  * Support "Reset terminal", "Quit", and "Separator" items in menu
 
