@@ -1,3 +1,7 @@
+UNRELEASED
+ * Make close button smaller
+ * Improve resizing behavior with "-VteTerminal-inner-border" property
+
 0.5.1~pre1
 
  * Temporary workaround for "-VteTerminal-inner-border" property

@@ -218,7 +218,7 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_notebook_set_tab_vborder (*p_gtk_notebook_set_tab_vborder)
 #define gtk_range_get_value (*p_gtk_range_get_value)
 #define gtk_range_set_value (*p_gtk_range_set_value)
-#define gtk_rc_style_new (*p_gtk_rc_style_new)
+#define gtk_rc_parse_string (*p_gtk_rc_parse_string)
 #define gtk_scale_new_with_range (*p_gtk_scale_new_with_range)
 #define gtk_scrollable_get_vadjustment (*p_gtk_scrollable_get_vadjustment)
 #define gtk_scrollbar_new (*p_gtk_scrollbar_new)
@@ -234,7 +234,6 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_widget_destroy (*p_gtk_widget_destroy)
 #define gtk_widget_get_screen (*p_gtk_widget_get_screen)
 #define gtk_widget_hide (*p_gtk_widget_hide)
-#define gtk_widget_modify_style (*p_gtk_widget_modify_style)
 #define gtk_widget_set_can_focus (*p_gtk_widget_set_can_focus)
 #define gtk_widget_set_colormap (*p_gtk_widget_set_colormap)
 #define gtk_widget_set_hexpand (*p_gtk_widget_set_hexpand)
@@ -951,12 +950,26 @@ GtkWidget *notebook;
 #define VTE_LABEL label
 #endif
 
+#if GTK3_CSS_USE_BOX && GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID)
+#if CLOSE_DIALOG || TAB_CLOSE_BUTTON || defined(SCROLLBAR) || STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
+#warning "You are using GtkGrid but your GTK3_CSS defined GtkHBox or GtkVBox."
+#endif
+#endif
+
 #if TAB_CLOSE_BUTTON
 #ifndef TAB_LABEL
 #define TAB_LABEL "Page %u"
 #endif
 #undef VTE_LABEL
 #define VTE_LABEL term->label
+#ifndef GTK3_CSS
+#ifdef USE_GTK_GRID
+#define GTK3_CSS "GtkNotebook GtkGrid GtkButton { -GtkWidget-focus-line-width: 0; } GtkNotebook GtkButton { border-width: 0; padding: 0; -GtkButton-inner-border: 0; }"
+#endif
+#ifndef USE_GTK_GRID
+#define GTK3_CSS "GtkNotebook GtkHBox GtkButton { -GtkWidget-focus-line-width: 0; } GtkNotebook GtkButton { border-width: 0; padding: 0; -GtkButton-inner-border: 0; }"
+#endif
+#endif
 #endif
 
 #ifdef TAB_LABEL_CUSTOM
@@ -1280,7 +1293,7 @@ void (*p_gtk_notebook_set_tab_reorderable)(GtkNotebook *notebook, GtkWidget *chi
 void (*p_gtk_notebook_set_tab_vborder)(GtkNotebook *notebook, guint tab_vborder);
 gdouble (*p_gtk_range_get_value)(GtkRange *range);
 void (*p_gtk_range_set_value)(GtkRange *range, gdouble value);
-GtkRcStyle* (*p_gtk_rc_style_new)(void);
+void (*p_gtk_rc_parse_string)(const gchar *rc_string);
 GtkWidget* (*p_gtk_scale_new_with_range)(GtkOrientation orientation, gdouble min, gdouble max, gdouble step);
 GtkAdjustment* (*p_gtk_scrollable_get_vadjustment)(GtkScrollable *scrollable);
 GtkWidget* (*p_gtk_scrollbar_new)(GtkOrientation orientation, GtkAdjustment *adjustment);
@@ -1296,7 +1309,6 @@ GtkWidget* (*p_gtk_vscrollbar_new)(GtkAdjustment *adjustment);
 void (*p_gtk_widget_destroy)(GtkWidget *widget);
 GdkScreen* (*p_gtk_widget_get_screen)(GtkWidget *widget);
 void (*p_gtk_widget_hide)(GtkWidget *widget);
-void (*p_gtk_widget_modify_style)(GtkWidget *widget, GtkRcStyle *style);
 void (*p_gtk_widget_set_can_focus)(GtkWidget *widget, gboolean can_focus);
 void (*p_gtk_widget_set_colormap)(GtkWidget *widget, GdkColormap *colormap);
 void (*p_gtk_widget_set_hexpand)(GtkWidget *widget, gboolean expand);
@@ -1504,21 +1516,9 @@ void tab_close_button(GtkWidget *tab_label)
   gtk_button_set_image(GTK_BUTTON(term->button), gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU));
   gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click(GTK_BUTTON(term->button), FALSE);
-#if RULE_THEM_ALL
-  if (with_gtk == 2)
-#endif
-#if RULE_THEM_ALL || !GTK_CHECK_VERSION(2,91,6)
-  {
-    GtkRcStyle *rcstyle = gtk_rc_style_new();
-    rcstyle->xthickness = 0;
-    rcstyle->ythickness = 0;
-    gtk_widget_modify_style(term->button, rcstyle);
-    g_object_unref(rcstyle);
-  }
-#endif
   term->label_edit = tab_label;
 #if GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID) && TAB_EXPANDED_WIDTH
-    gtk_widget_set_hexpand(term->label_edit, TRUE);
+  gtk_widget_set_hexpand(term->label_edit, TRUE);
 #endif
   gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, TRUE, TRUE, 0);
   gtk_box_pack_start(GTK_BOX(term->label), term->button, FALSE, FALSE, 0);
@@ -2073,12 +2073,7 @@ void add_tab()
 #if RULE_THEM_ALL
   if (with_gtk == 3)
 #endif
-  {
     gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
-#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-#endif
-  }
 #endif
 
   gtk_widget_show_all(notebook);
@@ -2293,12 +2288,7 @@ void do_zoom_routine()
 #if RULE_THEM_ALL
     if (with_gtk == 3)
 #endif
-    {
       gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
-#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
-      gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-#endif
-    }
 #endif
   }
 #ifndef VTE_FUNNY
@@ -3439,9 +3429,8 @@ bool at_dock_mode = FALSE;
     *(void **)(&p_gtk_notebook_set_tab_border) = dlsym(p_hdl_gtk, "gtk_notebook_set_tab_border");
     *(void **)(&p_gtk_notebook_set_tab_hborder) = dlsym(p_hdl_gtk, "gtk_notebook_set_tab_hborder");
     *(void **)(&p_gtk_notebook_set_tab_vborder) = dlsym(p_hdl_gtk, "gtk_notebook_set_tab_vborder");
-    *(void **)(&p_gtk_rc_style_new) = dlsym(p_hdl_gtk, "gtk_rc_style_new");
+    *(void **)(&p_gtk_rc_parse_string) = dlsym(p_hdl_gtk, "gtk_rc_parse_string");
     *(void **)(&p_gtk_vscrollbar_new) = dlsym(p_hdl_gtk, "gtk_vscrollbar_new");
-    *(void **)(&p_gtk_widget_modify_style) = dlsym(p_hdl_gtk, "gtk_widget_modify_style");
     *(void **)(&p_gtk_widget_set_colormap) = dlsym(p_hdl_gtk, "gtk_widget_set_colormap");
     *(void **)(&p_vte_terminal_get_adjustment) = dlsym(p_hdl_vte, "vte_terminal_get_adjustment");
     *(void **)(&p_vte_terminal_set_size) = dlsym(p_hdl_vte, "vte_terminal_set_size");
@@ -3480,6 +3469,15 @@ bool at_dock_mode = FALSE;
 #endif
 
   gtk_init(&argc, &argv);
+
+#if TAB_CLOSE_BUTTON
+#if RULE_THEM_ALL
+  if (with_gtk == 2)
+#endif
+#if RULE_THEM_ALL || !GTK_CHECK_VERSION(2,91,6)
+    gtk_rc_parse_string("style \"evilvte\" { GtkButton::default-border = { 0, 0, 0, 0 } GtkButton::default-outside-border = { 0, 0, 0, 0 } GtkButton::inner-border = { 0, 0, 0, 0 } GtkWidget::focus-line-width = 0 xthickness = 0 ythickness = 0 } widget_class \"*.GtkNotebook.GtkHBox.GtkButton\" style \"evilvte\"");
+#endif
+#endif
 
 #if defined(GTK3_CSS) && (RULE_THEM_ALL || GTK_CHECK_VERSION(2,91,6))
 #if RULE_THEM_ALL
@@ -3712,14 +3710,15 @@ bool at_dock_mode = FALSE;
       GET_CURRENT_TAB(i);
 #endif
       gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
-#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
-      gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-#endif
 #if COMMAND_TAB_NUMBERS
     }
 #endif
 #endif
   }
+
+#if (INNER_BORDER_H < 2) || (INNER_BORDER_W < 2)
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
 
   gtk_widget_show_all(main_window);
 

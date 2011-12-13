@@ -179,4 +179,4 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "_Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "_Character Encoding"
 // #define LABEL_SUBMENU_IME            "_Input Methods"
-// #define GTK3_CSS                     "GtkNotebook GtkButton { border-width: 0; padding: 0; } GtkWindow GtkNotebook { padding: 0; }"
+// #define GTK3_CSS                     "GtkNotebook GtkHBox GtkButton { -GtkWidget-focus-line-width: 0; } GtkNotebook GtkButton { border-width: 0; padding: 0; -GtkButton-inner-border: 0; } GtkWindow GtkNotebook { padding: 0; }"

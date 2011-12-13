@@ -25,11 +25,13 @@ MENU_ENCODING_LIST_SIZE=`grep MENU_ENCODING_LIST src/custom.h | tr '\t' ' ' | se
 TOGGLE_BG_ORDER_SIZE=`grep    TOGGLE_BG_ORDER    src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | grep '"' | wc -l`
 MENU_CUSTOM_SIZE=`grep        MENU_CUSTOM        src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | grep '"' | wc -l`
 UPPER_PROGRAM_NAME=`grep      PROGRAM_NAME       src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | cut -d '"' -f 2 | sed 's/\b\(.\)/\u\1/'`
+GTK3_CSS_USE_BOX=`grep        GTK3_CSS           src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep "Gtk.Box"`
 [ "$MENU_DEFAULT_ENCODING" != "" ]    && echo \#define MENU_DEFAULT_ENCODING   1                        >> $CONFFILE
 [ "$MENU_ENCODING_LIST_SIZE" != "0" ] && echo \#define MENU_ENCODING_LIST_SIZE $MENU_ENCODING_LIST_SIZE >> $CONFFILE
 [ "$TOGGLE_BG_ORDER_SIZE" != "0" ]    && echo \#define TOGGLE_BG_ORDER_SIZE    $TOGGLE_BG_ORDER_SIZE    >> $CONFFILE
 [ "$MENU_CUSTOM_SIZE" != "0" ]        && echo \#define MENU_CUSTOM_SIZE        $MENU_CUSTOM_SIZE        >> $CONFFILE
 [ "$UPPER_PROGRAM_NAME" != "" ]       && echo \#define UPPER_PROGRAM_NAME   '"'$UPPER_PROGRAM_NAME'"'   >> $CONFFILE
+[ "$GTK3_CSS_USE_BOX" != "" ]         && echo \#define GTK3_CSS_USE_BOX        1                        >> $CONFFILE
 
 DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1`
 if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
