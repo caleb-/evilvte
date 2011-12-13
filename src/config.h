@@ -1,4 +1,4 @@
-/* comment out options to reduce binary size and RAM consumption */
+/* Comment out options to reduce binary size and consumption of resources. */
 
 // #define ALLOW_BOLD             TRUE
 #define    BACKGROUND_IMAGE       ".config/evilvte/background.png"
@@ -15,24 +15,29 @@
 // #define BINDING_DELETE_KEY     VTE_ERASE_ASCII_BACKSPACE
 // #define BINDING_DELETE_KEY     VTE_ERASE_ASCII_DELETE
 // #define BINDING_DELETE_KEY     VTE_ERASE_DELETE_SEQUENCE
-// #define CLOSE_SAFE             TRUE /* Do not kill background applications */
-// #define COLOR_STYLE_LINUX      TRUE
-// #define COLOR_STYLE_RXVT       TRUE
-// #define COLOR_STYLE_TANGO      TRUE
-// #define COLOR_STYLE_XTERM      TRUE
+// #define BUTTON_ORDER_GTK_STYLE TRUE /* Accept gtk-alternative-button-order */
+// #define BUTTON_ORDER_QT_STYLE  TRUE
+// #define CLOSE_SAFELY           TRUE /* Do not kill background applications */
 // #define COLOR_BACKGROUND       "white"  /* "#FFFFFF" */
 // #define COLOR_FOREGROUND       "black"
 // #define COLOR_BOLD             "red"
 // #define COLOR_CURSOR           "blue"
 // #define COLOR_DIM              "yellow"
 // #define COLOR_HIGHLIGHT        "green"
+// #define COLOR_STYLE_LINUX      TRUE
+// #define COLOR_STYLE_RXVT       TRUE
+// #define COLOR_STYLE_TANGO      TRUE
+// #define COLOR_STYLE_XTERM      TRUE
+#define    COMMAND_EXEC_COMMAND   TRUE /* -e option, execute program */
+#define    COMMAND_SHOW_CONFIG    TRUE /* -o option, show build-time options */
+#define    COMMAND_SHOW_VERSION   TRUE /* -v option, show program version */
 // #define CURSOR_BLINKS          TRUE
+// #define DEFAULT_COLUMNS        80
+// #define DEFAULT_ROWS           24
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
 // #define DEFAULT_ARGV           NULL
 // #define DEFAULT_ENVV           NULL
 // #define DEFAULT_DIRECTORY      g_getenv("PWD")
-// #define DEFAULT_COLUMNS        80
-// #define DEFAULT_ROWS           24
 // #define DEFAULT_ENCODING       "UTF-8"
 // #define DEFAULT_FONT           "Monospace"
 // #define DEFAULT_FONT_SIZE      10
@@ -44,45 +49,73 @@
 // #define ENABLE_LASTLOG         TRUE
 // #define ENABLE_UTMP            TRUE
 // #define ENABLE_WTMP            TRUE
-// #define ENCODING_LIST_LABEL    "Default Encoding" /* Label for "Default" */
-// #define ENCODING_LIST_DEFAULT  TRUE /* Support "Default" in ENCODING_LIST */
-// #define ENCODING_LIST          "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
-#define    ENCODING_LIST          "UTF-8" /* Right click to switch encoding */
-#define    EXECUTE_COMMAND        TRUE /* Command line -e option */
-#define    MENU_INPUT_METHOD      TRUE /* Right click to switch input method */
 // #define MOUSE_AUTOHIDE         TRUE
+#define    PROGRAM_NAME           "evilvte"
 // #define SCROLL_BACKGROUND      TRUE
 // #define SCROLL_LINES           60
 // #define SCROLL_ON_KEYSTROKE    TRUE
 // #define SCROLL_ON_OUTPUT       TRUE
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
-#define    SHOW_BUILDTIME_OPTION  TRUE      /* Command line -o option */
-#define    SHOW_VERSION           TRUE      /* Command line -v option */
 // #define SHOW_WINDOW_BORDER     TRUE
 #define    SHOW_WINDOW_ICON       TRUE
-#define    SHOW_WINDOW_TITLE      "evilvte"
+#define    SHOW_WINDOW_TITLE      TRUE
 #define    STATUS_BAR             TRUE
 #define    WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
-#define    TAB                    TRUE
-// #define TAB_AT_BOTTOM          TRUE
-// #define TAB_AT_LEFT            TRUE
-// #define TAB_AT_RIGHT           TRUE
-// #define TAB_AT_TOP             TRUE
-// #define TAB_BORDER             0
-// #define TAB_BORDER_H           0
-// #define TAB_BORDER_V           0
-// #define TAB_INFO_AT_TITLE      TRUE /* Show tab infomation at window title */
-// #define TAB_INITIAL_NUMBER     1
-// #define TAB_LABEL              "Page"
-// #define TAB_LABEL_NUMBER       TRUE   /* Depends on TAB_LABEL */
-// #define TAB_LABEL_STYLE_POEM   TRUE
-// #define TAB_LABEL_STYLE_CUSTOM "One","Two","Three","Four","Five","Six"
-// #define TAB_MENU_SELECT_TAB    TRUE
-// #define TAB_MOUSE_SCROLLABLE   TRUE
-// #define TAB_NEW_TAB_OLD_PATH   TRUE /* New tab with current working path */
-// #define TABBAR                 TRUE
-// #define TABBAR_AUTOHIDE        TRUE
+
+
+
+/* Right click menu
+ *
+ * Turn off MENU will disable all, except TABBAR_MENU_SELECT_TAB.
+ * It is controlled by TAB and TABBAR.
+ */
+
+#define    MENU                   TRUE
+// #define MENU_COPY              TRUE
+// #define MENU_PASTE             TRUE
+// #define MENU_TAB_ADD_TAB       TRUE
+// #define MENU_TAB_CLOSE_TAB     TRUE
+// #define MENU_CLEAR             TRUE /* Reset and clear terminal */
+#define    MENU_INPUT_METHOD      TRUE
+#define    MENU_ENCODING_LIST     "UTF-8"
+// #define MENU_ENCODING_LIST     "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
+// #define MENU_ENCODING_DEFAULT  "Default Encoding"
+                                  /* If you define MENU_ENCODING_DEFAULT,
+                                   * you can define a "Default" item in
+                                   * MENU_ENCODING_LIST. It will be the initial
+                                   * encoding when program starts.
+                                   *
+                                   * You can put "Default" anywhere in the
+                                   * MENU_ENCODING_LIST.
+                                   */
+/* Tab
+ *
+ * Turn off TAB will disable all related options automatically,
+ * including hotkey definitions.
+ */
+
+#define    TAB                     TRUE
+// #define TAB_AT_BOTTOM           TRUE
+// #define TAB_AT_LEFT             TRUE
+// #define TAB_AT_RIGHT            TRUE
+// #define TAB_AT_TOP              TRUE
+// #define TAB_BORDER              0
+// #define TAB_BORDER_HORIZONTAL   0
+// #define TAB_BORDER_VERTICAL     0
+// #define TAB_INFO_AT_TITLE       TRUE /* Show tab info at window title */
+// #define TAB_INITIAL_NUMBER      1
+// #define TAB_LABEL               "Page"
+// #define TAB_LABEL_NUMBER        TRUE   /* Depends on TAB_LABEL */
+// #define TAB_LABEL_STYLE_POEM    TRUE
+// #define TAB_LABEL_STYLE_CUSTOM  "One","Two","Three","Four","Five","Six"
+// #define TAB_NEW_TAB_OLD_PATH    TRUE /* New tab with current working path */
+// #define TABBAR                  TRUE
+// #define TABBAR_AUTOHIDE         TRUE
+// #define TABBAR_MENU_SELECT_TAB  TRUE /* Right click tabbar menu */
+// #define TABBAR_MOUSE_SCROLLABLE TRUE
+
+
 
 /* Hotkey definitions
  *
@@ -92,38 +125,49 @@
  *
  * You may use || to define multiple keys
  * For example: (event->keyval == GDK_a || event->keyval == GDK_A)
+ *
+ * Turn off CTRL will disable all hotkeys automatically.
  */
 
-#define    CTRL_PREVIOUS_TAB      (event->keyval == GDK_Page_Up)
-#define    CTRL_NEXT_TAB          (event->keyval == GDK_Page_Down)
-#define    CTRL_NEW_TAB           (event->keyval == GDK_T)
-#define    CTRL_REMOVE_TAB        (event->keyval == GDK_W)
-// #define CTRL_FIRST_TAB         (event->keyval == GDK_Home)
-// #define CTRL_LAST_TAB          (event->keyval == GDK_End)
-// #define CTRL_JUMP_TAB_NUMBER   TRUE /* Ctrl + number -> goto tab number */
-// #define CTRL_EDIT_TAB_LABEL    (event->keyval == GDK_E)
-// #define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
-// #define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
-// #define CTRL_FONT_DEFAULT_SIZE (event->keyval == GDK_KP_Insert)
-// #define CTRL_COPY_TO_CLIPBOARD (event->keyval == GDK_C)
-// #define CTRL_PASTE_FROM_CLIPBD (event->keyval == GDK_V)
-// #define CTRL_RESET_TERMINAL    (event->keyval == GDK_R)
-// #define CTRL_RESET_AND_CLEAR   (event->keyval == GDK_A)
-// #define CTRL_MORE_SATURATION   (event->keyval == GDK_KP_Multiply)
-// #define CTRL_LESS_SATURATION   (event->keyval == GDK_KP_Divide)
-// #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
-// #define BG_TOGGLE_ORDER        "Image","Transparent","No background"
-// #define BG_TOGGLE_ORDER        "Image"
-                                  /* Define only one "Image" means reload image.
-                                   * Notice: Background image can be changed
-                                   *         only when there is only one tab.
-                                   *         When multiple tab is opened,
-                                   *         background image is not changeable.
-                                   *         It is an VTE problem, not my fault.
-                                   */
+#define    CTRL                      TRUE
+// #define CTRL_COPY_TO_CLIPBOARD    (event->keyval == GDK_C)
+// #define CTRL_PASTE_FROM_CLIPBOARD (event->keyval == GDK_V)
+// #define CTRL_EDIT_ENCODING        (event->keyval == GDK_U)
+// #define CTRL_FONT_BIGGER          (event->keyval == GDK_KP_Add)
+// #define CTRL_FONT_SMALLER         (event->keyval == GDK_KP_Subtract)
+// #define CTRL_FONT_DEFAULT_SIZE    (event->keyval == GDK_KP_Insert)
+// #define CTRL_OPEN_NEW_WINDOW      (event->keyval == GDK_N)
+// #define CTRL_RESET_TERMINAL       (event->keyval == GDK_R)
+// #define CTRL_RESET_AND_CLEAR_TERM (event->keyval == GDK_A)
+// #define CTRL_SATURATION_MORE      (event->keyval == GDK_KP_Multiply)
+// #define CTRL_SATURATION_LESS      (event->keyval == GDK_KP_Divide)
+#define    CTRL_TAB_OPEN_NEW_TAB     (event->keyval == GDK_T)
+#define    CTRL_TAB_CLOSE_TAB        (event->keyval == GDK_W)
+#define    CTRL_TAB_PREVIOUS_TAB     (event->keyval == GDK_Page_Up)
+#define    CTRL_TAB_NEXT_TAB         (event->keyval == GDK_Page_Down)
+// #define CTRL_TAB_FIRST_TAB        (event->keyval == GDK_Home)
+// #define CTRL_TAB_LAST_TAB         (event->keyval == GDK_End)
+// #define CTRL_TAB_JUMP_NUMBER      TRUE /* Ctrl + number -> goto tab number */
+// #define CTRL_TAB_EDIT_LABEL       (event->keyval == GDK_E)
+// #define CTRL_TOGGLE_BACKGROUND    (event->keyval == GDK_KP_Delete)
+// #define      TOGGLE_BG_ORDER      "Image","Transparent","No background"
+// #define      TOGGLE_BG_ORDER      "Image"
+                                     /* Define only one "Image" means reload
+                                      * image.
+                                      *
+                                      * Notice: Background image can be changed
+                                      *         only when there is only one tab.
+                                      *
+                                      *         When multiple tab is opened,
+                                      *         background image is not
+                                      *         changeable.
+                                      *
+                                      *         It is an VTE problem,
+                                      *         not my fault.
+                                      */
 
 /* If you enable DOUBLE_PRESS_HOTKEY,
- * press CTRL_NEW_TAB or CTRL_REMOVE_TAB twice quickly to add or remove a tab
+ * press CTRL_TAB_OPEN_NEW_TAB or CTRL_TAB_CLOSE_TAB twice quickly to add or remove a tab
  */
 
 // #define DOUBLE_PRESS_HOTKEY    TRUE

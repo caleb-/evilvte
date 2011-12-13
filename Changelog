@@ -1,6 +1,20 @@
+0.3.0
+ * Support MENU_COPY and MENU_PASTE
+ * Support MENU_TAB_ADD_TAB and MENU_TAB_CLOSE_TAB
+ * Support MENU_CLEAR
+ * Support CTRL_OPEN_NEW_WINDOW
+ * Support CTRL_EDIT_ENCODING
+ * Support BUTTON_ORDER_GTK_STYLE and BUTTON_ORDER_QT_STYLE
+   Enable BUTTON_ORDER_GTK_STYLE will disable BUTTON_ORDER_QT_STYLE.
+   BUTTON_ORDER_GTK_STYLE supports gtk-alternative-button-order setting in
+   GTK+ rc file.
+   It is only used in dialog window now.
+ * Fix a dialog title bug
+ * Fix a CTRL_TAB_EDIT_LABEL hotkey bug
+
 0.2.9
- * Support CTRL_EDIT_TAB_LABEL
- * Support BG_TOGGLE_ORDER
+ * Support CTRL_TAB_EDIT_LABEL
+ * Support TOGGLE_BG_ORDER
  * Support new tab with current tab's working directory
  * Fix a gtk_notebook_set_scrollable bug.
    It is an GTK+ bug exists in version 2.12.9.
@@ -15,19 +29,19 @@
     The universe is big and borderless."
    Thanks to BV1AL for the genius idea.
  * Support CTRL_TOGGLE_BACKGROUND
- * Support CTRL_FIRST_TAB and CTRL_LAST_TAB
- * Support CTRL_JUMP_TAB_NUMBER
+ * Support CTRL_TAB_FIRST_TAB and CTRL_TAB_LAST_TAB
+ * Support CTRL_TAB_JUMP_NUMBER
  * Add a manpage for showvte
 
 0.2.7
- * Support SHOW_BUILDTIME_OPTION
+ * Support COMMAND_SHOW_CONFIG
  * Add a script "showvte" to show buildtime configuration
  * Show configuration status in configure script
  * Simplify src/config.h
 
 0.2.6
- * Support CTRL_MORE_SATURATION and CTRL_LESS_SATURATION
- * Support ENCODING_LIST_LABEL
+ * Support CTRL_SATURATION_MORE and CTRL_SATURATION_LESS
+ * Support MENU_ENCODING_DEFAULT
  * Auto-detect FONT_CHANGE_SIZE and remove the option from src/config.h
    Just define CTRL_FONT_BIGGER or CTRL_FONT_SMALLER to enable it
 
@@ -35,7 +49,7 @@
  * Support all arguments in -e option
    Thanks to Tetralet <tetralet AT gmail DOT com>
  * Support CTRL_RESET_TERMINAL
- * Support CTRL_RESET_AND_CLEAR 
+ * Support CTRL_RESET_AND_CLEAR_TERM 
 
 0.2.4
  * Fix a TABBAR_AUTOHIDE bug
@@ -44,7 +58,7 @@
  * New option TABBAR
  * Support TAB_INFO_AT_TITLE
  * Remove TAB_REORDERABLE
- * Fix a CLOSE_SAFE bug for i386 system
+ * Fix a CLOSE_SAFELY bug for i386 system
  * Fix a statusbar size bug
  * Add a .desktop file
  * New icon with BSD License
@@ -53,14 +67,14 @@
 
 0.2.2
  * Support TAB_REORDERABLE
- * Support TAB_MENU_SELECT_TAB
- * Support TAB_MOUSE_SCROLLABLE
+ * Support TABBAR_MENU_SELECT_TAB
+ * Support TABBAR_MOUSE_SCROLLABLE
  * Support tab at bottom, left, right, and top
  * Add a manpage
 
 0.2.1
  * Support EMULATION_TYPE
- * Support a simple EXECUTE_COMMAND function
+ * Support a simple COMMAND_EXEC_COMMAND function
    You can use command line -e option to run applications
 
 0.2.0
@@ -78,7 +92,7 @@
 0.1.7
  * Support font size change with hotkey
  * Support "Default" in encoding switching menu
- * Support CLOSE_SAFE option
+ * Support CLOSE_SAFELY option
 
 0.1.6
  * Close a tab will not close background applications now
