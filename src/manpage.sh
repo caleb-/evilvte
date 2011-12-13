@@ -14,14 +14,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-if [ "$EVILVTE" = "min" ]; then
-  grep -v -i options misc/manpage.1 > misc/evilvte.1
-  exit
-fi
-
 COMMAND_ENABLED=`grep COMMAND_ src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | grep -v FALSE | grep -v 0 | tail -n 1`
 if [ "$COMMAND_ENABLED" = "" ]; then
-  grep -v -i options misc/manpage.1 > misc/evilvte.1
+  grep -v -i option misc/manpage.1 > misc/evilvte.1
   exit
 fi
 
@@ -74,3 +69,9 @@ if [ "$COMMAND_TAB_NUMBERS" != "" ]; then
 fi
 
 tail -n 4 misc/manpage.1 >> misc/evilvte.1
+
+COMMAND_NUMBERS=`grep '^.B..-' misc/evilvte.1 | wc | awk '{print $1}'`
+if [ "$COMMAND_NUMBERS" != "1" ]; then
+  sed -e 's/option/options/'  -e 's/OPTION/OPTIONS/' misc/evilvte.1 > misc/evilvte.2
+  mv misc/evilvte.2 misc/evilvte.1
+fi

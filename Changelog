@@ -1,3 +1,15 @@
+0.4.6~pre1
+ * Support PROGRAM_ICON so users can put their own icons at $HOME
+ * Respect CFLAGS and OPTFLAGS
+ * Drop obsolete option "Select_all" in MENU_CUSTOM
+   Please use "Select all" instead
+ * Do not install evilvte.xpm
+ * Auto-detect GNU gold linker to avoid unnecessary libraries linking
+ * Improve coloring of showvte and configure script
+ * Improve man page description. Thanks to editors of http://freshmeat.net.
+ * Drop environment variable EVILVTE=min. For a minimal terminal, just run:
+   "> src/config.h ; make distclean ; make strip"
+
 0.4.5
  * Support -ls command line option to enable login shell in all tabs
  * Fix an CLOSE_SAFELY bug which was in 0.4.5~pre5 to 0.4.5~pre7
@@ -7,6 +19,7 @@
  * Hide DEFAULT_ARGV and DEFAULT_ENVV since they are almost impossible to be
    defined manually.
  * Fix build failure when linked by GNU gold linker
+   Thanks to Peter Fritzsche <peter DOT fritzsche AT gmx DOT de>
 
 0.4.5~pre7
  * Fix an HOTKEY_TOGGLE_BACKGROUND bug which was in 0.4.5~pre3 to 0.4.5~pre6
@@ -245,14 +258,7 @@
  * Support new tab with current tab's working directory
 
 0.2.8
- * Support TAB_LABEL_STYLE_*
-   You may define some interesting tab labels, such as "天地玄黃宇宙洪荒".
-   They are sky, earth, black, yellow, space, time, big, and borderless.
-   The Chinese poem script means
-   "The sky is black,
-    The earth is yellow,
-    The universe is big and borderless."
-   Thanks to BV1AL for the genius idea.
+ * Support TAB_LABEL_STYLE_*, Thanks to BV1AL.
  * Support CTRL_TOGGLE_BACKGROUND
  * Support CTRL_TAB_FIRST and CTRL_TAB_LAST
  * Support CTRL_TAB_GO_TO_NUMBER

@@ -41,6 +41,7 @@
 // #define MOUSE_CTRL_SATURATION  TRUE  /* Scroll left or right to adjust it  */
 // #define MOUSE_CURSOR_AUTOHIDE  TRUE
 // #define PROGRAM_ALWAYS_ON_TOP  TRUE
+// #define PROGRAM_ICON           ".config/evilvte/icon.png"
 // #define PROGRAM_NAME           "evilvte"
 // #define PROGRAM_VERSION        "7.7.7"
 // #define PROGRAM_WM_CLASS       TRUE

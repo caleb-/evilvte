@@ -42,7 +42,7 @@
 
 #define CTRL event->keyval ==
 
-#if !EVILVTE_MINIMUM && !EVILVTE_MAXIMUM
+#if !EVILVTE_MAXIMUM
 #include "config.h"
 #include "evilvte.h"
 #endif
@@ -390,6 +390,10 @@ int background_status = 0;
 
 #ifdef BACKGROUND_IMAGE
 char imgstr[sizeof(BACKGROUND_IMAGE) + 64];
+#endif
+
+#ifdef PROGRAM_ICON
+char iconstr[sizeof(PROGRAM_ICON) + 64];
 #endif
 
 #if defined(BACKGROUND_IMAGE) || defined(BACKGROUND_TRANSPARENT)
@@ -1241,8 +1245,8 @@ void add_tab()
   vte_terminal_set_scrollback_lines(VTE_TERMINAL(term->vte), SCROLL_LINES);
 #endif
 
-#if DEFAULT_COLUMNS && DEFAULT_ROWS
-  vte_terminal_set_size(VTE_TERMINAL(term->vte), DEFAULT_COLUMNS, DEFAULT_ROWS);
+#if VTE_COLUMNS && VTE_ROWS
+  vte_terminal_set_size(VTE_TERMINAL(term->vte), VTE_COLUMNS, VTE_ROWS);
 #endif
 
 #ifdef WORD_CHARS
@@ -1768,7 +1772,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 9);
         return TRUE;
       }
-#endif /* HOTKEY_TAB_GO_TO_NUMBER */
+#endif
 
 #ifdef HOTKEY_TOGGLE_BACKGROUND
       if (HOTKEY_TOGGLE_BACKGROUND) {
@@ -1999,7 +2003,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         gtk_widget_destroy(font_dialog);
         return TRUE;
       }
-#endif /* HOTKEY_FONT_SELECT */
+#endif
 
 #ifdef HOTKEY_TAB_FIRST
       if (HOTKEY_TAB_FIRST) {
@@ -2360,7 +2364,7 @@ void do_select_font()
   }
   gtk_widget_destroy(font_dialog);
 }
-#endif /* MENU_FONT_SELECT */
+#endif
 
 #if MENU_TOGGLE_ANTI_ALIAS
 void do_toggle_antialias()
@@ -2604,8 +2608,11 @@ int main(int argc, char **argv)
   textdomain("gtk20");
 #endif
 
-#if !EVILVTE_MINIMUM
-  int i, j;
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
+  int i;
+#endif
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_CUSTOM)
+  int j;
 #endif
 
 #if COMMAND_EXEC_PROGRAM
@@ -2626,7 +2633,7 @@ int main(int argc, char **argv)
   }
 #endif
 
-#if !EVILVTE_MINIMUM
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
   i = 1;
   j = 1;
   while ((j < argc) && strncmp(argv[j], "-e", 3)) {
@@ -2651,7 +2658,13 @@ int main(int argc, char **argv)
 
 #if COMMAND_SHOW_HELP
     if (!strncmp(argv[j], "-h", 3)) {
-      printf("%s, version %s\n\nUsage:\n\t%s [options]\n\nOptions:\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME);
+      printf("%s, version %s\n\nUsage:\n\t%s [option%s]\n\nOption%s:\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME,
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
+             "s", "s");
+#endif
+#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
+             "", "");
+#endif
 #if COMMAND_EXEC_PROGRAM
       printf("\t-e [program] [options]\tspecify the program to be run in %s\n", PROGRAM_NAME);
 #endif
@@ -2679,8 +2692,9 @@ int main(int argc, char **argv)
       printf("\t-2 to -9              \tspecify the initial tab numbers\n");
 #endif
 #ifdef BACKGROUND_IMAGE
-      printf("\nBackground image:\n\t$HOME/%s\n\n", BACKGROUND_IMAGE);
+      printf("\nBackground image:\n\t$HOME/%s\n", BACKGROUND_IMAGE);
 #endif
+      printf("\n");
       return 0;
     }
 #endif
@@ -2718,10 +2732,14 @@ int main(int argc, char **argv)
 
     j++;
   }
-#endif /* !EVILVTE_MINIMUM */
+#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS */
 
 #ifdef BACKGROUND_IMAGE
   g_snprintf(imgstr, sizeof(imgstr), "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
+#endif
+
+#ifdef PROGRAM_ICON
+  g_snprintf(iconstr, sizeof(iconstr), "%s/%s", g_getenv("HOME"), PROGRAM_ICON);
 #endif
 
 #ifdef FONT
@@ -2782,7 +2800,12 @@ int main(int argc, char **argv)
   gtk_window_set_title(GTK_WINDOW(main_window), VTE_PROGRAM_NAME);
 #endif
 
-#if SHOW_WINDOW_ICON
+#ifdef PROGRAM_ICON
+  if (!gtk_window_set_icon_from_file(GTK_WINDOW(main_window), iconstr, NULL))
+    gtk_window_set_icon_from_file(GTK_WINDOW(main_window), ICON_DIR"/evilvte.png", NULL);
+#endif
+
+#if !defined(PROGRAM_ICON) && SHOW_WINDOW_ICON
   gtk_window_set_icon_from_file(GTK_WINDOW(main_window), ICON_DIR"/evilvte.png", NULL);
 #endif
 
@@ -2964,13 +2987,6 @@ int main(int argc, char **argv)
 
 #if MENU_SELECT_ALL
     if (!strncmp(menu_custom[j], "Select all", 11)) {
-      GtkWidget *menu_select_all = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL, NULL);
-      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_select_all);
-      g_signal_connect(menu_select_all, "activate", do_select_all, NULL);
-      menu_item_success++;
-    }
-
-    if (!strncmp(menu_custom[j], "Select_all", 11)) {
       GtkWidget *menu_select_all = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_select_all);
       g_signal_connect(menu_select_all, "activate", do_select_all, NULL);

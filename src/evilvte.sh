@@ -67,10 +67,8 @@ if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
   if [ "$ROWS_DEFINE" = "" ]; then
     ROWS_DEFINE=24
   fi
-  echo \#undef DEFAULT_COLUMNS >> $NEWCONFFILE
-  echo \#undef DEFAULT_ROWS >> $NEWCONFFILE
-  echo \#define DEFAULT_COLUMNS $COLUMNS_DEFINE >> $NEWCONFFILE
-  echo \#define DEFAULT_ROWS $ROWS_DEFINE >> $NEWCONFFILE
+  echo \#define VTE_COLUMNS $COLUMNS_DEFINE >> $NEWCONFFILE
+  echo \#define VTE_ROWS $ROWS_DEFINE >> $NEWCONFFILE
 fi
 
 TOGGLE_BG_ORDER_DEFINE=`grep TOGGLE_BG_ORDER $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
@@ -128,16 +126,6 @@ fi
 MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep 'Select all'`
 if [ "$MENU_SELECT_ALL" != "" ]; then
   echo \#define MENU_SELECT_ALL 1 >> $NEWCONFFILE
-fi
-
-MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep Select_all`
-if [ "$MENU_SELECT_ALL" != "" ]; then
-  echo \#define MENU_SELECT_ALL 1 >> $NEWCONFFILE
-  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
-  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
-  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
-  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
-  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
 fi
 
 MENU_COLOR_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Background tint'`
