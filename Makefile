@@ -24,7 +24,7 @@ install:
 	install -d $(ICON_DIR_INSTALL)
 	install -m 644 misc/evilvte.png misc/evilvte.xpm $(ICON_DIR_INSTALL)
 	install -d $(mandir)
-	install -m 644 misc/evilvte.1 $(mandir)
+	install -m 644 misc/evilvte.1 misc/showvte.1 $(mandir)
 	install -d $(deskdir)
 	install -m 644 misc/evilvte.desktop $(deskdir)
 

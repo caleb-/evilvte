@@ -45,7 +45,6 @@ if [ $? != 0 ]; then
 else
   echo Prefix: [1m[33m$prefix[m
   echo Configuration:
-  sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#undef | sed -e 's~/\*~\n~g' -e 's/^\#undef/\#undef /' | grep -v \*\/
   sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
   echo
   echo Please edit [1m[33msrc/config.h[m to customize your options.

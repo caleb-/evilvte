@@ -60,6 +60,15 @@
 #undef SCROLLBAR_RIGHT
 #endif
 
+#ifdef CTRL_TOGGLE_BACKGROUND
+#ifndef BACKGROUND_IMAGE
+#define BACKGROUND_IMAGE ".config/evilvte/background.png"
+#endif
+#undef BACKGROUND_TRANSPARENT /* prevent duplicated definitions */
+#define BACKGROUND_TRANSPARENT TRUE
+int background_status = 0;
+#endif
+
 #ifdef BACKGROUND_IMAGE
 #define BACKGROUND_EXIST TRUE
 #endif
@@ -79,6 +88,9 @@
 #undef CTRL_NEXT_TAB
 #undef CTRL_NEW_TAB
 #undef CTRL_REMOVE_TAB
+#undef CTRL_FIRST_TAB
+#undef CTRL_LAST_TAB
+#undef CTRL_JUMP_TAB_NUMBER
 #undef TAB_AT_BOTTOM
 #undef TAB_AT_LEFT
 #undef TAB_AT_RIGHT
@@ -89,15 +101,13 @@
 #undef TAB_INFO_AT_TITLE
 #undef TAB_INITIAL_NUMBER
 #undef TAB_LABEL
+#undef TAB_LABEL_STYLE_CUSTOM
+#undef TAB_LABEL_STYLE_POEM
 #undef TAB_MENU_SELECT_TAB
 #undef TAB_MOUSE_SCROLLABLE
 #undef TABBAR
 #undef TABBAR_AUTOHIDE
 #define SHOW_WINDOW_BORDER FALSE
-#endif
-
-#ifndef TAB_LABEL
-#undef TAB_LABEL_NUMBER
 #endif
 
 #if TABBAR_AUTOHIDE
@@ -181,6 +191,37 @@
 
 GtkWidget *main_window;
 GtkWidget *notebook;
+
+#ifdef TAB_LABEL_STYLE_CUSTOM
+#undef TAB_LABEL
+#undef TAB_LABEL_STYLE_POEM
+#define TAB_LABEL_INIT TRUE
+static char *label_style_custom[] = {
+TAB_LABEL_STYLE_CUSTOM
+};
+int label_style_size = sizeof(label_style_custom) / sizeof(label_style_custom[0]);
+#endif
+
+#if TAB_LABEL_STYLE_POEM
+#undef TAB_LABEL
+#define TAB_LABEL_INIT TRUE
+/* Taken from http://zh.wikipedia.org/wiki/%E5%8D%83%E5%AD%97%E6%96%87 */
+static char *label_style_poem[] = {
+"天","地","玄","黃","宇","宙","洪","荒",
+"日","月","盈","昃","辰","宿","列","張",
+"寒","來","暑","往","秋","收","冬","藏",
+"閏","餘","成","歲","律","呂","調","陽"
+};
+int label_style_size = sizeof(label_style_poem) / sizeof(label_style_poem[0]);
+#endif
+
+#ifdef TAB_LABEL
+#define TAB_LABEL_INIT TRUE
+#endif
+
+#ifndef TAB_LABEL
+#undef TAB_LABEL_NUMBER
+#endif
 
 #if COLOR_STYLE_LINUX
 const GdkColor color_linux[16] =
@@ -403,7 +444,7 @@ struct terminal {
 #if CLOSE_SAFE
   int pid;
 #endif
-#ifdef TAB_LABEL
+#ifdef TAB_LABEL_INIT
   GtkWidget *label;
 #endif
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
@@ -426,6 +467,99 @@ void set_encoding(GtkWidget *widget, void *data);
 gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
+
+#if CTRL_JUMP_TAB_NUMBER
+    if (event->keyval <= GDK_9 && event->keyval >= GDK_0) {
+      int pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook));
+      switch (event->keyval) {
+        case GDK_1:
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
+          break;
+        case GDK_2:
+          if (pages > 1)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 1);
+          else
+            return FALSE;
+          break;
+        case GDK_3:
+          if (pages > 2)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 2);
+          else
+            return FALSE;
+          break;
+        case GDK_4:
+          if (pages > 3)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 3);
+          else
+            return FALSE;
+          break;
+        case GDK_5:
+          if (pages > 4)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 4);
+          else
+            return FALSE;
+          break;
+        case GDK_6:
+          if (pages > 5)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 5);
+          else
+            return FALSE;
+          break;
+        case GDK_7:
+          if (pages > 6)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 6);
+          else
+            return FALSE;
+          break;
+        case GDK_8:
+          if (pages > 7)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 7);
+          else
+            return FALSE;
+          break;
+        case GDK_9:
+          if (pages > 8)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 8);
+          else
+            return FALSE;
+          break;
+        case GDK_0:
+          if (pages > 9)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 9);
+          else
+            return FALSE;
+          break;
+      }
+#if STATUS_BAR
+      change_statusbar_encoding();
+#endif
+#if TAB_INFO_AT_TITLE
+      change_window_title();
+#endif
+      return TRUE;
+    }
+#endif /* CTRL_JUMP_TAB_NUMBER */
+
+#ifdef CTRL_TOGGLE_BACKGROUND
+    if CTRL_TOGGLE_BACKGROUND {
+      background_status++;
+      if (background_status > 2)
+        background_status = 0;
+      if (background_status == 0)
+        vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), BACKGROUND_TRANSPARENT);
+      if (background_status == 1) {
+        char imgstr[64];
+        sprintf(imgstr, "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
+        vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), FALSE);
+        vte_terminal_set_background_image_file(VTE_TERMINAL(term.vte), imgstr);
+      }
+      if (background_status == 2) {
+        vte_terminal_set_background_transparent(VTE_TERMINAL(term.vte), FALSE);
+        vte_terminal_set_background_image_file(VTE_TERMINAL(term.vte), "/dev/null");
+      }
+      return TRUE;
+    }
+#endif /* CTRL_TOGGLE_BACKGROUND */
 
 #ifdef CTRL_MORE_SATURATION
     if CTRL_MORE_SATURATION {
@@ -495,6 +629,32 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       goto font_size_changed;
     }
 #endif
+
+#ifdef CTRL_FIRST_TAB
+    if CTRL_FIRST_TAB {
+      gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
+#if STATUS_BAR
+      change_statusbar_encoding();
+#endif
+#if TAB_INFO_AT_TITLE
+      change_window_title();
+#endif
+      return TRUE;
+    }
+#endif /* CTRL_FIRST_TAB */
+
+#ifdef CTRL_LAST_TAB
+    if CTRL_LAST_TAB {
+      gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
+#if STATUS_BAR
+      change_statusbar_encoding();
+#endif
+#if TAB_INFO_AT_TITLE
+      change_window_title();
+#endif
+      return TRUE;
+    }
+#endif /* CTRL_LAST_TAB */
 
 #ifdef CTRL_PREVIOUS_TAB
     if CTRL_PREVIOUS_TAB {
@@ -674,6 +834,20 @@ void sakura_add_tab()
 #else
   term.label = gtk_label_new(TAB_LABEL);
 #endif
+#endif
+
+#ifdef TAB_LABEL_STYLE_CUSTOM
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size)
+    term.label = gtk_label_new(g_strdup_printf("%s", label_style_custom[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
+  else
+    term.label = NULL;
+#endif
+
+#if TAB_LABEL_STYLE_POEM
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size)
+    term.label = gtk_label_new(g_strdup_printf("%s", label_style_poem[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
+  else
+    term.label = NULL;
 #endif
 
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
@@ -858,19 +1032,19 @@ void sakura_add_tab()
   vte_terminal_set_word_chars(VTE_TERMINAL(term.vte), WORD_CHARS);
 #endif
 
-#ifdef TAB_LABEL
+#ifdef TAB_LABEL_INIT
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.hbox, term.label);
 #else
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.vte, term.label);
 #endif
-#else /* TAB_LABEL */
+#else /* TAB_LABEL_INIT */
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.hbox, NULL);
 #else
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.vte, NULL);
 #endif
-#endif /* TAB_LABEL */
+#endif /* TAB_LABEL_INIT */
 
   g_signal_connect(term.vte, "child-exited", sakura_del_tab, NULL);
 
@@ -963,6 +1137,28 @@ void sakura_del_tab()
     term = g_array_index(terminals, struct terminal, i);
     term.label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (i + 1)));
     gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
+  }
+#endif
+
+#ifdef TAB_LABEL_STYLE_CUSTOM
+  int i;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = g_array_index(terminals, struct terminal, i);
+    if (i < label_style_size) {
+      term.label = gtk_label_new(g_strdup_printf("%s", label_style_custom[i]));
+      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
+    }
+  }
+#endif
+
+#if TAB_LABEL_STYLE_POEM
+  int i;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = g_array_index(terminals, struct terminal, i);
+    if (i < label_style_size) {
+      term.label = gtk_label_new(g_strdup_printf("%s", label_style_poem[i]));
+      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
+    }
   }
 #endif
 

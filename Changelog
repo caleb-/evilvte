@@ -1,3 +1,17 @@
+0.2.8
+ * Support TAB_LABEL_STYLE_*
+   You may define some interesting tab labels, such as "天地玄黃宇宙洪荒".
+   They are sky, earth, black, yellow, space, time, big, and borderless.
+   The Chinese poem script means
+   "The sky is black,
+    The earth is yellow,
+    The universe is big and borderless."
+   Thanks to BV1AL for the genius idea.
+ * Support CTRL_TOGGLE_BACKGROUND
+ * Support CTRL_FIRST_TAB and CTRL_LAST_TAB
+ * Support CTRL_JUMP_TAB_NUMBER
+ * Add a manpage for showvte
+
 0.2.7
  * Support SHOW_BUILDTIME_OPTION
  * Add a script "showvte" to show buildtime configuration

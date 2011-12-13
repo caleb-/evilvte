@@ -49,7 +49,7 @@
 // #define ENCODING_LIST          "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
 #define    ENCODING_LIST          "UTF-8" /* Right click to switch encoding */
 #define    EXECUTE_COMMAND        TRUE /* Command line -e option */
-#define    MENU_INPUT_METHOD      TRUE
+#define    MENU_INPUT_METHOD      TRUE /* Right click to switch input method */
 // #define MOUSE_AUTOHIDE         TRUE
 // #define SCROLL_BACKGROUND      TRUE
 // #define SCROLL_LINES           60
@@ -76,6 +76,8 @@
 // #define TAB_INITIAL_NUMBER     1
 // #define TAB_LABEL              "Page"
 // #define TAB_LABEL_NUMBER       TRUE   /* Depends on TAB_LABEL */
+// #define TAB_LABEL_STYLE_POEM   TRUE
+// #define TAB_LABEL_STYLE_CUSTOM "One","Two","Three","Four","Five","Six"
 // #define TAB_MENU_SELECT_TAB    TRUE
 // #define TAB_MOUSE_SCROLLABLE   TRUE
 // #define TABBAR                 TRUE
@@ -95,6 +97,9 @@
 #define    CTRL_NEXT_TAB          (event->keyval == GDK_Page_Down)
 #define    CTRL_NEW_TAB           (event->keyval == GDK_T)
 #define    CTRL_REMOVE_TAB        (event->keyval == GDK_W)
+// #define CTRL_FIRST_TAB         (event->keyval == GDK_Home)
+// #define CTRL_LAST_TAB          (event->keyval == GDK_End)
+// #define CTRL_JUMP_TAB_NUMBER   TRUE /* Ctrl + number -> goto tab number */
 // #define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
 // #define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
 // #define CTRL_FONT_DEFAULT_SIZE (event->keyval == GDK_KP_Insert)
@@ -104,6 +109,7 @@
 // #define CTRL_RESET_AND_CLEAR   (event->keyval == GDK_A)
 // #define CTRL_MORE_SATURATION   (event->keyval == GDK_KP_Multiply)
 // #define CTRL_LESS_SATURATION   (event->keyval == GDK_KP_Divide)
+// #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
 
 /* If you enable DOUBLE_PRESS_HOTKEY,
  * press CTRL_NEW_TAB or CTRL_REMOVE_TAB twice quickly to add or remove a tab
