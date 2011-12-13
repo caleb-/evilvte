@@ -1,3 +1,13 @@
+0.4.4~pre1
+ * Support command line -r option to run in root window
+ * Support command line -h option to show help messages
+ * Support command line -2 to -9 options to set initial tab numbers
+ * Remove TAB_INITIAL_NUMBER
+ * Make icons smaller, and update their copyright to year 2008 with permission
+   from the author, Tetralet <tetralet AT gmail DOT com>
+ * Make manpage of evilvte according to options in src/config.h
+ * Simplify Makefile and configure
+
 0.4.3
  * Fix Segmentation fault when closing program
    Please enable CLOSE_SAFELY or CLOSE_DIALOG
@@ -154,7 +164,7 @@
  * Support all arguments in -e option
    Thanks to Tetralet <tetralet AT gmail DOT com>
  * Support CTRL_RESET_TERMINAL
- * Support CTRL_RESET_AND_CLEAR 
+ * Support CTRL_RESET_AND_CLEAR
 
 0.2.4
  * Fix a TABBAR_AUTOHIDE bug
@@ -166,9 +176,7 @@
  * Fix a CLOSE_SAFELY bug for i386 architecture
  * Fix a statusbar size bug
  * Add a .desktop file
- * New icon with BSD License
-   misc/evilvte.xpm: Copyright (c) Lu, Chao-Ming (Tetralet)
-   You can see the license with: tail -n 26 misc/evilvte.xpm
+ * New icon with BSD License, misc/evilvte.xpm
 
 0.2.2
  * Support TAB_REORDERABLE
@@ -217,9 +225,7 @@
 
 0.1.1
  * Remove an useless g_signal_connect
- * New icon with BSD License
-   misc/evilvte.png: Copyright (c) Lu, Chao-Ming (Tetralet)
-   You can see the license with: tail -n 26 misc/evilvte.png
+ * New icon with BSD License, misc/evilvte.png
 
 0.1.0
  * Support window title

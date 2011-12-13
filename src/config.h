@@ -19,9 +19,12 @@
 // #define COLOR_TEXT_BOLD        "red"
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"
+// #define COMMAND_AT_ROOT_WINDOW TRUE  /* -r option, run in root window      */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
+// #define COMMAND_SHOW_HELP      TRUE  /* -h option, show help               */
 #define    COMMAND_SHOW_OPTIONS   TRUE  /* -o option, show build-time options */
 #define    COMMAND_SHOW_VERSION   TRUE  /* -v option, show program version    */
+// #define COMMAND_TAB_NUMBERS    TRUE  /* -[2-9] options, to set tab numbers */
 // #define CURSOR_BLINKS          TRUE
 // #define CURSOR_COLOR           "blue"
 // #define DEFAULT_ARGV           NULL
@@ -78,7 +81,6 @@
 // #define TAB_BORDER_HORIZONTAL  0
 // #define TAB_BORDER_VERTICAL    0
 // #define TAB_EXPANDED_WIDTH     TRUE
-// #define TAB_INITIAL_NUMBER     1
 // #define TAB_LABEL              "Page"
 // #define TAB_LABEL_NUMBER       TRUE
 // #define TAB_LABEL_POEM         TRUE

@@ -10,12 +10,12 @@ ifeq ($(SUSE_DETECTED),TRUE)
 CFLAGS += -DSUSE_DETECTED=1
 endif
 
-all: evilvte showvte
+all: evilvte showvte misc/evilvte.1
 
-parsecfg:
+src/evilvte.h:
 	sh src/evilvte.c
 
-evilvte: parsecfg $(OBJ)
+evilvte: src/evilvte.h $(OBJ)
 	$(CC) -o $(PROG) $(OBJ) $(LDFLAGS)
 
 strip: all
@@ -29,7 +29,10 @@ showvte:
 	sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ >> src/showvte
 	chmod 755 src/showvte
 
-install:
+misc/evilvte.1:
+	sh src/manpage.c
+
+install: all
 	install -d $(bindir)
 	install -m 755 $(PROG) src/showvte $(bindir)
 	install -d $(ICON_DIR_INSTALL)
@@ -39,10 +42,20 @@ install:
 	install -d $(deskdir)
 	install -m 644 misc/evilvte.desktop $(deskdir)
 
-installstrip: strip install
+installstrip: strip
+	install -d $(bindir)
+	install -m 755 $(PROG) src/showvte $(bindir)
+	install -d $(ICON_DIR_INSTALL)
+	install -m 644 misc/evilvte.png misc/evilvte.xpm $(ICON_DIR_INSTALL)
+	install -d $(mandir)
+	install -m 644 misc/evilvte.1 misc/showvte.1 $(mandir)
+	install -d $(deskdir)
+	install -m 644 misc/evilvte.desktop $(deskdir)
 
 clean: src/config.o
-	rm -f $(PROG) src/showvte src/*.o src/evilvte.h
+	rm -f $(PROG) src/showvte src/*.o src/evilvte.h misc/evilvte.1
 
 src/config.o:
 	./configure
+
+.PHONY: all strip install installstrip clean

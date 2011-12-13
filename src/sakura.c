@@ -171,7 +171,7 @@
 #undef TAB_BORDER_HORIZONTAL
 #undef TAB_BORDER_VERTICAL
 #undef TAB_EXPANDED_WIDTH
-#undef TAB_INITIAL_NUMBER
+#undef COMMAND_TAB_NUMBERS
 #undef TAB_LABEL
 #undef TAB_LABEL_POEM
 #undef TAB_LABEL_CUSTOM
@@ -572,6 +572,12 @@ int tabbar_status = 0;
 #endif
 #endif
 
+#if COMMAND_SHOW_HELP
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "evilvte"
+#endif
+#endif
+
 #ifdef PROGRAM_VERSION
 #define EVILVTE_PROGRAM_VERSION PROGRAM_VERSION
 #endif
@@ -861,6 +867,10 @@ int always_on_top = PROGRAM_ALWAYS_ON_TOP;
 double saturation_level = BACKGROUND_SATURATION;
 #endif
 
+#if COMMAND_AT_ROOT_WINDOW
+int at_root_window = 0;
+#endif
+
 #if TAB
 GArray *terminals;
 #endif
@@ -892,42 +902,42 @@ struct terminal {
 #endif
 } term;
 
-int key_press_event(GtkWidget *widget, GdkEventKey *event);
-int menu_popup(GtkWidget *widget, GdkEventButton *event);
-int scroll_event(GtkWidget *widget, GdkEventScroll *event);
-void change_statusbar_encoding();
-void change_window_title();
-void add_tab();
-void del_tab(int do_close_dialog);
-void delete_event();
-void do_always_on_top();
-void do_change_saturation();
-void do_clear();
-void do_copy();
-void do_edit_label();
-void do_match_copy();
-void do_match_open();
-void do_menu_saturation();
-void do_menu_tint_color();
-void do_new_window();
-void do_paste();
-void do_reset();
-void do_select_all();
-void do_select_font();
-void do_toggle_antialias();
-void do_toggle_bg();
-void do_toggle_decorated();
-void do_toggle_hotkeys();
-void do_toggle_scrollbar();
-void do_toggle_status_bar();
-void do_toggle_tabbar();
-void do_zoom_100();
-void do_zoom_in();
-void do_zoom_out();
-void set_encoding(GtkWidget *widget, void *data);
+static int key_press_event(GtkWidget *widget, GdkEventKey *event);
+static int menu_popup(GtkWidget *widget, GdkEventButton *event);
+static int scroll_event(GtkWidget *widget, GdkEventScroll *event);
+static void change_statusbar_encoding();
+static void change_window_title();
+static void add_tab();
+static void del_tab(int do_close_dialog);
+static void delete_event();
+static void do_always_on_top();
+static void do_change_saturation();
+static void do_clear();
+static void do_copy();
+static void do_edit_label();
+static void do_match_copy();
+static void do_match_open();
+static void do_menu_saturation();
+static void do_menu_tint_color();
+static void do_new_window();
+static void do_paste();
+static void do_reset();
+static void do_select_all();
+static void do_select_font();
+static void do_toggle_antialias();
+static void do_toggle_bg();
+static void do_toggle_decorated();
+static void do_toggle_hotkeys();
+static void do_toggle_scrollbar();
+static void do_toggle_status_bar();
+static void do_toggle_tabbar();
+static void do_zoom_100();
+static void do_zoom_in();
+static void do_zoom_out();
+static void set_encoding(GtkWidget *widget, void *data);
 
 #if CTRL
-int key_press_event(GtkWidget *widget, GdkEventKey *event)
+static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
   if (event->state & GDK_CONTROL_MASK) {
 
@@ -1112,6 +1122,14 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       if CTRL_TOGGLE_ON_TOP {
         always_on_top = !always_on_top;
         gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
+#if COMMAND_AT_ROOT_WINDOW
+        if (at_root_window && !always_on_top) {
+          gtk_window_set_keep_below(GTK_WINDOW(main_window), 1);
+          gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
+          gtk_window_set_skip_taskbar_hint(GTK_WINDOW(main_window), 1);
+          gtk_window_set_skip_pager_hint(GTK_WINDOW(main_window), 1);
+        }
+#endif
         return TRUE;
       }
 #endif
@@ -1590,7 +1608,7 @@ font_size_changed:
 #endif /* CTRL */
 
 #if MENU
-int menu_popup(GtkWidget *widget, GdkEventButton *event)
+static int menu_popup(GtkWidget *widget, GdkEventButton *event)
 {
   GdkEventButton *event_button;
   if (event->type == GDK_BUTTON_PRESS) {
@@ -1634,7 +1652,7 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #endif /* MENU */
 
 #if MOUSE_CTRL_SATURATION
-int scroll_event(GtkWidget *widget, GdkEventScroll *event)
+static int scroll_event(GtkWidget *widget, GdkEventScroll *event)
 {
   if (event->direction == GDK_SCROLL_RIGHT) {
     saturation_level += 0.025;
@@ -1686,7 +1704,7 @@ int scroll_event(GtkWidget *widget, GdkEventScroll *event)
 #endif /* MOUSE_CTRL_SATURATION */
 
 #if STATUS_BAR
-void change_statusbar_encoding()
+static void change_statusbar_encoding()
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -1696,7 +1714,7 @@ void change_statusbar_encoding()
 #endif
 
 #if TAB_SHOW_INFO_AT_TITLE
-void change_window_title()
+static void change_window_title()
 {
   int index = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook));
   if (index == 1)
@@ -1710,7 +1728,7 @@ void change_window_title()
 #endif
 
 #if CLOSE_SAFELY || CLOSE_DIALOG
-void delete_event()
+static void delete_event()
 {
 #if CLOSE_DIALOG && TAB
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1) {
@@ -1757,15 +1775,23 @@ void delete_event()
 #endif
 
 #if MENU_TOGGLE_ON_TOP
-void do_always_on_top()
+static void do_always_on_top()
 {
   always_on_top = !always_on_top;
   gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
+#if COMMAND_AT_ROOT_WINDOW
+  if (at_root_window && !always_on_top) {
+    gtk_window_set_keep_below(GTK_WINDOW(main_window), 1);
+    gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
+    gtk_window_set_skip_taskbar_hint(GTK_WINDOW(main_window), 1);
+    gtk_window_set_skip_pager_hint(GTK_WINDOW(main_window), 1);
+  }
+#endif
 }
 #endif
 
 #if DO_CHANGE_SATURATION
-void do_change_saturation()
+static void do_change_saturation()
 {
   saturation_level = gtk_range_get_value(GTK_RANGE(adjustment));
 #if TAB
@@ -1783,7 +1809,7 @@ void do_change_saturation()
 #endif
 
 #if MENU_RESET_AND_CLEAR
-void do_clear()
+static void do_clear()
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -1793,7 +1819,7 @@ void do_clear()
 #endif
 
 #if MENU_COPY
-void do_copy()
+static void do_copy()
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -1803,7 +1829,7 @@ void do_copy()
 #endif
 
 #if MENU_TAB_EDIT_LABEL
-void do_edit_label()
+static void do_edit_label()
 {
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
   char *label_name = (char*)gtk_label_get_text(GTK_LABEL(gtk_notebook_get_tab_label(GTK_NOTEBOOK(notebook), gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index))));
@@ -1837,7 +1863,7 @@ void do_edit_label()
 #endif /* MENU_TAB_EDIT_LABEL */
 
 #ifdef MENU_MATCH_STRING_EXEC
-void do_match_copy()
+static void do_match_copy()
 {
   gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD), matched_url, -1);
   matched_url = NULL;
@@ -1845,7 +1871,7 @@ void do_match_copy()
 #endif
 
 #ifdef MENU_MATCH_STRING_EXEC
-void do_match_open()
+static void do_match_open()
 {
   char new_window_str[256];
   sprintf(new_window_str, "%s %s &\0", MENU_MATCH_STRING_EXEC, matched_url);
@@ -1855,7 +1881,7 @@ void do_match_open()
 #endif
 
 #if MENU_CHANGE_SATURATION
-void do_menu_saturation()
+static void do_menu_saturation()
 {
   double saturation_level_old = saturation_level;
   GtkWidget *saturation_dialog;
@@ -1896,7 +1922,7 @@ void do_menu_saturation()
 #endif /* MENU_CHANGE_SATURATION */
 
 #if MENU_COLOR_BACKGROUND
-void do_menu_tint_color()
+static void do_menu_tint_color()
 {
   GtkColorSelectionDialog *color_tint_dialog = (GtkColorSelectionDialog*)gtk_color_selection_dialog_new(LABEL_DIALOG_BACKGROUND_TINT);
   gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color_tint_dialog->colorsel), &color_tint);
@@ -1917,14 +1943,14 @@ void do_menu_tint_color()
 #endif
 
 #if MENU_OPEN_NEW_WINDOW
-void do_new_window()
+static void do_new_window()
 {
   system(PROGRAM_NAME " &");
 }
 #endif
 
 #if MENU_PASTE
-void do_paste()
+static void do_paste()
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -1934,7 +1960,7 @@ void do_paste()
 #endif
 
 #if MENU_RESET_TERMINAL
-void do_reset()
+static void do_reset()
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -1944,7 +1970,7 @@ void do_reset()
 #endif
 
 #if MENU_SELECT_ALL
-void do_select_all()
+static void do_select_all()
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -1954,7 +1980,7 @@ void do_select_all()
 #endif
 
 #if MENU_FONT_SELECT
-void do_select_font()
+static void do_select_font()
 {
   GtkWidget *font_dialog = gtk_font_selection_dialog_new(font_str);
   gtk_font_selection_dialog_set_font_name(GTK_FONT_SELECTION_DIALOG(font_dialog), font_str);
@@ -1996,7 +2022,7 @@ void do_select_font()
 #endif /* MENU_FONT_SELECT */
 
 #if MENU_TOGGLE_ANTI_ALIAS
-void do_toggle_antialias()
+static void do_toggle_antialias()
 {
   antialias_status++;
   if (antialias_status > VTE_ANTI_ALIAS_FORCE_DISABLE)
@@ -2014,7 +2040,7 @@ void do_toggle_antialias()
 #endif
 
 #if MENU_TOGGLE_BACKGROUND
-void do_toggle_bg()
+static void do_toggle_bg()
 {
   background_status++;
   if (background_status == background_order_size)
@@ -2079,7 +2105,7 @@ void do_toggle_bg()
 #endif
 
 #if MENU_TOGGLE_DECORATED
-void do_toggle_decorated()
+static void do_toggle_decorated()
 {
   window_decorated_status = !window_decorated_status;
   if (window_decorated_status)
@@ -2098,7 +2124,7 @@ void do_toggle_decorated()
 #endif
 
 #if MENU_TOGGLE_HOTKEYS
-void do_toggle_hotkeys()
+static void do_toggle_hotkeys()
 {
   hotkey_status = !hotkey_status;
 }
@@ -2106,7 +2132,7 @@ void do_toggle_hotkeys()
 
 #if MENU_TOGGLE_SCROLLBAR
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
-void do_toggle_scrollbar()
+static void do_toggle_scrollbar()
 {
 #if TAB
   int i;
@@ -2137,7 +2163,7 @@ void do_toggle_scrollbar()
 #endif /* MENU_TOGGLE_SCROLLBAR */
 
 #if MENU_TOGGLE_STATUS_BAR && STATUS_BAR
-void do_toggle_status_bar()
+static void do_toggle_status_bar()
 {
   status_bar_status = !status_bar_status;
   if (status_bar_status)
@@ -2149,7 +2175,7 @@ void do_toggle_status_bar()
 #endif
 
 #if MENU_TOGGLE_TABBAR
-void do_toggle_tabbar()
+static void do_toggle_tabbar()
 {
   tabbar_status = !tabbar_status;
   if (tabbar_status)
@@ -2165,7 +2191,7 @@ void do_toggle_tabbar()
 #endif
 
 #if MENU_FONT_DEFAULT_SIZE
-void do_zoom_100()
+static void do_zoom_100()
 {
   font_size = FONT_SIZE;
   sprintf(font_str, "%s %d", font_name, font_size);
@@ -2183,7 +2209,7 @@ void do_zoom_100()
 #endif
 
 #if MENU_FONT_BIGGER
-void do_zoom_in()
+static void do_zoom_in()
 {
   font_size++;
   sprintf(font_str, "%s %d", font_name, font_size);
@@ -2201,7 +2227,7 @@ void do_zoom_in()
 #endif
 
 #if MENU_FONT_SMALLER
-void do_zoom_out()
+static void do_zoom_out()
 {
   font_size--;
   sprintf(font_str, "%s %d", font_name, font_size);
@@ -2218,7 +2244,7 @@ void do_zoom_out()
 }
 #endif
 
-void add_tab()
+static void add_tab()
 {
 #if TAB_LABEL_INIT
   GtkWidget *label;
@@ -2528,7 +2554,7 @@ void add_tab()
   gtk_window_set_focus(GTK_WINDOW(main_window), term.vte);
 }
 
-void del_tab(int do_close_dialog)
+static void del_tab(int do_close_dialog)
 {
 #if TAB_LABEL_INIT
   GtkWidget *label;
@@ -2678,7 +2704,7 @@ void del_tab(int do_close_dialog)
 #endif
 }
 
-void set_encoding(GtkWidget *widget, void *data)
+static void set_encoding(GtkWidget *widget, void *data)
 {
 #if TAB
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -2691,34 +2717,55 @@ void set_encoding(GtkWidget *widget, void *data)
 
 int main(int argc, char **argv)
 {
+#if COMMAND_EXEC_PROGRAM
+  sprintf(default_command, "%s", DEFAULT_COMMAND);
+  if (argc > 2) {
+    int i;
+    for (i = 0 ; i < argc ; i++) {
+      if (!strcmp(argv[i], "-e")) {
+        if (i < argc - 1)
+          sprintf(default_command, "%s", argv[i + 1]);
+        if (++i != argc)
+          default_argv = &(argv[i]);
+      }
+    }
+  }
+#endif
+
 #if COMMAND_SHOW_VERSION
-  if (argc == 2 && !strcmp(argv[1], "-v")) {
+  if (argc > 1 && !strcmp(argv[1], "-v")) {
     printf("%s, version %s\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION);
     return 0;
   }
 #endif
 
 #if COMMAND_SHOW_OPTIONS
-  if (argc == 2 && !strcmp(argv[1], "-o")) {
+  if (argc > 1 && !strcmp(argv[1], "-o")) {
     system("showvte");
     return 0;
   }
 #endif
 
+#if COMMAND_SHOW_HELP
+  if (argc > 1 && !strcmp(argv[1], "-h")) {
+    printf("%s, version %s\n\nUsage:\n\t%s [options]\n\nOptions:\n\t-h                    \tshow this help\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME);
+#if COMMAND_AT_ROOT_WINDOW
+    printf("\t-r                    \tmake %s run in root window\n", PROGRAM_NAME);
+#endif
 #if COMMAND_EXEC_PROGRAM
-  if (argc > 2 && !strcmp(argv[1], "-e")) {
-    sprintf(default_command, "%s", argv[2]);
-    int i;
-    for (i = 0 ; i < argc ; i++)
-    {
-      if (!strcmp(argv[i], "-e")) {
-        if (++i != argc)
-          default_argv = &(argv[i]);
-      }
-    }
+    printf("\t-e [program] [options]\tspecifies the program to be run in %s\n", PROGRAM_NAME);
+#endif
+#if COMMAND_SHOW_OPTIONS
+    printf("\t-o                    \tshow build-time configuration\n");
+#endif
+#if COMMAND_SHOW_VERSION
+    printf("\t-v                    \tshow version\n");
+#endif
+#if COMMAND_TAB_NUMBERS
+    printf("\t-2 to -9              \tspecifies the initial tab numbers\n");
+#endif
+    return 0;
   }
-  else
-    sprintf(default_command, "%s", DEFAULT_COMMAND);
 #endif
 
 #ifdef BACKGROUND_IMAGE
@@ -2814,10 +2861,51 @@ int main(int argc, char **argv)
   default_argv = DEFAULT_ARGV;
 #endif
 
-#if TAB_INITIAL_NUMBER
-  int i;
-  for (i = 1 ; i < TAB_INITIAL_NUMBER ; i++)
-    add_tab();
+#if COMMAND_TAB_NUMBERS
+  if (argc > 1) {
+    int i = 1;
+    if (!strcmp(argv[1], "-2"))
+      i = 2;
+    if (!strcmp(argv[1], "-3"))
+      i = 3;
+    if (!strcmp(argv[1], "-4"))
+      i = 4;
+    if (!strcmp(argv[1], "-5"))
+      i = 5;
+    if (!strcmp(argv[1], "-6"))
+      i = 6;
+    if (!strcmp(argv[1], "-7"))
+      i = 7;
+    if (!strcmp(argv[1], "-8"))
+      i = 8;
+    if (!strcmp(argv[1], "-9"))
+      i = 9;
+    if (argc > 2) {
+      if (!strcmp(argv[2], "-2"))
+        i = 2;
+      if (!strcmp(argv[2], "-3"))
+        i = 3;
+      if (!strcmp(argv[2], "-4"))
+        i = 4;
+      if (!strcmp(argv[2], "-5"))
+        i = 5;
+      if (!strcmp(argv[2], "-6"))
+        i = 6;
+      if (!strcmp(argv[2], "-7"))
+        i = 7;
+      if (!strcmp(argv[2], "-8"))
+        i = 8;
+      if (!strcmp(argv[2], "-9"))
+        i = 9;
+    }
+    while (i > 1) {
+      add_tab();
+      i--;
+    }
+    term = g_array_index(terminals, struct terminal, 0);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
+    gtk_window_set_focus(GTK_WINDOW(main_window), term.vte);
+  }
 #endif
 
 #if STATUS_BAR
@@ -2838,8 +2926,30 @@ int main(int argc, char **argv)
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(key_press_event), NULL);
 #endif
 
+#if COMMAND_AT_ROOT_WINDOW
+  if (argc > 1 && !strcmp(argv[1], "-r"))
+    at_root_window = 1;
+  if (argc > 2 && !strcmp(argv[2], "-r"))
+    at_root_window = 1;
+  if (at_root_window) {
+    gtk_window_set_keep_below(GTK_WINDOW(main_window), 1);
+    gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
+#ifdef CTRL_TOGGLE_DECORATED
+    window_decorated_status = 1;
+#endif
+#if MENU_TOGGLE_DECORATED
+    window_decorated_status = 1;
+#endif
+    gtk_window_set_skip_taskbar_hint(GTK_WINDOW(main_window), 1);
+    gtk_window_set_skip_pager_hint(GTK_WINDOW(main_window), 1);
+  }
+#endif
+
 #ifdef PROGRAM_ALWAYS_ON_TOP
-  gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
+#if COMMAND_AT_ROOT_WINDOW
+  if (!at_root_window)
+#endif
+    gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
 #endif
 
   gtk_widget_show_all(main_window);

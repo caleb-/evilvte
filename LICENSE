@@ -15,7 +15,7 @@ Licence: GPL-2
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Files: src/evilvte.c, src/showvte.c
+Files: src/evilvte.c, src/manpage.c, src/showvte.c
 Copyright:  2008 Wen-Yen Chuang <caleb AT calno DOT com>
 Licence: GPL-2
     This program is free software; you can redistribute it and/or modify
@@ -32,11 +32,8 @@ Licence: GPL-2
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 Files: misc/evilvte.png, misc/evilvte.xpm
-Copyright:  Lu, Chao-Ming (Tetralet)
+Copyright:  2008 Lu, Chao-Ming (Tetralet)
 Licence: other-BSD
-    Copyright (c) Lu, Chao-Ming (Tetralet).
-    All rights reserved.
-
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:

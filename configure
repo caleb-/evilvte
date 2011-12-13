@@ -44,15 +44,7 @@ else
   SUSE_DETECTED=FALSE
 fi
 
-VTE=vte
-
-VTEINC=`pkg-config --cflags $VTE`
-
-if [ $? != 0 ]; then
-  exit
-fi
-
-VTELDFLAGS=`pkg-config --libs $VTE`
+VTEINC=`pkg-config --cflags vte`
 
 if [ $? != 0 ]; then
   exit
@@ -72,7 +64,7 @@ deskdir=$prefix/share/applications
 ICON_DIR=$prefix/share/pixmaps
 
 if [ $prefix = /usr ]; then
-  echo OPTFLAGS=-Os >> src/config.o
+  echo "OPTFLAGS=-Os" >> src/config.o
 fi
 
 EVILVTE_VERSION=`head -n 1 Changelog`
@@ -86,8 +78,7 @@ echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
 echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
 echo "ICON_DIR=$ICON_DIR" >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
-# echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> src/config.o
-echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 >> src/config.o
+echo "LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> src/config.o
 echo "SUSE_DETECTED=$SUSE_DETECTED" >> src/config.o

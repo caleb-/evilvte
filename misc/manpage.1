@@ -1,0 +1,33 @@
+.TH EVILVTE 1 "June 12, 2008"
+.SH NAME
+evilvte \- an VTE based super lightweight terminal emulator
+.SH SYNOPSIS
+.B evilvte
+.RI [ options ]
+.SH DESCRIPTION
+.B evilvte
+is a terminal emulator. It supports almost everything VTE provides. It also supports tabs, tabbar autohide, and switch encoding at runtime. Configuration is via editing source code and recompilation. A standard stripped i386 binary size of evilvte is less than
+.B 9 kilobytes.
+.SH OPTIONS
+.\" 2 .TP
+.\" 2 .B \-2 \-3 \-4 \-5 \-6 \-7 \-8 \-9
+.\" 2 Specifies the initial tab numbers.
+.\" E .TP
+.\" E .B \-e [program] [options]
+.\" E Specifies the program to be run in evilvte.
+.\" H .TP
+.\" H .B \-h
+.\" H Show help
+.\" O .TP
+.\" O .B \-o
+.\" O Show build-time configuration of evilvte. It is as same as the "showvte" command.
+.\" R .TP
+.\" R .B \-r
+.\" R Make evilvte run in root window.
+.\" V .TP
+.\" V .B \-v
+.\" V Show version of evilvte.
+.SH SEE ALSO
+.BR showvte (1)
+.SH AUTHOR
+evilvte was written by Wen-Yen Chuang <caleb AT calno DOT com>
