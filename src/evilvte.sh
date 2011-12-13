@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
+# Copyright (C) 2008-2010  Wen-Yen Chuang <caleb AT calno DOT com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,28 +17,11 @@
 NEWCONFFILE=src/evilvte.h
 
 cat /dev/null > $NEWCONFFILE
-rm -f $1 src/sakura.o
+rm -f $1 src/evilvte.o
 
 MENU_DEFAULT_ENCODING=`grep MENU_ENCODING_LIST src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
 if [ "$MENU_DEFAULT_ENCODING" != "" ]; then
   echo \#define MENU_DEFAULT_ENCODING 1 >> $NEWCONFFILE
-fi
-
-COLOR_STYLE_DEFINE=`grep COLOR_STYLE src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | awk '{print $3}'`
-if [ "$COLOR_STYLE_DEFINE" = "VTE_FIXED" ]; then
-  echo \#define COLOR_VTE_FIXED 1 >> $NEWCONFFILE
-fi
-if [ "$COLOR_STYLE_DEFINE" = "LINUX" ]; then
-  echo \#define COLOR_LINUX 1 >> $NEWCONFFILE
-fi
-if [ "$COLOR_STYLE_DEFINE" = "RXVT" ]; then
-  echo \#define COLOR_RXVT 1 >> $NEWCONFFILE
-fi
-if [ "$COLOR_STYLE_DEFINE" = "TANGO" ]; then
-  echo \#define COLOR_TANGO 1 >> $NEWCONFFILE
-fi
-if [ "$COLOR_STYLE_DEFINE" = "XTERM" ]; then
-  echo \#define COLOR_XTERM 1 >> $NEWCONFFILE
 fi
 
 DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`

@@ -29,11 +29,11 @@
 #define DELETE          VTE_ERASE_ASCII_DELETE
 #define DELETE_SEQUENCE VTE_ERASE_DELETE_SEQUENCE
 
-#define VTE_FIXED color_vte_fixed
-#define LINUX     color_linux
-#define RXVT      color_rxvt
-#define TANGO     color_tango
-#define XTERM     color_xterm
+#define LINUX     1
+#define RXVT      2
+#define TANGO     3
+#define VTE_FIXED 4
+#define XTERM     5
 
 #define LEFT   0
 #define RIGHT  1
@@ -554,31 +554,9 @@ const char *label_style_custom[] = { TAB_LABEL_CUSTOM };
 const int label_style_size = sizeof(label_style_custom) / sizeof(label_style_custom[0]);
 #endif
 
-#if COLOR_VTE_FIXED
-const GdkColor color_vte_fixed[16] =
-{
-  { 0, 0x0000, 0x0000, 0x0000 },
-  { 0, 0xc0c0, 0x0000, 0x0000 },
-  { 0, 0x0000, 0xc0c0, 0x0000 },
-  { 0, 0xc0c0, 0xc0c0, 0x0000 },
-  { 0, 0x0000, 0x0000, 0xc0c0 },
-  { 0, 0xc0c0, 0x0000, 0xc0c0 },
-  { 0, 0x0000, 0xc0c0, 0xc0c0 },
-  { 0, 0xc0c0, 0xc0c0, 0xc0c0 },
-  { 0, 0x3f3f, 0x3f3f, 0x3f3f },
-  { 0, 0xffff, 0x3f3f, 0x3f3f },
-  { 0, 0x3f3f, 0xffff, 0x3f3f },
-  { 0, 0xffff, 0xffff, 0x3f3f },
-  { 0, 0x3f3f, 0x3f3f, 0xffff },
-  { 0, 0xffff, 0x3f3f, 0xffff },
-  { 0, 0x3f3f, 0xffff, 0xffff },
-  { 0, 0xffff, 0xffff, 0xffff }
-};
-#endif
-
-#if COLOR_LINUX
-const GdkColor color_linux[16] =
-{
+#ifdef COLOR_STYLE
+const GdkColor color_style[16] = {
+#if COLOR_STYLE == LINUX
   { 0, 0x0000, 0x0000, 0x0000 },
   { 0, 0xaaaa, 0x0000, 0x0000 },
   { 0, 0x0000, 0xaaaa, 0x0000 },
@@ -595,12 +573,8 @@ const GdkColor color_linux[16] =
   { 0, 0xffff, 0x5555, 0xffff },
   { 0, 0x5555, 0xffff, 0xffff },
   { 0, 0xffff, 0xffff, 0xffff }
-};
 #endif
-
-#if COLOR_RXVT
-const GdkColor color_rxvt[16] =
-{
+#if COLOR_STYLE == RXVT
   { 0, 0x0000, 0x0000, 0x0000 },
   { 0, 0xcdcd, 0x0000, 0x0000 },
   { 0, 0x0000, 0xcdcd, 0x0000 },
@@ -617,12 +591,8 @@ const GdkColor color_rxvt[16] =
   { 0, 0xffff, 0x0000, 0xffff },
   { 0, 0x0000, 0xffff, 0xffff },
   { 0, 0xffff, 0xffff, 0xffff }
-};
 #endif
-
-#if COLOR_TANGO
-const GdkColor color_tango[16] =
-{
+#if COLOR_STYLE == TANGO
   { 0, 0x2e2e, 0x3434, 0x3636 },
   { 0, 0xcccc, 0x0000, 0x0000 },
   { 0, 0x4e4e, 0x9a9a, 0x0606 },
@@ -639,28 +609,43 @@ const GdkColor color_tango[16] =
   { 0, 0xadad, 0x7f7f, 0xa8a8 },
   { 0, 0x3434, 0xe2e2, 0xe2e2 },
   { 0, 0xeeee, 0xeeee, 0xecec }
-};
 #endif
-
-#if COLOR_XTERM
-const GdkColor color_xterm[16] =
-{
-    {0, 0x0000, 0x0000, 0x0000 },
-    {0, 0xcdcb, 0x0000, 0x0000 },
-    {0, 0x0000, 0xcdcb, 0x0000 },
-    {0, 0xcdcb, 0xcdcb, 0x0000 },
-    {0, 0x1e1a, 0x908f, 0xffff },
-    {0, 0xcdcb, 0x0000, 0xcdcb },
-    {0, 0x0000, 0xcdcb, 0xcdcb },
-    {0, 0xe5e2, 0xe5e2, 0xe5e2 },
-    {0, 0x4ccc, 0x4ccc, 0x4ccc },
-    {0, 0xffff, 0x0000, 0x0000 },
-    {0, 0x0000, 0xffff, 0x0000 },
-    {0, 0xffff, 0xffff, 0x0000 },
-    {0, 0x4645, 0x8281, 0xb4ae },
-    {0, 0xffff, 0x0000, 0xffff },
-    {0, 0x0000, 0xffff, 0xffff },
-    {0, 0xffff, 0xffff, 0xffff }
+#if COLOR_STYLE == VTE_FIXED
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0xc0c0, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xc0c0, 0x0000 },
+  { 0, 0xc0c0, 0xc0c0, 0x0000 },
+  { 0, 0x0000, 0x0000, 0xc0c0 },
+  { 0, 0xc0c0, 0x0000, 0xc0c0 },
+  { 0, 0x0000, 0xc0c0, 0xc0c0 },
+  { 0, 0xc0c0, 0xc0c0, 0xc0c0 },
+  { 0, 0x3f3f, 0x3f3f, 0x3f3f },
+  { 0, 0xffff, 0x3f3f, 0x3f3f },
+  { 0, 0x3f3f, 0xffff, 0x3f3f },
+  { 0, 0xffff, 0xffff, 0x3f3f },
+  { 0, 0x3f3f, 0x3f3f, 0xffff },
+  { 0, 0xffff, 0x3f3f, 0xffff },
+  { 0, 0x3f3f, 0xffff, 0xffff },
+  { 0, 0xffff, 0xffff, 0xffff }
+#endif
+#if COLOR_STYLE == XTERM
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0xcdcb, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xcdcb, 0x0000 },
+  { 0, 0xcdcb, 0xcdcb, 0x0000 },
+  { 0, 0x1e1a, 0x908f, 0xffff },
+  { 0, 0xcdcb, 0x0000, 0xcdcb },
+  { 0, 0x0000, 0xcdcb, 0xcdcb },
+  { 0, 0xe5e2, 0xe5e2, 0xe5e2 },
+  { 0, 0x4ccc, 0x4ccc, 0x4ccc },
+  { 0, 0xffff, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xffff, 0x0000 },
+  { 0, 0xffff, 0xffff, 0x0000 },
+  { 0, 0x4645, 0x8281, 0xb4ae },
+  { 0, 0xffff, 0x0000, 0xffff },
+  { 0, 0x0000, 0xffff, 0xffff },
+  { 0, 0xffff, 0xffff, 0xffff }
+#endif
 };
 #endif
 
@@ -895,6 +880,7 @@ void do_title_changed()
   GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
   GtkRcStyle *rcstyle = gtk_rc_style_new();
   gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+  gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
   rcstyle->xthickness = 0;
   rcstyle->ythickness = 0;
   gtk_widget_modify_style(term->button, rcstyle);
@@ -981,6 +967,62 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #if MOUSE_CTRL_SATURATION
 int scroll_event(GtkWidget *widget, GdkEventScroll *event)
 {
+#if HOTKEY
+#if !CTRL_ALT
+  if (event->state & GDK_CONTROL_MASK) {
+#endif
+#if CTRL_ALT
+  if ((event->state & GDK_CONTROL_MASK) && (event->state & GDK_MOD1_MASK)) {
+#endif
+    if (event->direction == GDK_SCROLL_UP) {
+      saturation_level += 0.025;
+      if (saturation_level > 1)
+        saturation_level = 1;
+#if TAB
+      int i = 0;
+      for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+        current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+        term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+        vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
+#if BACKGROUND_OPACITY
+        vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
+        if (!strncmp(background_order[background_status], "Opacity", 8))
+          vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if TAB
+      }
+#endif
+      return TRUE;
+    }
+    if (event->direction == GDK_SCROLL_DOWN) {
+      saturation_level -= 0.025;
+      if (saturation_level < 0)
+        saturation_level = 0;
+#if TAB
+      int i = 0;
+      for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+        current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+        term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+        vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
+#if BACKGROUND_OPACITY
+        vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
+        if (!strncmp(background_order[background_status], "Opacity", 8))
+          vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if TAB
+      }
+#endif
+      return TRUE;
+    }
+  }
+#endif /* HOTKEY */
+
   if (event->direction == GDK_SCROLL_RIGHT) {
     saturation_level += 0.025;
     if (saturation_level > 1)
@@ -1067,6 +1109,7 @@ void add_tab()
   GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
   GtkRcStyle *rcstyle = gtk_rc_style_new();
   gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+  gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
   rcstyle->xthickness = 0;
   rcstyle->ythickness = 0;
   gtk_widget_modify_style(term->button, rcstyle);
@@ -1169,7 +1212,7 @@ void add_tab()
 #endif
 
 #ifdef COLOR_STYLE
-  vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, COLOR_STYLE, 16);
+  vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, color_style, 16);
 #endif
 
 #if SET_DEFAULT_COLORS
@@ -1726,6 +1769,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
           GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
           GtkRcStyle *rcstyle = gtk_rc_style_new();
           gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+          gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
           rcstyle->xthickness = 0;
           rcstyle->ythickness = 0;
           gtk_widget_modify_style(term->button, rcstyle);
@@ -2205,6 +2249,7 @@ void do_edit_label()
     GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
     GtkRcStyle *rcstyle = gtk_rc_style_new();
     gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+    gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
     rcstyle->xthickness = 0;
     rcstyle->ythickness = 0;
     gtk_widget_modify_style(term->button, rcstyle);

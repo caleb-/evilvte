@@ -1,6 +1,13 @@
+0.4.6~pre5
+ * Saturation can be adjusted by holding Ctrl and scrolling mouse up or down.
+   Define both MOUSE_CTRL_SATURATION and HOTKEY to TRUE to use this function.
+   If CTRL_ALT is TRUE, you have to hold Ctrl and Alt while scrolling.
+ * Remove close button border in some specific themes
+   Thanks to Tetralet <tetralet AT gmail DOT com>
+
 0.4.6~pre4
  * Support MATCH_STRING_EXEC
-   You may click an url to open it without menu
+   You may click an URL to open it without menu
  * Fix an Arch Linux bug.
    When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
    crash.
@@ -28,7 +35,6 @@
  * Respect CFLAGS and OPTFLAGS
  * Drop obsolete option "Select_all" in MENU_CUSTOM
    Please use "Select all" instead
- * Do not install evilvte.xpm
  * Auto-detect GNU gold linker to avoid unnecessary libraries linking
  * Improve coloring of showvte and configure script
  * Improve man page description. Thanks to editors of http://freshmeat.net.

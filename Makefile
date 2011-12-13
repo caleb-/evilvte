@@ -28,8 +28,8 @@ src/custom.h: prepare
 src/evilvte.h: src/custom.h
 	sh src/evilvte.sh src/$(PROG)
 
-evilvte: src/evilvte.h src/sakura.o
-	$(CC) $(LDFLAGS) src/sakura.o $(LDLIBS) -o src/$(PROG)
+evilvte: src/evilvte.h src/evilvte.o
+	$(CC) $(LDFLAGS) src/evilvte.o $(LDLIBS) -o src/$(PROG)
 
 strip: all
 	strip --remove-section=.comment --remove-section=.note src/$(PROG)
@@ -68,7 +68,7 @@ uninstall:
 	sh src/uninstall.sh
 
 clean: src/config.o
-	rm -f src/$(PROG) src/showvte src/sakura.o src/evilvte.h misc/evilvte.? src/custom.h
+	rm -f src/$(PROG) src/showvte src/evilvte.o src/evilvte.h misc/evilvte.? src/custom.h
 
 distclean: clean
 	rm -f src/*.o src/uninstall.sh
