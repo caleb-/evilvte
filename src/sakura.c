@@ -1703,10 +1703,6 @@ void delete_event()
     gtk_widget_show_all(dialog);
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_CLOSE) {
       gtk_widget_destroy(dialog);
-#if CLOSE_SAFELY
-      while (1)
-        del_tab(0);
-#endif
 #if !CLOSE_SAFELY
       gtk_main_quit();
 #endif
@@ -2573,9 +2569,10 @@ void del_tab(int do_close_dialog)
   g_array_remove_index(terminals, index);
 #endif
 
-  gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 1)
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2)
     gtk_main_quit();
+  else
+    gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
 
 #if TAB
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);

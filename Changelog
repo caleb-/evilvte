@@ -1,3 +1,7 @@
+0.4.3~pre1
+ * Fix Segmentation fault when closing program
+   Please enable CLOSE_SAFELY or CLOSE_DIALOG
+
 0.4.2
  * Clarify licenses
    Thanks to Vincent Bernat <bernat AT debian DOT org> and
