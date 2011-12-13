@@ -101,8 +101,8 @@ if [ "$TOGGLE_BG_OPACITY" != "" ]; then
   echo \#define TOGGLE_BG_OPACITY 1 >> $NEWCONFFILE
 fi
 
-CTRL_TOGGLE_BACKGROUND_DEFINE=`grep CTRL_TOGGLE_BACKGROUND $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
-if [ "$CTRL_TOGGLE_BACKGROUND_DEFINE" != "" ]; then
+HOTKEY_TOGGLE_BACKGROUND_DEFINE=`grep HOTKEY_TOGGLE_BACKGROUND $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+if [ "$HOTKEY_TOGGLE_BACKGROUND_DEFINE" != "" ]; then
   if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
     echo \#undef INIT_OPACITY >> $NEWCONFFILE
     echo \#define INIT_OPACITY 1 >> $NEWCONFFILE
@@ -125,9 +125,19 @@ if [ "$MENU_PASTE" != "" ]; then
   echo \#define MENU_PASTE 1 >> $NEWCONFFILE
 fi
 
-MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep 'Select_all'`
+MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep 'Select all'`
 if [ "$MENU_SELECT_ALL" != "" ]; then
   echo \#define MENU_SELECT_ALL 1 >> $NEWCONFFILE
+fi
+
+MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep Select_all`
+if [ "$MENU_SELECT_ALL" != "" ]; then
+  echo \#define MENU_SELECT_ALL 1 >> $NEWCONFFILE
+  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
+  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
+  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
+  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
+  echo '[1m[31mWARNING: Please use "Select all" instead of "Select_all".[m'
 fi
 
 MENU_COLOR_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Background tint'`
@@ -155,7 +165,7 @@ if [ "$MENU_OPEN_NEW_WINDOW" != "" ]; then
   echo \#define MENU_OPEN_NEW_WINDOW 1 >> $NEWCONFFILE
 fi
 
-MENU_QUIT=`echo $MENU_CUSTOM_DEFINE | grep 'Quit'`
+MENU_QUIT=`echo $MENU_CUSTOM_DEFINE | grep Quit`
 if [ "$MENU_QUIT" != "" ]; then
   echo \#define MENU_QUIT 1 >> $NEWCONFFILE
 fi

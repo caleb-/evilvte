@@ -1,7 +1,10 @@
+0.4.5~pre7
+ * Fix an HOTKEY_TOGGLE_BACKGROUND bug which was in 0.4.5~pre3 to 0.4.5~pre6
+ * Enable gcc -Wall -Wextra options and fix all warnings
+
 0.4.5~pre6
  * Support TAB_LABEL_DYNAMIC to show current path dynamically
    Thanks to Pavel Plesov
- * Remove virtual keyboard
  * Relicense icons to GNU General Public License version 2 with permission
    from the author, Tetralet <tetralet AT gmail DOT com>
 
@@ -21,7 +24,6 @@
  * Limit font size range. Only 1 to 99 are accepted.
 
 0.4.5~pre2
- * Support virtual keyboard
  * Detect GTK+ version and disable unsupported options automatically.
  * Fix a displaying bug about toggling scrollbar or status bar.
  * Avoid an GTK+ warning message when TAB_LABEL is customized.
