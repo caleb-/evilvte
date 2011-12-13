@@ -1,3 +1,10 @@
+0.4.5~pre3
+ * Improve command line option support
+ * Improve hotkey customization a bit
+   Please note that almost all CTRL_* in src/config.h are renamed to HOTKEY_*.
+ * Limit font size range. Only 1 to 99 are accepted.
+ * Remove VTE_DISABLE_DEPRECATED
+
 0.4.5~pre2
  * Support virtual keyboard with libXtst
    You may disable libXtst by "./configure --disable-xtst".
@@ -9,13 +16,15 @@
  * Update license to latest format published by the Free Software Foundation.
 
 0.4.5~pre1
- * Support command line -T option to assign program title.
-   You may use -title as before.
  * Detect VTE version and disable unsupported options automatically.
  * Support VTE_DISABLE_DEPRECATED
    You may use deprecated VTE functions that were disabled in evilvte 0.4.4.
  * Support environment variable EVILVTE=min to build a minimal usable terminal.
  * Disable deprecated GLib, GDK and GTK+ functions.
+
+0.4.4.1
+ * Support command line -T option to assign program title.
+   You may use -title as before.
 
 0.4.4
  * Disable deprecated VTE functions if VTE version >= 0.19.4
