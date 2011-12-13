@@ -1,3 +1,9 @@
+0.3.6
+ * Support BACKGROUND_OPACITY and SHOW_WINDOW_DECORATION
+   Thanks to dx <dx AT dxzone DOT com DOT ar>
+ * Do not kill foreground applications when CLOSE_SAFELY is enabled
+   Thanks to Tetralet <tetralet AT gmail DOT com>
+
 0.3.5
  * Support "Submenu encoding list" item in menu
  * Support "Submenu input method" item in menu

@@ -4,13 +4,14 @@
 // #define BACKGROUND_SATURATION  0.4
 // #define BACKGROUND_SCROLLABLE  TRUE
 // #define BACKGROUND_TINT_COLOR  "brown"
-// #define BACKGROUND_TRANSPARENT TRUE
+// #define BACKGROUND_TRANSPARENT TRUE /* Pseudo transparent background */
+// #define BACKGROUND_OPACITY     TRUE /* True transparent background */
 // #define BACKSPACE_KEY /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
 // #define DELETE_KEY    /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
 // #define BUTTON_ORDER_BY_RCFILE TRUE
-// #define CLOSE_SAFELY           TRUE /* Do not kill background applications */
+// #define CLOSE_SAFELY           TRUE /* Do not kill running applications */
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
 // #define COLOR_STYLE            LINUX /* Options: LINUX, RXVT, TANGO, XTERM */
@@ -46,6 +47,7 @@
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
 // #define SHOW_WINDOW_BORDER     TRUE
+// #define SHOW_WINDOW_DECORATION TRUE
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      TRUE
 #define    STATUS_BAR             TRUE
@@ -109,7 +111,7 @@
 // #define CTRL_TAB_GO_TO_NUMBER  TRUE
 // #define CTRL_TAB_EDIT_LABEL    (event->keyval == GDK_E)
 // #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
-// #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background"
+// #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background", "Opacity"
 
 // #define LABEL_DEFAULT_ENCODING "Default Encoding"
 // #define LABEL_MENU_TOGGLE_BG   "Toggle background"
