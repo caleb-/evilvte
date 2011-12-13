@@ -101,6 +101,11 @@ if [ "$MENU_TOGGLE_BACKGROUND" != "" ]; then
   echo \#define MENU_TOGGLE_BACKGROUND 1 >> src/evilvte.h
 fi
 
+MENU_TOGGLE_HOTKEYS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle hotkeys locking'`
+if [ "$MENU_TOGGLE_HOTKEYS" != "" ]; then
+  echo \#define MENU_TOGGLE_HOTKEYS 1 >> src/evilvte.h
+fi
+
 MENU_TOGGLE_SCROLLBAR=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle scrollbar'`
 if [ "$MENU_TOGGLE_SCROLLBAR" != "" ]; then
   echo \#define MENU_TOGGLE_SCROLLBAR 1 >> src/evilvte.h
