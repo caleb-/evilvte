@@ -66,20 +66,25 @@
 #define    MENU                   TRUE
 // #define MENU_ENCODING_LIST     "BIG-5", "Default Encoding", "GBK", "EUC-JP"
 // #define MENU_MATCH_STRING_EXEC "firefox"
-// #define      MATCH_STRING_EXEC "firefox" /* click to open, no menu needed  */
+// #define      MATCH_STRING_L    "firefox" /* left click to open without menu*/
+// #define      MATCH_STRING_M    "firefox" /* middle click to open           */
 // #define      MATCH_STRING      "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
 // #define MENU_CUSTOM            "Copy", "Separator", "Paste", "Separator"
-           /* Options: "Copy", "Paste", "Select all", "Add tab", "Remove tab",
-            *          "Edit label", "New window", "Quit", "Zoom in",
-            *          "Zoom out", "Zoom default", "Reset terminal",
-            *          "Reset and clear", "Select font", "Separator",
-            *          "Encoding list", "Input method", "Submenu encoding list",
-            *          "Submenu input method", "Toggle background",
-            *          "Toggle scrollbar", "Toggle status bar",
-            *          "Toggle tabbar", "Toggle window decorated",
-            *          "Toggle anti-alias", "Toggle hotkeys locking",
-            *          "Toggle always on top", "Toggle fullscreen",
-            *          "Adjust saturation", "Background tint"                 */
+           /* Options: "Copy",         "Zoom in",       "Add tab",
+            *          "Paste",        "Zoom out",      "Remove tab",
+            *          "Select all",   "Zoom default",  "New window",
+            *          "Edit label",   "Select font",
+            *          "Input method",                  "Encoding list",
+            *          "Submenu input method",          "Submenu encoding list",
+            *          "Toggle tabbar",
+            *          "Toggle scrollbar",              "Background tint",
+            *          "Toggle status bar",             "Adjust saturation",
+            *          "Toggle anti-alias",
+            *          "Toggle background",             "Separator",
+            *          "Toggle fullscreen",             "Quit",
+            *          "Toggle always on top",
+            *          "Toggle hotkeys locking",        "Reset terminal",
+            *          "Toggle window decorated",       "Reset and clear"     */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0

@@ -1,3 +1,15 @@
+0.4.7~pre1
+
+ The "Thanks to Aragon!" Release
+
+ * Rename MATCH_STRING_EXEC to MATCH_STRING_L
+   MATCH_STRING_EXEC in old conffile will be mapped to MATCH_STRING_L
+ * Provide MATCH_STRING_M
+   You may middle-click an URL to open it without menu
+ * Fix two MATCH_STRING_* bugs
+ * Fix two WINDOW_TITLE_DYNAMIC bugs
+ * Fix a cross-platform issue
+
 0.4.6
  * Apply a workaround for VTE 0.24.0 vte_terminal_set_background_image_file()
    bug
@@ -125,7 +137,7 @@
 
 0.4.4~pre8
 
- The "Thanks to Samuli Suominen!" Release.
+ The "Thanks to Samuli Suominen!" Release
 
  * Rename libraries variable to LDLIBS
  * Fix Makefile to work with LDFLAGS="-Wl,--as-needed"
@@ -255,7 +267,7 @@
 0.3.3
  * Remove an useless variable in the struct terminal.
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
- * Fix a TABBAR_SCROLLABLE bug
+ * Fix an TABBAR_SCROLLABLE bug
    I misunderstood gtk_notebook_set_scrollable. :-P
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
  * Fix a label editing bug when scrollbar is not enabled
@@ -289,7 +301,7 @@
  * Support QT_STYLE button order and gtk-alternative-button-order setting in
    GTK+ rc file.
  * Fix a dialog title bug
- * Fix a CTRL_TAB_EDIT_LABEL hotkey bug
+ * Fix an CTRL_TAB_EDIT_LABEL hotkey bug
 
 0.2.9
  * Support CTRL_TAB_EDIT_LABEL
@@ -322,12 +334,12 @@
  * Support CTRL_RESET_AND_CLEAR
 
 0.2.4
- * Fix a TABBAR_AUTOHIDE bug
+ * Fix an TABBAR_AUTOHIDE bug
 
 0.2.3
  * New option TABBAR
  * Support TAB_SHOW_INFO_AT_TITLE
- * Fix a CLOSE_SAFELY bug for i386 architecture
+ * Fix an CLOSE_SAFELY bug for i386 architecture
  * Fix a statusbar size bug
  * Add a .desktop file
  * New icon with BSD License, misc/evilvte.xpm

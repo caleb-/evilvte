@@ -2,14 +2,14 @@
 
 rm -f src/*.o src/custom.h src/evilvte.h src/install.sh src/uninstall.sh
 
-DO_SED=sed
+DO_CAT=cat
 DO_ECHO=echo
 prefix="/usr/local"
 CONF_FILE="src/config.h"
 
 for opt do
   case "$opt" in
-  --quiet) DO_SED=true
+  --quiet) DO_CAT=true
            DO_ECHO=true
   ;;
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
@@ -62,13 +62,6 @@ else
   ARCH_DETECTED=FALSE
 fi
 
-GNU_GOLD=`ld -v | tr A-Z a-z | tr -s ' ' ' ' | grep 'gnu gold'`
-if [ "$GNU_GOLD" != "" ]; then
-  LDLIBS="-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lglib-2.0 -lgdk_pixbuf-2.0"
-else
-  LDLIBS="-L/usr/local/lib -lvte"
-fi
-
 VTEINC=`pkg-config --cflags vte`
 if [ $? != 0 ]; then
   exit
@@ -78,13 +71,13 @@ else
   $DO_ECHO [1m[33mSUSE system detected[m $SUSE_DETECTED | sed 's/TRUE//' | grep -v FALSE$
   $DO_ECHO [1m[33mArch Linux detected[m $ARCH_DETECTED | sed 's/TRUE//' | grep -v FALSE$
   $DO_ECHO -n "Configuration: "
-  DEFINE_LINES=`sed 's/\t/ /g' $CONF_FILE | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc -l`
+  DEFINE_LINES=`cat $CONF_FILE | tr '\t' ' ' | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc -l`
   if [ "$DEFINE_LINES" = "0" ]; then
     $DO_ECHO [1m[31mDisable everything.[m
   else
     $DO_ECHO
   fi
-  $DO_SED 's/\t/ /g' $CONF_FILE | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | \
+  $DO_CAT $CONF_FILE | tr '\t' ' ' | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | \
   sed -e 's/$/[m/' \
       -e 's/"/[1m[32m"/' \
       -e 's/ 0/[1m[32m 0/' \
@@ -139,7 +132,6 @@ echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
 echo \#define ICON_DIR '"'$ICON_DIR'"' >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
 echo "GNOME_DEF_APP=\$(DESTDIR)$GNOME_DEF_APP" >> src/config.o
-echo "LDLIBS=$LDLIBS" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo \#define EVILVTE_VERSION '"'$EVILVTE_VERSION'"' >> src/config.o
 echo "CONF_FILE=$CONF_FILE" >> src/config.o

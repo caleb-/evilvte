@@ -24,12 +24,17 @@ if [ "$MENU_DEFAULT_ENCODING" != "" ]; then
   echo \#define MENU_DEFAULT_ENCODING 1 >> $NEWCONFFILE
 fi
 
-MENU_ENCODING_LIST_SIZE=`grep MENU_ENCODING_LIST src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | sed 's/,/\n/g' | wc -l`
-TOGGLE_BG_ORDER_SIZE=`grep    TOGGLE_BG_ORDER    src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | sed 's/,/\n/g' | wc -l`
-MENU_CUSTOM_SIZE=`grep        MENU_CUSTOM        src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | sed 's/,/\n/g' | wc -l`
+MENU_ENCODING_LIST_SIZE=`grep MENU_ENCODING_LIST src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | wc -l`
+TOGGLE_BG_ORDER_SIZE=`grep    TOGGLE_BG_ORDER    src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | wc -l`
+MENU_CUSTOM_SIZE=`grep        MENU_CUSTOM        src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | wc -l`
 echo \#define MENU_ENCODING_LIST_SIZE $MENU_ENCODING_LIST_SIZE              >> $NEWCONFFILE
 echo \#define TOGGLE_BG_ORDER_SIZE    $TOGGLE_BG_ORDER_SIZE | grep -v ' 0$' >> $NEWCONFFILE
 echo \#define MENU_CUSTOM_SIZE        $MENU_CUSTOM_SIZE                     >> $NEWCONFFILE
+
+MATCH_STRING_EXEC_DEFINE=`grep MATCH_STRING_EXEC src/custom.h | grep -v _MATCH_STRING_EXEC | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+if [ "$MATCH_STRING_EXEC_DEFINE" != "" ]; then
+  echo "[1m[31mWARNING: MATCH_STRING_EXEC is obsolete. Please use MATCH_STRING_L instead.[m"
+fi
 
 DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
 if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
@@ -213,9 +218,9 @@ make -n install | grep 'install ' >> src/install.sh
 
   head -n 1 $0 > src/showvte
   tail -n 6 $0 | grep -v ^grep >> src/showvte
-  sed 's/\t/ /g' src/custom.h | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define >> src/showvte
+  cat src/custom.h | tr '\t' ' ' | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define >> src/showvte
 
-SHOWVTE_PROG_NAME=`grep PROGRAM_NAME src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | sed 's/"//g'`
+SHOWVTE_PROG_NAME=`grep PROGRAM_NAME src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | tr -d '"'`
 if [ "$SHOWVTE_PROG_NAME" = "" ]; then
   SHOWVTE_PROG_NAME="evilvte"
 fi
