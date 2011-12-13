@@ -127,6 +127,8 @@
 // #define HOTKEY_FONT_SMALLER          CTRL GDK_KP_Subtract
 // #define HOTKEY_FONT_DEFAULT_SIZE     CTRL GDK_KP_Insert
 // #define HOTKEY_FONT_SELECT           CTRL GDK_F
+// #define HOTKEY_MIMIC_SCROLL_UP       CTRL GDK_K
+// #define HOTKEY_MIMIC_SCROLL_DOWN     CTRL GDK_J
 // #define HOTKEY_OPEN_NEW_WINDOW       CTRL GDK_N
 // #define HOTKEY_RESET_TERMINAL        CTRL GDK_R
 // #define HOTKEY_RESET_AND_CLEAR       CTRL GDK_A

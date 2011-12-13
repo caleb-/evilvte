@@ -1,3 +1,9 @@
+0.4.7~pre4
+ * Support HOTKEY_MIMIC_SCROLL_*
+   Thanks to qotsa
+ * New configure option: --with-gtk=2.0|3.0
+ * Rename make target installstrip to install-strip
+
 0.4.7~pre3
  * Support vte_terminal_fork_command_full (VTE >= 0.25.1)
  * Support all positive integer font size

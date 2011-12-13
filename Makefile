@@ -9,7 +9,7 @@ ifeq ($(LDFLAGS),)
 endif
 
 ifeq ($(LDLIBS),)
-	LDLIBS = -L/usr/local/lib -lgdk-x11-2.0 -lglib-2.0 -lgobject-2.0 -lgtk-x11-2.0 -lvte
+	LDLIBS = -L/usr/local/lib -lglib-2.0 -lgobject-2.0 $(LIBS_VTE)
 endif
 
 CFLAGS += $(OPTFLAGS) $(VTEINC)
@@ -41,7 +41,7 @@ install:
 	install -d $(GNOME_DEF_APP)
 	install -m 644 misc/evilvte.xml $(GNOME_DEF_APP)
 
-installstrip: strip
+install-strip: strip
 	sh src/install.sh
 
 uninstall:
@@ -56,4 +56,4 @@ distclean: clean
 src/config.o:
 	./configure --quiet
 
-.PHONY: evilvte prepare strip install installstrip uninstall clean distclean
+.PHONY: evilvte prepare strip install install-strip uninstall clean distclean

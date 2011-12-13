@@ -9,6 +9,8 @@ CONF_FILE="src/config.h"
 
 for opt do
   case "$opt" in
+  --with-gtk=*) with_gtk=`echo $opt | cut -d '=' -f 2`
+  ;;
   --quiet) DO_CAT=true
            DO_ECHO=true
   ;;
@@ -23,7 +25,9 @@ for opt do
      echo "          --config=src/config.h (default)"
      echo '          --config=$HOME/.config/evilvte/config.h'
      echo
-     exit
+     echo "          --with-gtk=2.0 (default)"
+     echo "          --with-gtk=3.0"
+     exec echo
   ;;
   esac
 done
@@ -37,39 +41,46 @@ if [ ! -e $CONF_FILE ] || [ -d $CONF_FILE ]; then
   else
     $DO_ECHO "         Please make sure your configuration file is correct."
   fi
-  $DO_ECHO
-  exit
+  exec $DO_ECHO
 fi
 
 PROG=`grep PROGRAM_NAME $CONF_FILE | grep -v ^\/\/ | awk '{print $3}'`
-if [ "$PROG" = "" ]; then
-  PROG=evilvte
-fi
+[ "$PROG" = "" ] && PROG=evilvte
 
 SUSE_LD=`ld -v 2>&1 | tr A-Z a-z | grep suse`
-if [ "$SUSE_LD" != "" ]; then
-  SUSE_DETECTED=TRUE
-  echo \#define DEF_TAB_LABEL 1 >> src/config.o
-else
-  SUSE_DETECTED=FALSE
-fi
+[ "$SUSE_LD" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.o
 
 ARCH_UNAME=`uname -a | grep -- '-ARCH '`
-if [ "$ARCH_UNAME" != "" ]; then
-  ARCH_DETECTED=TRUE
-  echo \#define DEF_TAB_LABEL 1 >> src/config.o
-else
-  ARCH_DETECTED=FALSE
+[ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.o
+
+if [ "$with_gtk" != "2.0" ] && [ "$with_gtk" != "3.0" ]; then
+  with_gtk=2.0
+  VTEINC=`pkg-config --cflags vte 2> /dev/null`
+  if [ $? != 0 ]; then
+    VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
+    [ $? = 0 ] && with_gtk=3.0
+  fi
 fi
 
-VTEINC=`pkg-config --cflags vte`
-if [ $? != 0 ]; then
-  exit
-else
+if [ "$with_gtk" = "2.0" ]; then
+  VTEINC=`pkg-config --cflags vte 2> /dev/null`
+  [ $? != 0 ] && exec pkg-config --cflags vte
+  LIBS_VTE="-lgdk-x11-2.0 -lgtk-x11-2.0 -lvte"
+fi
+
+if [ "$with_gtk" = "3.0" ]; then
+  VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
+  [ $? != 0 ] && exec pkg-config --cflags vte-2.90
+  LIBS_VTE="-lgdk-x11-3.0 -lgtk-x11-3.0 -lvte2_90"
+fi
+
   $DO_ECHO
+  [ "$SUSE_LD" != "" ] && $DO_ECHO "OS    :" [1m[33mSUSE[m
+  [ "$ARCH_UNAME" != "" ] && $DO_ECHO "OS    :" [1m[33mArch Linux[m
+  [ "$with_gtk" = "2.0" ] && $DO_ECHO "VTE   :" [1m[33m`pkg-config --modversion vte`[m
+  [ "$with_gtk" = "3.0" ] && $DO_ECHO "VTE   :" [1m[33m`pkg-config --modversion vte-2.90`[m
+  $DO_ECHO "GTK+  :" [1m[33m`pkg-config --modversion gtk+-$with_gtk`[m
   $DO_ECHO Prefix: [1m[33m$prefix[m
-  $DO_ECHO [1m[33mSUSE system detected[m $SUSE_DETECTED | sed 's/TRUE//' | grep -v FALSE$
-  $DO_ECHO [1m[33mArch Linux detected[m $ARCH_DETECTED | sed 's/TRUE//' | grep -v FALSE$
   $DO_ECHO -n "Configuration: "
   DEFINE_LINES=`cat $CONF_FILE | tr '\t' ' ' | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc -l`
   if [ "$DEFINE_LINES" = "0" ]; then
@@ -115,7 +126,6 @@ else
   $DO_ECHO
   $DO_ECHO Please edit [1m[33m$CONF_FILE[m to customize your options.
   $DO_ECHO
-fi
 
 bindir=$prefix/bin
 mandir=$prefix/share/man/man1
@@ -125,6 +135,7 @@ GNOME_DEF_APP=$prefix/share/gnome-control-center/default-apps
 EVILVTE_VERSION=`head -n 1 ChangeLog`
 
 echo "VTEINC=$VTEINC" >> src/config.o
+echo "LIBS_VTE=$LIBS_VTE" >> src/config.o
 echo "prefix=$prefix" >> src/config.o
 echo "bindir=\$(DESTDIR)$bindir" >> src/config.o
 echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
