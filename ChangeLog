@@ -1,3 +1,11 @@
+0.4.9~pre4
+ * Support SEARCH_CASE_SENSITIVE
+   I will make it toggleable at runtime in the future.
+   But I am lazy to write it now. :-P
+   Patches are very welcome.
+ * Make everything GLib 2.29.8 compatible
+ * Sign SHA1SUMS using RSA key ID BE8BA819 and DSA key ID E98D6159
+
 0.4.9~pre3
  * Grayed out menu items according to their status:
    "Copy", "Paste", "Zoom default"

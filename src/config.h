@@ -142,6 +142,7 @@
 // #define HOTKEY_SEARCH_STRING         CTRL GDK_Q
 // #define HOTKEY_SEARCH_PREVIOUS       CTRL GDK_G
 // #define HOTKEY_SEARCH_NEXT           CTRL GDK_g
+// #define        SEARCH_CASE_SENSITIVE TRUE
 #define    HOTKEY_TAB_ADD               CTRL GDK_T
 #define    HOTKEY_TAB_REMOVE            CTRL GDK_W
 #define    HOTKEY_TAB_PREVIOUS          CTRL GDK_Page_Up
@@ -177,4 +178,4 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "_Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "_Character Encoding"
 // #define LABEL_SUBMENU_IME            "_Input Methods"
-// #define GTK3_CSS                     "GtkNotebook GtkButton { border-width: 0; } GtkWindow GtkNotebook { padding: 0; }"
+// #define GTK3_CSS                     "GtkNotebook GtkButton { border-width: 0; padding: 0; } GtkWindow GtkNotebook { padding: 0; }"

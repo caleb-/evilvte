@@ -17,6 +17,10 @@
  */
 
 #include <ctype.h>
+#include <glib.h>
+#ifndef G_CONST_RETURN
+#define G_CONST_RETURN const
+#endif
 #include <gtk/gtk.h>
 #if GTK_CHECK_VERSION(2,90,7)
 #include <gdk/gdkkeysyms-compat.h>
@@ -617,6 +621,12 @@ char *wm_class_name = PROGRAM_NAME;
 char *wm_class_class = UPPER_PROGRAM_NAME;
 #endif
 
+#define VTE_REGEX 0
+#if defined(SEARCH_CASE_SENSITIVE) && !SEARCH_CASE_SENSITIVE
+#undef VTE_REGEX
+#define VTE_REGEX G_REGEX_CASELESS
+#endif
+
 #define VTE_PROGRAM_NAME PROGRAM_NAME
 #if COMMAND_SET_TITLE
 #undef VTE_PROGRAM_NAME
@@ -898,7 +908,7 @@ GtkWidget* make_close_dialog()
 #endif
     dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
   gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
-  dialog_hbox = gtk_hbox_new(0, 0);
+  dialog_hbox = (GtkWidget*)gtk_hbox_new(0, 0);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), dialog_hbox);
   gtk_box_pack_start(GTK_BOX(dialog_hbox), gtk_image_new_from_stock(GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG), 0, 0, 0);
   gtk_box_pack_start(GTK_BOX(dialog_hbox), gtk_label_new(LABEL_DIALOG_CLOSE), 1, 0, 0);
@@ -1001,7 +1011,7 @@ void button_clicked(GtkWidget *widget, void *data)
 #if TAB_CLOSE_BUTTON
 void tab_close_button(GtkWidget *tab_label)
 {
-  term->label = gtk_hbox_new(0, 0);
+  term->label = (GtkWidget*)gtk_hbox_new(0, 0);
   term->button = gtk_button_new();
   gtk_button_set_image(GTK_BUTTON(term->button), gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU));
   gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
@@ -1259,13 +1269,13 @@ void add_tab()
 #endif
 
 #ifdef SCROLLBAR
-  term->hbox = gtk_hbox_new(0, 0);
+  term->hbox = (GtkWidget*)gtk_hbox_new(0, 0);
 #endif
 
   term->vte = vte_terminal_new();
 
 #ifdef SCROLLBAR
-  term->scrollbar = gtk_vscrollbar_new(vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
+  term->scrollbar = (GtkWidget*)gtk_vscrollbar_new(vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
 #endif
 
 #ifdef SCROLLBAR
@@ -1640,7 +1650,7 @@ void do_edit_search()
     if (strlen(gtk_entry_get_text(GTK_ENTRY(entry))))
       gtk_entry_set_text(GTK_ENTRY(global_search_string), gtk_entry_get_text(GTK_ENTRY(entry)));
     gtk_entry_set_text(GTK_ENTRY(term->search_string), gtk_entry_get_text(GTK_ENTRY(entry)));
-    vte_terminal_search_set_gregex(VTE_TERMINAL(term->vte), g_regex_new(gtk_entry_get_text(GTK_ENTRY(term->search_string)), 0, 0, NULL));
+    vte_terminal_search_set_gregex(VTE_TERMINAL(term->vte), g_regex_new(gtk_entry_get_text(GTK_ENTRY(term->search_string)), VTE_REGEX, 0, NULL));
     vte_terminal_search_set_wrap_around(VTE_TERMINAL(term->vte), TRUE);
   }
   gtk_widget_destroy(dialog);
@@ -1699,7 +1709,7 @@ void do_menu_saturation()
   else
 #endif
     dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-  adjustment = gtk_hscale_new_with_range(0, 1, 0.01);
+  adjustment = (GtkWidget*)gtk_hscale_new_with_range(0, 1, 0.01);
   gtk_range_set_value(GTK_RANGE(adjustment), saturation_level_old);
   g_signal_connect_after(adjustment, "change-value", do_change_saturation, NULL);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), adjustment);
@@ -2058,7 +2068,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
           if (term->global_string && strlen(gtk_entry_get_text(GTK_ENTRY(global_search_string)))) {
             term->global_string = 0;
             gtk_entry_set_text(GTK_ENTRY(term->search_string), gtk_entry_get_text(GTK_ENTRY(global_search_string)));
-            vte_terminal_search_set_gregex(VTE_TERMINAL(term->vte), g_regex_new(gtk_entry_get_text(GTK_ENTRY(term->search_string)), 0, 0, NULL));
+            vte_terminal_search_set_gregex(VTE_TERMINAL(term->vte), g_regex_new(gtk_entry_get_text(GTK_ENTRY(term->search_string)), VTE_REGEX, 0, NULL));
             vte_terminal_search_set_wrap_around(VTE_TERMINAL(term->vte), TRUE);
           } else
             do_edit_search();
@@ -2077,7 +2087,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
           if (term->global_string && strlen(gtk_entry_get_text(GTK_ENTRY(global_search_string)))) {
             term->global_string = 0;
             gtk_entry_set_text(GTK_ENTRY(term->search_string), gtk_entry_get_text(GTK_ENTRY(global_search_string)));
-            vte_terminal_search_set_gregex(VTE_TERMINAL(term->vte), g_regex_new(gtk_entry_get_text(GTK_ENTRY(term->search_string)), 0, 0, NULL));
+            vte_terminal_search_set_gregex(VTE_TERMINAL(term->vte), g_regex_new(gtk_entry_get_text(GTK_ENTRY(term->search_string)), VTE_REGEX, 0, NULL));
             vte_terminal_search_set_wrap_around(VTE_TERMINAL(term->vte), TRUE);
           } else
             do_edit_search();
@@ -2747,7 +2757,7 @@ int at_dock_mode = 0;
 #endif
 
 #if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
-  vbox = gtk_vbox_new(0, 0);
+  vbox = (GtkWidget*)gtk_vbox_new(0, 0);
   gtk_container_add(GTK_CONTAINER(main_window), vbox);
 #endif
 
