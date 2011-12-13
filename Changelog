@@ -1,3 +1,9 @@
+0.2.5
+ * Support all arguments in -e option
+   Thanks to Tetralet <tetralet@gmail.com>
+ * Support CTRL_RESET_TERMINAL
+ * Support CTRL_RESET_AND_CLEAR 
+
 0.2.4
  * Fix a TABBAR_AUTOHIDE bug
 

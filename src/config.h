@@ -95,6 +95,8 @@
 // #define CTRL_FONT_DEFAULT_SIZE (event->keyval == GDK_KP_Insert)
 // #define CTRL_COPY_TO_CLIPBOARD (event->keyval == GDK_C)
 // #define CTRL_PASTE_FROM_CLIPBD (event->keyval == GDK_V)
+// #define CTRL_RESET_TERMINAL    (event->keyval == GDK_R)
+// #define CTRL_RESET_AND_CLEAR   (event->keyval == GDK_A)
 
 /* If you enable DOUBLE_PRESS_HOTKEY,
  * press CTRL_NEW_TAB or CTRL_REMOVE_TAB twice quickly to add or remove a tab

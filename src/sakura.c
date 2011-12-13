@@ -281,9 +281,12 @@ ENCODING_LIST
 
 #if EXECUTE_COMMAND
 #define VTE_DEFAULT_COMMAND default_command
+#define VTE_DEFAULT_ARGV default_argv
 char default_command[32];
+char **default_argv = NULL;
 #else
 #define VTE_DEFAULT_COMMAND DEFAULT_COMMAND
+#define VTE_DEFAULT_ARGV DEFAULT_ARGV
 #endif
 
 #if MENU_INPUT_METHOD
@@ -297,6 +300,16 @@ char default_command[32];
 #endif
 
 #ifdef CTRL_PASTE_FROM_CLIPBD
+#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#define ENABLE_KEY_PRESS TRUE
+#endif
+
+#ifdef CTRL_RESET_TERMINAL
+#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#define ENABLE_KEY_PRESS TRUE
+#endif
+
+#ifdef CTRL_RESET_AND_CLEAR
 #undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
 #define ENABLE_KEY_PRESS TRUE
 #endif
@@ -358,6 +371,20 @@ void set_encoding(GtkWidget *widget, void *data);
 gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
+
+#ifdef CTRL_RESET_TERMINAL
+    if CTRL_RESET_TERMINAL {
+      vte_terminal_reset(VTE_TERMINAL(term.vte), 1,  0);
+      return TRUE;
+    }
+#endif
+
+#ifdef CTRL_RESET_AND_CLEAR
+    if CTRL_RESET_AND_CLEAR {
+      vte_terminal_reset(VTE_TERMINAL(term.vte), 1,  1);
+      return TRUE;
+    }
+#endif
 
 #ifdef CTRL_COPY_TO_CLIPBOARD
     if CTRL_COPY_TO_CLIPBOARD {
@@ -599,9 +626,9 @@ void sakura_add_tab()
 #endif
 
 #if CLOSE_SAFE
-  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 #else
-  vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+  vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 #endif
 
 #ifdef EMULATION_TYPE
@@ -897,8 +924,17 @@ int main(int argc, char **argv)
 #endif
 
 #if EXECUTE_COMMAND
-  if (argc > 2 && !strcmp(argv[1], "-e"))
+  if (argc > 2 && !strcmp(argv[1], "-e")) {
     sprintf(default_command, "%s", argv[2]);
+    int k;
+    for (k = 0 ; k < argc ; k++)
+    {
+      if (!strcmp(argv[k], "-e")) {
+        if (++k != argc)
+          default_argv = &(argv[k]);
+      }
+    }
+  }
   else
     sprintf(default_command, "%s", DEFAULT_COMMAND);
 #endif
@@ -958,6 +994,7 @@ int main(int argc, char **argv)
 
 #if EXECUTE_COMMAND && TAB
   sprintf(default_command, "%s", DEFAULT_COMMAND);
+  default_argv = DEFAULT_ARGV;
 #endif
 
 #if TAB_INITIAL_NUMBER
@@ -994,7 +1031,7 @@ int main(int argc, char **argv)
 #ifdef ENCODING_LIST
   int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
   GtkWidget *encoding_item[encoding_size];
-  int i = 0;
+  int i;
   for (i = 0 ; i < encoding_size ; i++) {
 #if ENCODING_LIST_DEFAULT
     if (encoding[i] == "Default") {
