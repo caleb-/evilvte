@@ -1,3 +1,8 @@
+0.4.2
+ * Clarify licenses
+   Thanks to Vincent Bernat <bernat AT debian DOT org> and
+             Don Armstrong <don AT debian DOT org>
+
 0.4.1
  * Support CTRL_SATURATION_DIALOG and "Adjust saturation" item in menu
  * Support CTRL_COLOR_BACKGROUND and "Background tint" item in menu
