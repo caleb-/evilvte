@@ -1,3 +1,10 @@
+0.4.6~pre6
+ * Support CURSOR_SHAPE
+ * New BACKSPACE_KEY and DELETE_KEY option: ERASE_TTY
+ * Make everything GSEAL_ENABLE compatible
+   Further information: http://live.gnome.org/GnomeGoals/UseGseal
+ * Simplify Makefile and configure
+
 0.4.6~pre5
  * Saturation can be adjusted by holding Ctrl and scrolling mouse up or down.
    Define both MOUSE_CTRL_SATURATION and HOTKEY to TRUE to use this function.
