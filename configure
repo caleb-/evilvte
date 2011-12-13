@@ -28,6 +28,8 @@ for opt do
      echo
      echo "          --with-gtk=2.0 (default)"
      echo "          --with-gtk=3.0"
+     echo "          --with-gtk=2+3"
+     echo "          --with-gtk=3+2"
      exec echo
   ;;
   *)
@@ -58,12 +60,22 @@ SUSE_LD=`ld -v 2>&1 | tr A-Z a-z | grep suse`
 ARCH_UNAME=`uname -a | grep -- '-ARCH '`
 [ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.o
 
+real_gtk=$with_gtk
 if [ "$with_gtk" != "2.0" ] && [ "$with_gtk" != "3.0" ]; then
   with_gtk=2.0
   VTEINC=`pkg-config --cflags vte 2> /dev/null`
   if [ $? != 0 ]; then
     VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
     [ $? = 0 ] && with_gtk=3.0
+  fi
+fi
+
+if [ "$real_gtk" = "3+2" ]; then
+  with_gtk=3.0
+  VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
+  if [ $? != 0 ]; then
+    VTEINC=`pkg-config --cflags vte 2> /dev/null`
+    [ $? = 0 ] && with_gtk=2.0
   fi
 fi
 
@@ -79,6 +91,11 @@ if [ "$with_gtk" = "3.0" ]; then
   [ $? != 0 ] && exec pkg-config --cflags vte-2.90
   LIBS_VTE="-lgdk-3 -lgtk-3 -lvte2_90"
   LIBS_VTE_L=`pkg-config --libs-only-L vte-2.90 2> /dev/null`
+fi
+
+if [ "$real_gtk" = "2+3" ] || [ "$real_gtk" = "3+2" ]; then
+  real_gtk="all"
+  LIBS_VTE="-ldl"
 fi
 
   $DO_ECHO
@@ -119,7 +136,6 @@ fi
       -e 's/BACKSPACE_KEY/[mBACKSPACE_KEY/' \
       -e 's/ DELETE/[1m[32m DELETE/g' \
       -e 's/DELETE_KEY/[mDELETE_KEY/' \
-      -e 's/ VTE_FIXED/[1m[32m VTE_FIXED/' \
       -e 's/ LINUX/[1m[32m LINUX/' \
       -e 's/ RXVT/[1m[32m RXVT/' \
       -e 's/ TANGO/[1m[32m TANGO/' \
@@ -159,6 +175,7 @@ echo "THEME_DIR=\$(DESTDIR)$THEME_DIR" >> src/config.o
 echo "GNOME_DEF_APP=\$(DESTDIR)$GNOME_DEF_APP" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo \#define EVILVTE_VERSION '"'$EVILVTE_VERSION'"' >> src/config.o
+[ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL 1 >> src/config.o
 echo "CONF_FILE=$CONF_FILE" >> src/config.o
 head -n 1 $0 > src/uninstall.sh
 echo "set -x" >> src/uninstall.sh

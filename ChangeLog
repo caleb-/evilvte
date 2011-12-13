@@ -1,3 +1,17 @@
+0.5.0
+
+ The "One binary to rule them all!" Release
+
+ * Fix a bug for -e option
+ * Fix a bug for input method menu
+ * New configure option: --with-gtk=2+3|3+2
+   The binary will not link to VTE nor GTK+, thus can support GTK+ 2.x and 3.x
+   at the same time. It still depends on VTE runtime, of course.
+   Use --2 or --3 command line options to choose the version of GTK+.
+   If evilvte segfaults with --3 option, please try export USE_ACCESSIBLE=0 or
+   USE_ACCESSIBLE=1.
+ * Drop codes with VTE version < 0.17.1
+
 0.5.0~pre1
  * Sync COLOR_STYLE: ZENBURN with xterm
    Thanks to Artur Dryomov <me AT ming13 DOT ru>
@@ -38,7 +52,7 @@
 
 0.4.9~pre2
  * Minor tweaks in TABBAR_AUTOHIDE for GTK+ 3.x
- * Hide VTE_FIXED color style which is merged in VTE version >= 0.17.1
+ * Hide VTE_FIXED color style which was merged in VTE version >= 0.17.1
  * Drop !TAB codes since evilvte is GtkNotebook-only for a very long time.
    For those who do not use tabs, the binary size will increase a little.
  * Code clean up
