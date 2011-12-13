@@ -1,3 +1,13 @@
+0.4.8~pre2
+ * Initial support for vte_terminal_search_*
+   The feature of VTE is still quite buggy.
+   Please see: https://bugzilla.gnome.org/627886
+ * Support underscore in LABEL_* to indicate mnemonic of menu item
+ * Drop MATCH_STRING_EXEC which was deprecated since 0.4.7~pre1
+ * Hide DEFAULT_EMULATION_TYPE, TAB_BORDER_HORIZONTAL and TAB_BORDER_VERTICAL
+ * Provide a clearsigned SHA1SUMS using DSA key ID E98D6159
+ * Make everything GTK+ 2.91.6 compatible
+
 0.4.8~pre1
  * Status bar and scrollbar can be hidden initially and be toggled on later
  * Better behavior for *_TOGGLE_TABBAR with TABBAR_AUTOHIDE enabled
@@ -41,8 +51,6 @@
 
 0.4.7~pre2
  * Support BELL_URGENT, aka WM_URGENT hint. Thanks to L29Ah.
- * Make everything GTK+ 2.90.0 compatible
- * Sync gpl-2.0.txt with http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 0.4.7~pre1
 

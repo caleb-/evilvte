@@ -127,6 +127,8 @@ fi
       -e 's/ g_/[1m[32m g_/' \
       -e 's/ RIGHT/[1m[32m RIGHT/' \
       -e 's/ LEFT/[1m[32m LEFT/' \
+      -e 's/ OFF_R/[1m[32m OFF_R/' \
+      -e 's/ OFF_L/[1m[32m OFF_L/' \
       -e 's/ TOP/[1m[32m TOP/' \
       -e 's/ BOTTOM/[1m[32m BOTTOM/' \
       -e 's/ CTRL /[1m[32m CTRL /'

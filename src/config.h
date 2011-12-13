@@ -39,7 +39,6 @@
 // #define CURSOR_SHAPE  /* Options: BLOCK, IBEAM, UNDERLINE                  */
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
 // #define DEFAULT_DIRECTORY      g_get_current_dir()
-// #define DEFAULT_EMULATION_TYPE "xterm"
 // #define DEFAULT_ENCODING       "UTF-8"
 // #define DEFAULT_TERMINAL_SIZE  80x24
 // #define FONT                   "Monospace 10"
@@ -91,8 +90,6 @@
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
-// #define TAB_BORDER_HORIZONTAL  0
-// #define TAB_BORDER_VERTICAL    0
 // #define TAB_CLOSE_BUTTON       TRUE
 // #define TAB_EXPANDED_WIDTH     TRUE
 // #define TAB_LABEL              "Page %u" /* %u will be replaced by numbers */
@@ -137,6 +134,9 @@
 // #define HOTKEY_SATURATION_DIALOG     CTRL GDK_X
 // #define HOTKEY_SATURATION_MORE       CTRL GDK_KP_Multiply
 // #define HOTKEY_SATURATION_LESS       CTRL GDK_KP_Divide
+// #define HOTKEY_SEARCH_STRING         CTRL GDK_Q
+// #define HOTKEY_SEARCH_PREVIOUS       CTRL GDK_G
+// #define HOTKEY_SEARCH_NEXT           CTRL GDK_g
 #define    HOTKEY_TAB_ADD               CTRL GDK_T
 #define    HOTKEY_TAB_REMOVE            CTRL GDK_W
 #define    HOTKEY_TAB_PREVIOUS          CTRL GDK_Page_Up
@@ -156,18 +156,19 @@
 // #define HOTKEY_TOGGLE_BACKGROUND     CTRL GDK_KP_Delete
 // #define TOGGLE_BG_ORDER    "Image", "Transparent", "No background", "Opacity"
 
-// #define LABEL_DEFAULT_ENCODING       "Default Encoding"
-// #define LABEL_DIALOG_BACKGROUND_TINT "Background tint color"
+// #define LABEL_DEFAULT_ENCODING       "_Default Encoding"
+// #define LABEL_DIALOG_BACKGROUND_TINT "_Background tint color"
 // #define LABEL_DIALOG_CLOSE           "Do you really want to close it?"
-// #define LABEL_MENU_SATURATION        "Adjust saturation"
-// #define LABEL_MENU_TOGGLE_ANTI_ALIAS "Toggle anti-alias"
-// #define LABEL_MENU_TOGGLE_BG         "Toggle background"
-// #define LABEL_MENU_TOGGLE_DECORATED  "Toggle window decorated"
-// #define LABEL_MENU_TOGGLE_FULLSCREEN "Toggle fullscreen"
-// #define LABEL_MENU_TOGGLE_HOTKEYS    "Toggle hotkeys locking"
-// #define LABEL_MENU_TOGGLE_ON_TOP     "Toggle always on top"
-// #define LABEL_MENU_TOGGLE_SCROLLBAR  "Toggle scrollbar"
-// #define LABEL_MENU_TOGGLE_STATUS_BAR "Toggle status bar"
-// #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
-// #define LABEL_SUBMENU_ENCODING       "Character Encoding"
-// #define LABEL_SUBMENU_IME            "Input Methods"
+// #define LABEL_DIALOG_SEARCH          "Find"
+// #define LABEL_MENU_SATURATION        "_Adjust saturation"
+// #define LABEL_MENU_TOGGLE_ANTI_ALIAS "_Toggle anti-alias"
+// #define LABEL_MENU_TOGGLE_BG         "_Toggle background"
+// #define LABEL_MENU_TOGGLE_DECORATED  "_Toggle window decorated"
+// #define LABEL_MENU_TOGGLE_FULLSCREEN "_Toggle fullscreen"
+// #define LABEL_MENU_TOGGLE_HOTKEYS    "_Toggle hotkeys locking"
+// #define LABEL_MENU_TOGGLE_ON_TOP     "_Toggle always on top"
+// #define LABEL_MENU_TOGGLE_SCROLLBAR  "_Toggle scrollbar"
+// #define LABEL_MENU_TOGGLE_STATUS_BAR "_Toggle status bar"
+// #define LABEL_MENU_TOGGLE_TABBAR     "_Toggle tabbar"
+// #define LABEL_SUBMENU_ENCODING       "_Character Encoding"
+// #define LABEL_SUBMENU_IME            "_Input Methods"

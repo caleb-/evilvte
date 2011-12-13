@@ -1,0 +1,22 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+70b93646fd69d7035f5b0a940f3af61f33d0e87d  14341 ChangeLog
+5a08fc9fc6a4bdee8637f9b509bcd3fc7597a81c   1356 Makefile
+54a0bd0a3c36a01e8ebc556630772e130ab4931b   7224 configure
+4cc77b90af91e615a64ae04893fdffa7939db84c  18092 gpl-2.0.txt
+0a23169107aaa7cd45541422bbfa8b67357e4364   1426 misc/evilvte.desktop
+277e5a3c9c73bdcf6526f5ee67f5241cc7b30e7a   2023 misc/evilvte.png
+83055c532a24e778aabd9b5aa86cf9ee3d1f17a9    353 misc/evilvte.xml
+877f9894db8361809ed0bb3fe06cd971dd1a9d24   1585 misc/manpage.1
+a83357473eb7c431a9f8e2813e02553d5ffa54b7    338 misc/showvte.1
+d1eb5165813dd1c36ab4dd76f8eae4e31b50d3ac   9491 src/config.h
+ed82b2a42e7ed29b0f97a0438ec16a27580f22b0 104216 src/evilvte.c
+abc9e0942ecf4fe153b08068a5b9c66f75597658  14317 src/process.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk0OuisACgkQdEpXpumNYVnRDwCeKdWX8TJ6XND39+dRLlfl2xbk
+Tk8AnjsiBkfSXEBvdrMF+T9t0v/mIRhf
+=M0O2
+-----END PGP SIGNATURE-----
