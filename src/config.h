@@ -7,6 +7,8 @@
 // #define COLOR_STYLE_RXVT    TRUE
 // #define COLOR_STYLE_TANGO   TRUE
 // #define COLOR_STYLE_XTERM   TRUE
+// #define COLOR_BACKGROUND    "white" /* "#FFFFFF" */
+// #define COLOR_FOREGROUND    "black"
 // #define DEFAULT_COLUMNS     80
 // #define DEFAULT_ROWS        24
 // #define DEFAULT_ENCODING    "UTF-8"

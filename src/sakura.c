@@ -53,6 +53,35 @@
 #endif
 #endif
 
+#ifdef COLOR_BACKGROUND
+#define SET_DEFAULT_COLORS 1
+#endif
+
+#ifdef COLOR_FOREGROUND
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 1
+#endif
+
+#if COLOR_STYLE_LINUX
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 0
+#endif
+
+#if COLOR_STYLE_RXVT
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 0
+#endif
+
+#if COLOR_STYLE_TANGO
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 0
+#endif
+
+#if COLOR_STYLE_XTERM
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 0
+#endif
+
 GtkWidget *main_window;
 GtkWidget *notebook;
 
@@ -163,11 +192,15 @@ GtkWidget *vbox;
 #endif
 
 #if DOUBLE_PRESS_HOTKEY
+#ifdef CTRL_NEW_TAB
 gint64 now_time_1;
 gint64 last_time_1 = 0;
+#endif
+#ifdef CTRL_REMOVE_TAB
 gint64 now_time_2;
 gint64 last_time_2 = 0;
 #endif
+#endif /* DOUBLE_PRESS_HOTKEY */
 
 struct terminal {
   GtkWidget *vte;
@@ -353,20 +386,36 @@ void sakura_add_tab()
   vte_terminal_set_visible_bell(VTE_TERMINAL(term.vte), BELL_VISIBLE);
 #endif
 
-#if COLOR_STYLE_TANGO
-  vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_tango, 16);
-#endif
-
 #if COLOR_STYLE_LINUX
   vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_linux, 16);
+#endif
+
+#if COLOR_STYLE_RXVT
+  vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_rxvt, 16);
+#endif
+
+#if COLOR_STYLE_TANGO
+  vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_tango, 16);
 #endif
 
 #if COLOR_STYLE_XTERM
   vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_xterm, 16);
 #endif
 
-#if COLOR_STYLE_RXVT
-  vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_rxvt, 16);
+#if SET_DEFAULT_COLORS
+  vte_terminal_set_default_colors(VTE_TERMINAL(term.vte));
+#endif
+
+#ifdef COLOR_BACKGROUND
+  GdkColor color_bg;
+  gdk_color_parse(COLOR_BACKGROUND, &color_bg);
+  vte_terminal_set_color_background(VTE_TERMINAL(term.vte), &color_bg);
+#endif
+
+#ifdef COLOR_FOREGROUND
+  GdkColor color_fg;
+  gdk_color_parse(COLOR_FOREGROUND, &color_fg);
+  vte_terminal_set_color_foreground(VTE_TERMINAL(term.vte), &color_fg);
 #endif
 
 #ifdef DEFAULT_ENCODING
