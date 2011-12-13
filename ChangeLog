@@ -1,3 +1,14 @@
+0.5.0~pre1
+ * Sync COLOR_STYLE: ZENBURN with xterm
+   Thanks to Artur Dryomov <me AT ming13 DOT ru>
+   Previous ZENBURN is renamed to ZENBURN_DARK
+ * Replace all deprecated functions that have suitable replacements
+ * Make everything GTK+ 3.1.92 compatible
+   Use GTK_FONT_CHOOSER_DIALOG only for GTK+ version >= 3.1.90
+ * Make everything VTE 0.29.1 compatible
+   If you encounter problems, try export CFLAGS="-DUSE_ACCESSIBLE=0"
+   and rebuild evilvte.
+
 0.4.9
  * Fix makefile parallelization
    Thanks to Thomas Weißschuh <thomas_weissschuh AT lavabit DOT com>

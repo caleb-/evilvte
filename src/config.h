@@ -18,7 +18,8 @@
 // #define CLOSE_SAFELY           TRUE  /* Do not kill running applications   */
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
-// #define COLOR_STYLE   /* Options: LINUX, RXVT, TANGO, XTERM, ZENBURN       */
+// #define COLOR_STYLE   /* Options: LINUX, RXVT, TANGO, XTERM, ZENBURN,      */
+                         /*          ZENBURN_DARK                             */
 // #define COLOR_TEXT_BOLD        "red"
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"

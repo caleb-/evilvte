@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vte/vte.h>
+#include <vte/vteaccess.h>
 
 #ifndef VTE_CHECK_VERSION
 #define VTE_CHECK_VERSION(x,y,z) FALSE
@@ -51,12 +52,13 @@
 #define IBEAM     VTE_CURSOR_SHAPE_IBEAM
 #define UNDERLINE VTE_CURSOR_SHAPE_UNDERLINE
 
-#define LINUX     1
-#define RXVT      2
-#define TANGO     3
-#define VTE_FIXED 4
-#define XTERM     5
-#define ZENBURN   6
+#define LINUX        1
+#define RXVT         2
+#define TANGO        3
+#define VTE_FIXED    4
+#define XTERM        5
+#define ZENBURN_DARK 6
+#define ZENBURN      7
 
 #define LEFT   0
 #define RIGHT  1
@@ -105,6 +107,11 @@
 #define gtk_widget_set_vexpand(x,y);
 #endif
 
+#if !GTK_CHECK_VERSION(2,91,2)
+#define GTK_SCROLLABLE VTE_TERMINAL
+#define gtk_scrollable_get_vadjustment vte_terminal_get_adjustment
+#endif
+
 #if GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID)
 #undef GTK_BOX
 #define GTK_BOX GTK_GRID
@@ -118,12 +125,12 @@
 #define gdk_device_get_position(w,x,y,z) gdk_display_get_pointer(display,x,y,z,NULL)
 #endif
 
-#if GTK_CHECK_VERSION(3,1,12)
+#if GTK_CHECK_VERSION(3,1,90)
 #define gtk_font_selection_dialog_new(x) gtk_font_chooser_dialog_new(x,NULL)
-#define gtk_font_selection_dialog_get_font_name gtk_font_chooser_dialog_get_font_name
-#define gtk_font_selection_dialog_set_font_name gtk_font_chooser_dialog_set_font_name
+#define gtk_font_selection_dialog_get_font_name gtk_font_chooser_get_font
+#define gtk_font_selection_dialog_set_font_name gtk_font_chooser_set_font
 #undef GTK_FONT_SELECTION_DIALOG
-#define GTK_FONT_SELECTION_DIALOG GTK_FONT_CHOOSER_DIALOG
+#define GTK_FONT_SELECTION_DIALOG GTK_FONT_CHOOSER
 #endif
 
 #if !VTE_CHECK_VERSION(0,25,1)
@@ -157,6 +164,10 @@
 
 #ifndef VTE_FORK_CMD_OLD
 #define VTE_FORK_CMD_OLD TRUE
+#endif
+
+#if !defined(USE_ACCESSIBLE) && VTE_CHECK_VERSION(0,29,0)
+#define USE_ACCESSIBLE TRUE
 #endif
 
 #define VTE_WINDOW_RESIZE(x,y,z) gtk_window_resize(x,y,z)
@@ -781,7 +792,7 @@ const GdkColor color_style[16] = {
   { 0, 0x0000, 0xffff, 0xffff },
   { 0, 0xffff, 0xffff, 0xffff }
 #endif
-#if COLOR_STYLE == ZENBURN
+#if COLOR_STYLE == ZENBURN_DARK
   { 0, 0x0000, 0x0000, 0x0000 },
   { 0, 0x9e9e, 0x1818, 0x2828 },
   { 0, 0xaeae, 0xcece, 0x9292 },
@@ -797,6 +808,24 @@ const GdkColor color_style[16] = {
   { 0, 0x4141, 0x8686, 0xbebe },
   { 0, 0xcfcf, 0x9e9e, 0xbebe },
   { 0, 0x7171, 0xbebe, 0xbebe },
+  { 0, 0xffff, 0xffff, 0xffff }
+#endif
+#if COLOR_STYLE == ZENBURN
+  { 0, 0x3f3f, 0x3f3f, 0x3f3f },
+  { 0, 0x7070, 0x5050, 0x5050 },
+  { 0, 0x6060, 0xb4b4, 0x8a8a },
+  { 0, 0xdfdf, 0xafaf, 0x8f8f },
+  { 0, 0x5050, 0x6060, 0x7070 },
+  { 0, 0xdcdc, 0x8c8c, 0xc3c3 },
+  { 0, 0x8c8c, 0xd0d0, 0xd3d3 },
+  { 0, 0xdcdc, 0xdcdc, 0xcccc },
+  { 0, 0x7070, 0x9090, 0x8080 },
+  { 0, 0xdcdc, 0xa3a3, 0xa3a3 },
+  { 0, 0xc3c3, 0xbfbf, 0x9f9f },
+  { 0, 0xf0f0, 0xdfdf, 0xafaf },
+  { 0, 0x9494, 0xbfbf, 0xf3f3 },
+  { 0, 0xecec, 0x9393, 0xd3d3 },
+  { 0, 0x9393, 0xe0e0, 0xe3e3 },
   { 0, 0xffff, 0xffff, 0xffff }
 #endif
 };
@@ -1304,7 +1333,7 @@ void add_tab()
 
 #ifdef SCROLLBAR
   term->hbox = (GtkWidget*)gtk_hbox_new(FALSE, 0);
-  term->scrollbar = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
+  term->scrollbar = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(term->vte)));
 #if !(SCROLLBAR & 1)
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, FALSE, FALSE, 0);
 #endif
@@ -1342,6 +1371,10 @@ void add_tab()
   else
 #endif
     GET_VTE_CHILD_PID vte_terminal_fork_command(VTE_TERMINAL(term->vte), VTE_DEFAULT_COMMAND, DEFAULT_ARGV, NULL, VTE_DEFAULT_DIRECTORY, RECORD_LASTLOG, RECORD_UTMP, RECORD_WTMP);
+#endif
+
+#if USE_ACCESSIBLE
+    vte_terminal_accessible_new(VTE_TERMINAL(term->vte));
 #endif
 
 #ifdef MATCH_STRING
