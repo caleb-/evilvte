@@ -2,6 +2,12 @@
 
 PROG=src/evilvte
 
+PROG_CUSTOM=`grep PROGRAM_NAME src/config.h | grep -v ^\/\/ | awk '{print $3}'`
+
+if [ "$PROG_CUSTOM" != "" ]; then
+  PROG=src/$PROG_CUSTOM
+fi
+
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
   echo
   echo " * Valid option:"
