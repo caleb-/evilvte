@@ -204,10 +204,6 @@
 #define LABEL_SUBMENU_IME "Input Methods"
 #endif
 
-#if SCROLLBAR_LEFT
-#undef SCROLLBAR_RIGHT
-#endif
-
 #if CLOSE_DIALOG
 #define GET_VTE_CHILD_PID 1
 #define DO_CLOSE_DIALOG 1
@@ -329,7 +325,7 @@
 #endif
 #define DO_TOGGLE_BACKGROUND 1
 char *background_order[] = { TOGGLE_BG_ORDER };
-int background_order_size = sizeof(background_order) / sizeof(background_order[0]);
+const int background_order_size = sizeof(background_order) / sizeof(background_order[0]);
 int background_status = 0;
 #endif
 
@@ -476,7 +472,7 @@ GtkWidget *encoding_item;
 #ifndef HOTKEY_TOGGLE_BACKGROUND
 #define DO_TOGGLE_BACKGROUND 1
 char *background_order[] = { TOGGLE_BG_ORDER };
-int background_order_size = sizeof(background_order) / sizeof(background_order[0]);
+const int background_order_size = sizeof(background_order) / sizeof(background_order[0]);
 int background_status = 0;
 #endif
 #endif
@@ -522,14 +518,14 @@ GdkColor color_tint;
 #endif
 
 #ifdef HOTKEY_TOGGLE_SCROLLBAR
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
 #define DO_TOGGLE_SCROLLBAR 1
 int scrollbar_status = 0;
 #endif
 #endif
 
 #if MENU_TOGGLE_SCROLLBAR
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
 #ifndef HOTKEY_TOGGLE_SCROLLBAR
 #define DO_TOGGLE_SCROLLBAR 1
 int scrollbar_status = 0;
@@ -537,11 +533,11 @@ int scrollbar_status = 0;
 #endif
 #endif
 
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
 #define VTE_HBOX term->hbox
 #endif
 
-#if !SCROLLBAR_LEFT && !SCROLLBAR_RIGHT
+#ifndef SCROLLBAR
 #define VTE_HBOX term->vte
 #endif
 
@@ -791,21 +787,21 @@ GtkWidget *notebook;
 #undef TAB_LABEL
 #undef TAB_LABEL_POEM
 #define TAB_LABEL_INIT 1
-char *label_style_custom[] = { TAB_LABEL_CUSTOM };
-int label_style_size = sizeof(label_style_custom) / sizeof(label_style_custom[0]);
+const char *label_style_custom[] = { TAB_LABEL_CUSTOM };
+const int label_style_size = sizeof(label_style_custom) / sizeof(label_style_custom[0]);
 #endif
 
 #if TAB_LABEL_POEM
 #undef TAB_LABEL
 #define TAB_LABEL_INIT 1
 /* http://zh.wikisource.org/wiki/千字文 */
-char *label_style_poem[] = {
+const char *label_style_poem[] = {
 "天", "地", "玄", "黃", "宇", "宙", "洪", "荒",
 "日", "月", "盈", "昃", "辰", "宿", "列", "張",
 "寒", "來", "暑", "往", "秋", "收", "冬", "藏",
 "閏", "餘", "成", "歲", "律", "呂", "調", "陽"
 };
-int label_style_size = sizeof(label_style_poem) / sizeof(label_style_poem[0]);
+const int label_style_size = sizeof(label_style_poem) / sizeof(label_style_poem[0]);
 #endif
 
 #ifdef TAB_LABEL
@@ -936,12 +932,11 @@ const GdkColor color_xterm[16] =
 #endif
 
 #ifdef FONT_ANTI_ALIAS
-#ifndef FONT
-#define FONT "Monospace"
-#endif
+#define FONT_CHANGE_SIZE 1
 #endif
 
 #if MENU_FONT_BIGGER
+#undef FONT_CHANGE_SIZE
 #define FONT_CHANGE_SIZE 1
 #endif
 
@@ -953,19 +948,16 @@ const GdkColor color_xterm[16] =
 #if MENU_FONT_SELECT
 #undef FONT_CHANGE_SIZE
 #define FONT_CHANGE_SIZE 1
-char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #endif
 
 #if MENU_TOGGLE_ANTI_ALIAS
-#ifndef FONT
-#define FONT "Monospace"
-#endif
+#undef FONT_CHANGE_SIZE
+#define FONT_CHANGE_SIZE 1
 #endif
 
 #ifdef HOTKEY_TOGGLE_ANTI_ALIAS
-#ifndef FONT
-#define FONT "Monospace"
-#endif
+#undef FONT_CHANGE_SIZE
+#define FONT_CHANGE_SIZE 1
 #endif
 
 #ifdef HOTKEY_FONT_BIGGER
@@ -981,14 +973,11 @@ char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #ifdef HOTKEY_FONT_SELECT
 #undef FONT_CHANGE_SIZE
 #define FONT_CHANGE_SIZE 1
-#if !MENU_FONT_SELECT
-char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-#endif
 #endif
 
 #if FONT_CHANGE_SIZE
 #ifndef FONT
-#define FONT "Monospace"
+#define FONT "Monospace 10"
 #endif
 #endif
 
@@ -997,19 +986,12 @@ char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #undef HOTKEY_FONT_DEFAULT_SIZE
 #endif
 
-#if FONT_SIZE
-#ifndef FONT
-#define FONT "Monospace"
-#endif
-#endif
-
 #ifdef FONT
-#ifndef FONT_SIZE
-#define FONT_SIZE 10
-#endif
 char font_name[125];
 char font_str[128];
-int font_size = FONT_SIZE;
+int font_size;
+int font_size_default;
+const char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #endif
 
 #if COMMAND_EXEC_PROGRAM
@@ -1084,7 +1066,7 @@ struct terminal {
   GtkWidget *label;
   GtkWidget *label_edit;
 #endif
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
   GtkWidget *hbox;
   GtkWidget *scrollbar;
 #endif
@@ -1152,7 +1134,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_HOTKEYS
     if (HOTKEY_TOGGLE_HOTKEYS) {
-      hotkey_status = !hotkey_status;
+      hotkey_status ^= 1;
       return TRUE;
     }
 #endif
@@ -1243,7 +1225,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_DECORATED
       if (HOTKEY_TOGGLE_DECORATED) {
-        window_decorated_status = !window_decorated_status;
+        window_decorated_status ^= 1;
         gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status ? 0 : 1);
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if TAB
@@ -1263,7 +1245,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_FULLSCREEN
       if (HOTKEY_TOGGLE_FULLSCREEN) {
-        window_fullscreen_status = !window_fullscreen_status;
+        window_fullscreen_status ^= 1;
         window_fullscreen_status ? gtk_window_maximize(GTK_WINDOW(main_window)) : gtk_window_unmaximize(GTK_WINDOW(main_window));
         return TRUE;
       }
@@ -1271,7 +1253,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_TABBAR
       if (HOTKEY_TOGGLE_TABBAR) {
-        tabbar_status = !tabbar_status;
+        tabbar_status ^= 1;
         gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), tabbar_status ? 0 : 1);
 #if TABBAR_AUTOHIDE
         if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1)
@@ -1284,20 +1266,20 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_STATUS_BAR
       if (HOTKEY_TOGGLE_STATUS_BAR) {
-        status_bar_status = !status_bar_status;
+        status_bar_status ^= 1;
         status_bar_status ? gtk_widget_hide(statusbar) : gtk_widget_show(statusbar);
         gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
         return TRUE;
       }
 #endif
 
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
 #ifdef HOTKEY_TOGGLE_SCROLLBAR
       if (HOTKEY_TOGGLE_SCROLLBAR) {
 #if TAB
         int i = 0;
 #endif
-        scrollbar_status = !scrollbar_status;
+        scrollbar_status ^= 1;
         if (scrollbar_status) {
 #if TAB
           for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
@@ -1323,7 +1305,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         return TRUE;
       }
 #endif
-#endif /* SCROLLBAR_LEFT || SCROLLBAR_RIGHT */
+#endif /* SCROLLBAR */
 
 #ifdef HOTKEY_OPEN_NEW_WINDOW
       if (HOTKEY_OPEN_NEW_WINDOW) {
@@ -1334,7 +1316,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_ON_TOP
       if (HOTKEY_TOGGLE_ON_TOP) {
-        always_on_top = !always_on_top;
+        always_on_top ^= 1;
         gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
 #if COMMAND_AT_ROOT_WINDOW
         if (at_root_window && !always_on_top) {
@@ -1365,7 +1347,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
         term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
-        char *encoding_name = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term->vte));
+        const char *encoding_name = vte_terminal_get_encoding(VTE_TERMINAL(term->vte));
         GtkWidget *encoding_entry = gtk_entry_new();
         GtkWidget *encoding_dialog;
 #if BUTTON_ORDER_BY_RCFILE
@@ -1679,7 +1661,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_FONT_DEFAULT_SIZE
       if (HOTKEY_FONT_DEFAULT_SIZE) {
-        font_size = FONT_SIZE;
+        font_size = font_size_default;
         font_size_changed();
         return TRUE;
       }
@@ -1939,7 +1921,7 @@ void delete_event()
 #if MENU_TOGGLE_ON_TOP
 void do_always_on_top()
 {
-  always_on_top = !always_on_top;
+  always_on_top ^= 1;
   gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
 #if COMMAND_AT_ROOT_WINDOW
   if (at_root_window && !always_on_top) {
@@ -2299,7 +2281,7 @@ void do_toggle_bg()
 void do_toggle_decorated()
 {
   gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status);
-  window_decorated_status = !window_decorated_status;
+  window_decorated_status ^= 1;
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if TAB
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
@@ -2318,7 +2300,7 @@ void do_toggle_decorated()
 #if MENU_TOGGLE_FULLSCREEN
 void do_toggle_fullscreen()
 {
-  window_fullscreen_status = !window_fullscreen_status;
+  window_fullscreen_status ^= 1;
   window_fullscreen_status ? gtk_window_maximize(GTK_WINDOW(main_window)) : gtk_window_unmaximize(GTK_WINDOW(main_window));
 }
 #endif
@@ -2326,18 +2308,18 @@ void do_toggle_fullscreen()
 #if MENU_TOGGLE_HOTKEYS
 void do_toggle_hotkeys()
 {
-  hotkey_status = !hotkey_status;
+  hotkey_status ^= 1;
 }
 #endif
 
 #if MENU_TOGGLE_SCROLLBAR
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
 void do_toggle_scrollbar()
 {
 #if TAB
   int i = 0;
 #endif
-  scrollbar_status = !scrollbar_status;
+  scrollbar_status ^= 1;
   if (scrollbar_status) {
 #if TAB
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
@@ -2367,7 +2349,7 @@ void do_toggle_scrollbar()
 #if MENU_TOGGLE_STATUS_BAR && STATUS_BAR
 void do_toggle_status_bar()
 {
-  status_bar_status = !status_bar_status;
+  status_bar_status ^= 1;
   status_bar_status ? gtk_widget_hide(statusbar) : gtk_widget_show(statusbar);
   gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
 }
@@ -2377,7 +2359,7 @@ void do_toggle_status_bar()
 void do_toggle_tabbar()
 {
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), tabbar_status);
-  tabbar_status = !tabbar_status;
+  tabbar_status ^= 1;
 #if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1)
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
@@ -2389,11 +2371,7 @@ void do_toggle_tabbar()
 #if MENU_FONT_DEFAULT_SIZE
 void do_zoom_100()
 {
-  font_size = FONT_SIZE;
-  if (font_size > 99)
-    font_size = 99;
-  if (font_size < 1)
-    font_size = 1;
+  font_size = font_size_default;
   font_size_changed();
 }
 #endif
@@ -2479,26 +2457,24 @@ void add_tab()
   g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
 #endif
 
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
   term->hbox = gtk_hbox_new(0, 0);
 #endif
 
   term->vte = vte_terminal_new();
 
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
   term->scrollbar = gtk_vscrollbar_new(vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
 #endif
 
-#if SCROLLBAR_LEFT
+#ifdef SCROLLBAR
+#if !SCROLLBAR
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
 #endif
-
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   gtk_box_pack_start(GTK_BOX(term->hbox), term->vte, 1, 1, 0);
-#endif
-
-#if SCROLLBAR_RIGHT
+#if SCROLLBAR
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
+#endif
 #endif
 
 #if TAB_NEW_PATH_EQUAL_OLD
@@ -2729,7 +2705,7 @@ void add_tab()
   gtk_widget_show_all(notebook);
 
 #if DO_TOGGLE_SCROLLBAR
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
   if (scrollbar_status) {
 #if TAB
     int i = 0;
@@ -2901,7 +2877,7 @@ void font_size_changed()
 void recover_window_status()
 {
 #if DO_TOGGLE_SCROLLBAR
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
   if (scrollbar_status) {
 #if TAB
     int i = 0;
@@ -3063,12 +3039,33 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef FONT
-  if (font_size > 99)
-    font_size = 99;
-  if (font_size < 1)
-    font_size = 1;
   g_snprintf(font_name, sizeof(font_name), "%s", FONT);
+  int len = strlen(font_name) - 1;
+  font_size = 0;
+  int k = 0;
+  if (isdigit(font_name[len - 1])) {
+    for (k = 0 ; k < 10 ; k++) {
+      if (font_name[len - 1] == *number_char[k])
+        font_size += k * 10;
+      if (font_name[len] == *number_char[k])
+        font_size += k;
+    }
+  } else {
+    for (k = 0 ; k < 10 ; k++) {
+      if (font_name[len] == *number_char[k])
+        font_size += k;
+    }
+  }
+  if (isdigit(font_name[len - 2]))
+    font_size = 10;
+  else if (font_size < 1)
+    font_size = 10;
+  while (len > 0 && isdigit(font_name[len]))
+    font_name[len--] = 0;
+  while (len > 0 && font_name[len] == ' ')
+    font_name[len--] = 0;
   g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
+  font_size_default = font_size;
 #endif
 
   gtk_init(NULL, NULL);
@@ -3255,7 +3252,7 @@ int main(int argc, char **argv)
 
 #ifdef MENU_CUSTOM
   GtkWidget *menu_item;
-  int menu_custom_size = sizeof(menu_custom) / sizeof(menu_custom[0]);
+  const int menu_custom_size = sizeof(menu_custom) / sizeof(menu_custom[0]);
   for (j = 0 ; j < menu_custom_size ; j++)
 #endif
   {
@@ -3424,7 +3421,7 @@ int main(int argc, char **argv)
 #endif
 
 #if MENU_TOGGLE_SCROLLBAR
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+#ifdef SCROLLBAR
     if (menu_custom[j] == "Toggle scrollbar") {
       GtkWidget *menu_toggle_scrollbar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_SCROLLBAR);
       GtkWidget *image_toggle_scrollbar = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
@@ -3525,7 +3522,7 @@ int main(int argc, char **argv)
 #endif
 #ifdef MENU_ENCODING_LIST
     {
-      int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
+      const int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
       GtkWidget *encoding_item[encoding_size];
 #ifdef MENU_CUSTOM
       GtkWidget *image_menu_enc;
@@ -3603,7 +3600,7 @@ int main(int argc, char **argv)
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), subitem_enc);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(subitem_enc), image_submenu_enc);
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(subitem_enc), submenu_enc);
-      int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
+      const int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
       GtkWidget *encoding_sub[encoding_size];
       for (i = 0 ; i < encoding_size ; i++) {
 #if MENU_DEFAULT_ENCODING

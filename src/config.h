@@ -30,15 +30,13 @@
 // #define CURSOR_BLINKS          TRUE
 // #define CURSOR_COLOR           "blue"
 // #define DEFAULT_ARGV           NULL
-// #define DEFAULT_COLUMNS        80
-// #define DEFAULT_ROWS           24
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
 // #define DEFAULT_DIRECTORY      g_get_current_dir()
 // #define DEFAULT_EMULATION_TYPE "xterm"
 // #define DEFAULT_ENCODING       "UTF-8"
 // #define DEFAULT_ENVV           NULL
-// #define FONT                   "Monospace"
-// #define FONT_SIZE              10
+// #define DEFAULT_TERMINAL_SIZE  80x24
+// #define FONT                   "Monospace 10"
 // #define FONT_ANTI_ALIAS        TRUE
 // #define FONT_ENABLE_BOLD_TEXT  TRUE
 // #define MOUSE_CTRL_SATURATION  TRUE  /* Scroll left or right to adjust it  */
@@ -53,8 +51,7 @@
 // #define SCROLL_LINES           1000
 // #define SCROLL_ON_KEYSTROKE    TRUE
 // #define SCROLL_ON_OUTPUT       TRUE
-// #define SCROLLBAR_LEFT         TRUE
-#define    SCROLLBAR_RIGHT        TRUE
+#define    SCROLLBAR              RIGHT /* Options: LEFT, RIGHT               */
 // #define SHOW_WINDOW_BORDER     TRUE
 // #define SHOW_WINDOW_DECORATED  TRUE
 #define    SHOW_WINDOW_ICON       TRUE
@@ -162,5 +159,5 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "Character Encoding"
 // #define LABEL_SUBMENU_IME            "Input Methods"
-// #define VIRTUAL_KEYBOARD_MENU_KEY    "Menu" /* " 目 "                    */
-// #define VIRTUAL_KEYBOARD_WINDOW_KEY  "Win"  /* "ﾐ田"                     */
+// #define VIRTUAL_KEYBOARD_MENU_KEY    "Menu" /* " 目 "                      */
+// #define VIRTUAL_KEYBOARD_WINDOW_KEY  "Win"  /* "ﾐ田"                       */

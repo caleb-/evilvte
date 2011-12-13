@@ -1,3 +1,9 @@
+0.4.5~pre4
+ * New option DEFAULT_TERMINAL_SIZE, remove DEFAULT_COLUMNS and DEFAULT_ROWS
+ * New option SCROLLBAR, remove SCROLLBAR_LEFT and SCROLLBAR_RIGHT
+ * Remove FONT_SIZE
+   You may define font size in FONT option.
+
 0.4.5~pre3
  * Improve command line option support
  * Improve hotkey customization a bit

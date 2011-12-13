@@ -60,6 +60,19 @@ if [ "$COLOR_STYLE_DEFINE" = "XTERM" ]; then
   echo \#define COLOR_XTERM 1 >> $NEWCONFFILE
 fi
 
+DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
+  COLUMNS_DEFINE=`echo $DEFAULT_TERMINAL_SIZE_DEFINE | awk '{print $3}' | cut -d x -f 1`
+  ROWS_DEFINE=`echo $DEFAULT_TERMINAL_SIZE_DEFINE | grep x - | cut -d x -f 2`
+  if [ "$ROWS_DEFINE" = "" ]; then
+    ROWS_DEFINE=24
+  fi
+  echo \#undef DEFAULT_COLUMNS >> $NEWCONFFILE
+  echo \#undef DEFAULT_ROWS >> $NEWCONFFILE
+  echo \#define DEFAULT_COLUMNS $COLUMNS_DEFINE >> $NEWCONFFILE
+  echo \#define DEFAULT_ROWS $ROWS_DEFINE >> $NEWCONFFILE
+fi
+
 TOGGLE_BG_ORDER_DEFINE=`grep TOGGLE_BG_ORDER $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
 if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
   echo \#define TOGGLE_BG_IMAGE 1 >> $NEWCONFFILE
