@@ -15,6 +15,9 @@ all: evilvte showvte
 evilvte: $(OBJ)
 	$(CC) -o $(PROG) $(OBJ) $(LDFLAGS)
 
+strip: all
+	strip --remove-section=.comment --remove-section=.note $(PROG)
+
 showvte:
 	head -n 1 src/showvte.c > src/showvte
 	sh src/showvte.c >> src/showvte
@@ -31,6 +34,8 @@ install:
 	install -m 644 misc/evilvte.1 misc/showvte.1 $(mandir)
 	install -d $(deskdir)
 	install -m 644 misc/evilvte.desktop $(deskdir)
+
+installstrip: strip install
 
 clean: src/config.o
 	rm -f $(PROG) src/showvte src/*.o

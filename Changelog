@@ -1,3 +1,10 @@
+0.3.8
+ * Support CLOSE_DIALOG
+   Let user confirm close event.
+ * Support "Toggle window decorated" item in menu
+ * Support "Toggle anti-alias" item in menu
+ * Support "make strip" and "make installstrip"
+
 0.3.7
  * Support MOUSE_CTRL_SATURATION
    Scroll left to decrease saturation, and scroll right to increase it.
@@ -9,7 +16,7 @@
    BACKGROUND_SATURATION
 
 0.3.6
- * Support BACKGROUND_OPACITY and SHOW_WINDOW_DECORATION
+ * Support BACKGROUND_OPACITY and SHOW_WINDOW_DECORATED
    Thanks to dx <dx AT dxzone DOT com DOT ar>
  * Do not kill foreground applications when CLOSE_SAFELY is enabled
    Thanks to Tetralet <tetralet AT gmail DOT com>

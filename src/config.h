@@ -4,14 +4,15 @@
 // #define BACKGROUND_SATURATION  0.4
 // #define BACKGROUND_SCROLLABLE  TRUE
 // #define BACKGROUND_TINT_COLOR  "brown"
-// #define BACKGROUND_TRANSPARENT TRUE /* Pseudo transparent background */
-// #define BACKGROUND_OPACITY     TRUE /* True transparent background */
+// #define BACKGROUND_TRANSPARENT TRUE  /* Pseudo transparent background      */
+// #define BACKGROUND_OPACITY     TRUE  /* True transparent background        */
 // #define BACKSPACE_KEY /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
 // #define DELETE_KEY    /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
 // #define BUTTON_ORDER_BY_RCFILE TRUE
-// #define CLOSE_SAFELY           TRUE /* Do not kill running applications */
+// #define CLOSE_DIALOG           TRUE  /* Dialog to confirm close event      */
+// #define CLOSE_SAFELY           TRUE  /* Do not kill running applications   */
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
 // #define COLOR_STYLE            LINUX /* Options: LINUX, RXVT, TANGO, XTERM */
@@ -35,7 +36,7 @@
 // #define FONT_SIZE              10
 // #define FONT_ANTI_ALIAS        TRUE
 // #define FONT_ENABLE_BOLD_TEXT  TRUE
-// #define MOUSE_CTRL_SATURATION  TRUE /* Scroll left or right to adjust it */
+// #define MOUSE_CTRL_SATURATION  TRUE  /* Scroll left or right to adjust it  */
 // #define MOUSE_CURSOR_AUTOHIDE  TRUE
 // #define PROGRAM_NAME           "evilvte"
 // #define PROGRAM_VERSION        "7.7.7"
@@ -48,7 +49,7 @@
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
 // #define SHOW_WINDOW_BORDER     TRUE
-// #define SHOW_WINDOW_DECORATION TRUE
+// #define SHOW_WINDOW_DECORATED  TRUE
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      TRUE
 #define    STATUS_BAR             TRUE
@@ -66,7 +67,8 @@
             *          "Input method", "Submenu encoding list",
             *          "Submenu input method", "Toggle background",
             *          "Toggle scrollbar", "Toggle status bar",
-            *          "Toggle tabbar"                                        */
+            *          "Toggle tabbar", "Toggle window decorated",
+            *          "Toggle anti-alias"                                    */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -117,7 +119,10 @@
 // #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background", "Opacity"
 
 // #define LABEL_DEFAULT_ENCODING       "Default Encoding"
+// #define LABEL_DIALOG_CLOSE           "Do you really want to close it?"
+// #define LABEL_MENU_TOGGLE_ANTI_ALIAS "Toggle anti-alias"
 // #define LABEL_MENU_TOGGLE_BG         "Toggle background"
+// #define LABEL_MENU_TOGGLE_DECORATED  "Toggle window decorated"
 // #define LABEL_MENU_TOGGLE_SCROLLBAR  "Toggle scrollbar"
 // #define LABEL_MENU_TOGGLE_STATUS_BAR "Toggle status bar"
 // #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
