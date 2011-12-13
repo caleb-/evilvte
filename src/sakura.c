@@ -427,6 +427,12 @@ GdkColor color_tint;
 #endif
 #endif
 
+#if PROGRAM_WM_CLASS
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "evilvte"
+#endif
+#endif
+
 #if MENU_OPEN_NEW_WINDOW
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "evilvte"
@@ -2970,6 +2976,10 @@ int main(int argc, char **argv)
 #endif
 
   main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+#if PROGRAM_WM_CLASS
+  gtk_window_set_wmclass(GTK_WINDOW(main_window), VTE_PROGRAM_NAME, PROGRAM_NAME);
+#endif
 
 #ifdef SHOW_WINDOW_DECORATED
   gtk_window_set_decorated(GTK_WINDOW(main_window), SHOW_WINDOW_DECORATED);

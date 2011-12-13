@@ -45,6 +45,7 @@
 // #define PROGRAM_ALWAYS_ON_TOP  TRUE
 // #define PROGRAM_NAME           "evilvte"
 // #define PROGRAM_VERSION        "7.7.7"
+// #define PROGRAM_WM_CLASS       TRUE
 // #define RECORD_LASTLOG         TRUE
 // #define RECORD_UTMP            TRUE
 // #define RECORD_WTMP            TRUE

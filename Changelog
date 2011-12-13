@@ -1,3 +1,7 @@
+0.4.4~pre6
+ * Support PROGRAM_WM_CLASS
+   Thanks to Bruno Vieira <mail AT bmpvieira DOT com> for reporting this issue.
+
 0.4.4~pre5
  * Support CTRL_TOGGLE_FULLSCREEN and "Toggle fullscreen" item in menu
    I tested this feature in jwm and kwin.
