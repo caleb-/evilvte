@@ -1,3 +1,11 @@
+0.4.4~pre5
+ * Support CTRL_TOGGLE_FULLSCREEN and "Toggle fullscreen" item in menu
+   I tested this feature in jwm and kwin.
+ * Fix a do-no-harm message when trying to rename a null tab label
+   Thanks to Bernhard R. Link <brlink AT debian DOT org> for reporting it.
+ * Fix number_char redefinition error if built with gcc 4.3.1
+ * Rename shell scripts to the .sh scheme, and update the LICENSE file
+
 0.4.4~pre4
  * Support command line -title option to assign program title
  * Use g_get_current_dir() instead of g_getenv("PWD") to decide current path
@@ -109,7 +117,7 @@
    This is inspired from nicevte 0.1.
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
  * Fix a TABBAR_SCROLLABLE bug
-   I misunderstanded gtk_notebook_set_scrollable. :-P
+   I misunderstood gtk_notebook_set_scrollable. :-P
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
  * Fix a label editing bug when scrollbar is not enabled
  * Support TAB_EXPANDED_WIDTH
@@ -148,7 +156,6 @@
  * Support CTRL_TAB_EDIT_LABEL
  * Support TOGGLE_BG_ORDER
  * Support new tab with current tab's working directory
- * Fix a gtk_notebook_set_scrollable bug.
 
 0.2.8
  * Support TAB_LABEL_STYLE_*

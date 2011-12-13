@@ -13,7 +13,7 @@ endif
 all: evilvte showvte misc/evilvte.1
 
 src/evilvte.h:
-	sh src/evilvte.c
+	sh src/evilvte.sh
 
 evilvte: src/evilvte.h $(OBJ)
 	$(CC) -o $(PROG) $(OBJ) $(LDFLAGS)
@@ -22,15 +22,15 @@ strip: all
 	strip --remove-section=.comment --remove-section=.note $(PROG)
 
 showvte:
-	head -n 19 src/showvte.c | grep -v 'This is not an C program text' > src/showvte
-	tail -n 7 src/showvte.c | head -n 6 >> src/showvte
-	sh src/showvte.c >> src/showvte
-	tail -n 1 src/showvte.c >> src/showvte
+	head -n 16 src/showvte.sh > src/showvte
+	tail -n 7 src/showvte.sh | head -n 6 >> src/showvte
+	sh src/showvte.sh >> src/showvte
+	tail -n 1 src/showvte.sh >> src/showvte
 	sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ >> src/showvte
 	chmod 755 src/showvte
 
 misc/evilvte.1:
-	sh src/manpage.c
+	sh src/manpage.sh
 
 install: all
 	install -d $(bindir)

@@ -15,7 +15,7 @@ Licence: GPL-2
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Files: src/evilvte.c, src/manpage.c, src/showvte.c
+Files: src/evilvte.sh, src/manpage.sh, src/showvte.sh
 Copyright:  2008 Wen-Yen Chuang <caleb AT calno DOT com>
 Licence: GPL-2
     This program is free software; you can redistribute it and/or modify

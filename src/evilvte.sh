@@ -1,6 +1,4 @@
 #!/bin/sh
-# This is not an C program text
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.
@@ -15,7 +13,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
-#
 
 cat /dev/null > src/evilvte.h
 rm -f src/evilvte src/sakura.o
@@ -212,6 +209,11 @@ fi
 MENU_TOGGLE_DECORATED=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle window decorated'`
 if [ "$MENU_TOGGLE_DECORATED" != "" ]; then
   echo \#define MENU_TOGGLE_DECORATED 1 >> src/evilvte.h
+fi
+
+MENU_TOGGLE_FULLSCREEN=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle fullscreen'`
+if [ "$MENU_TOGGLE_FULLSCREEN" != "" ]; then
+  echo \#define MENU_TOGGLE_FULLSCREEN 1 >> src/evilvte.h
 fi
 
 MENU_TOGGLE_ANTI_ALIAS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle anti-alias'`

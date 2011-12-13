@@ -1,6 +1,4 @@
 #!/bin/sh
-# This is not an C program text
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.
@@ -15,7 +13,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 # Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
-#
 
 COMMAND_ENABLED=0
 

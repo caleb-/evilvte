@@ -74,8 +74,8 @@
             *          "Toggle scrollbar", "Toggle status bar",
             *          "Toggle tabbar", "Toggle window decorated",
             *          "Toggle anti-alias", "Toggle hotkeys locking",
-            *          "Toggle always on top", "Adjust saturation",
-            *          "Background tint"                                      */
+            *          "Toggle always on top", "Toggle fullscreen",
+            *          "Adjust saturation", "Background tint"                 */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -127,6 +127,7 @@
 // #define CTRL_TAB_EDIT_LABEL    (event->keyval == GDK_E)
 // #define CTRL_TOGGLE_ANTI_ALIAS (event->keyval == GDK_L)
 // #define CTRL_TOGGLE_DECORATED  (event->keyval == GDK_Left)
+// #define CTRL_TOGGLE_FULLSCREEN (event->keyval == GDK_M)
 // #define CTRL_TOGGLE_HOTKEYS    (event->keyval == GDK_quoteleft)
 // #define CTRL_TOGGLE_ON_TOP     (event->keyval == GDK_O)
 // #define CTRL_TOGGLE_SCROLLBAR  (event->keyval == GDK_Right)
@@ -143,6 +144,7 @@
 // #define LABEL_MENU_TOGGLE_ANTI_ALIAS "Toggle anti-alias"
 // #define LABEL_MENU_TOGGLE_BG         "Toggle background"
 // #define LABEL_MENU_TOGGLE_DECORATED  "Toggle window decorated"
+// #define LABEL_MENU_TOGGLE_FULLSCREEN "Toggle fullscreen"
 // #define LABEL_MENU_TOGGLE_HOTKEYS    "Toggle hotkeys locking"
 // #define LABEL_MENU_TOGGLE_ON_TOP     "Toggle always on top"
 // #define LABEL_MENU_TOGGLE_SCROLLBAR  "Toggle scrollbar"
