@@ -54,9 +54,6 @@
 #endif
 
 #if TAB
-#ifndef TABBAR
-#define TABBAR FALSE
-#endif
 #define ENABLE_KEY_PRESS TRUE
 #endif
 
@@ -81,6 +78,12 @@
 
 #ifndef TAB_LABEL
 #undef TAB_LABEL_NUMBER
+#endif
+
+#if TABBAR_AUTOHIDE
+#ifndef TABBAR
+#define TABBAR TRUE
+#endif
 #endif
 
 #ifdef TAB_INFO_AT_TITLE
@@ -943,6 +946,14 @@ int main(int argc, char **argv)
   gtk_notebook_set_tab_vborder(GTK_NOTEBOOK(notebook), TAB_BORDER_H);
 #endif
 
+#ifdef TABBAR
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
+#endif
+
+#if !TAB
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
+#endif
+
   sakura_add_tab();
 
 #if EXECUTE_COMMAND && TAB
@@ -970,12 +981,6 @@ int main(int argc, char **argv)
 
 #if ENABLE_KEY_PRESS
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(sakura_key_press), NULL);
-#endif
-
-#if TAB
-  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
-#else
-  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
 #endif
 
 #if FONT_CHANGE_SIZE

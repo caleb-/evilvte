@@ -48,12 +48,12 @@
 #define    MENU_INPUT_METHOD      TRUE
 // #define MOUSE_AUTOHIDE         TRUE
 // #define SCROLL_BACKGROUND      TRUE
-#define    SCROLL_LINES           1024
+// #define SCROLL_LINES           60
 // #define SCROLL_ON_KEYSTROKE    TRUE
 // #define SCROLL_ON_OUTPUT       TRUE
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
-#define    SHOW_WINDOW_BORDER     FALSE
+// #define SHOW_WINDOW_BORDER     TRUE 
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      "evilvte"
 #define    SHOW_WINDOW_VERSION    TRUE      /* Command line -v option */
@@ -67,13 +67,13 @@
 // #define TAB_BORDER             0
 // #define TAB_BORDER_H           0
 // #define TAB_BORDER_V           0
-#define    TAB_INFO_AT_TITLE      TRUE /* Show tab infomation at window title */
+// #define TAB_INFO_AT_TITLE      TRUE /* Show tab infomation at window title */
 // #define TAB_INITIAL_NUMBER     1
 // #define TAB_LABEL              "Page"
 // #define TAB_LABEL_NUMBER       TRUE   /* Depends on TAB_LABEL */
 // #define TAB_MENU_SELECT_TAB    TRUE
 // #define TAB_MOUSE_SCROLLABLE   TRUE
-#define    TABBAR                 FALSE
+// #define TABBAR                 TRUE
 // #define TABBAR_AUTOHIDE        TRUE
 
 /* Hotkey definitions

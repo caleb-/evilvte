@@ -1,3 +1,6 @@
+0.2.4
+ * Fix a TABBAR_AUTOHIDE bug
+
 0.2.3
  * New option TABBAR
  * Support TAB_INFO_AT_TITLE
