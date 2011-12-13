@@ -1,3 +1,17 @@
+0.4.7
+ * Better compatibility with WM_CLASS
+   - Accept environment variable RESOURCE_NAME
+   - You may use --name and --class command line option to set WM_CLASS,
+     both are provided by GTK+
+   - Note that -title and -T no longer changes WM_CLASS
+   - Thanks to Zveroy <zveroy AT gmail DOT com> and
+               Tetralet <tetralet AT gmail DOT com>
+ * Accept environment variable PKG_CONFIG_PATH
+   Thanks to letoh
+ * Support -g +X+Y command line option to assign initial window geometry
+ * Prevent tab labels getting focus
+ * Make everything GTK+ 2.91.0 compatible
+
 0.4.7~pre5
  * Support -fn command line option to assign font and font size
  * Better compatibility with configure options

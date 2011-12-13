@@ -27,6 +27,7 @@
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
 // #define COMMAND_FULLSCREEN     TRUE  /* -f option, init in fullscreen mode */
 // #define COMMAND_FONT           TRUE  /* -fn option, to assign font & size  */
+// #define COMMAND_GEOMETRY       TRUE  /* -g +X+Y option, to assign geometry */
 // #define COMMAND_LOGIN_SHELL    TRUE  /* -ls option, to enable login shell  */
 // #define COMMAND_SET_TITLE      TRUE  /* -T or -title to set program title  */
 // #define COMMAND_SHOW_HELP      TRUE  /* -h option, show help               */
@@ -113,7 +114,7 @@
  * CTRL GDK_a = "Ctrl + a"
  * CTRL GDK_A = "Ctrl + Shift + a"
  *
- * See /usr/include/gtk-2.0/gdk/gdkkeysyms.h for GDK_* definitions.
+ * See /usr/include/gtk-?.0/gdk/gdkkeysyms.h for GDK_* definitions.
  *
  * If you enable "CTRL_ALT", all hotkeys will become Ctrl + Alt + hotkey(s).  */
 

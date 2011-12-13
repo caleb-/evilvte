@@ -49,7 +49,7 @@ if [ ! -e $CONF_FILE ] || [ -d $CONF_FILE ]; then
   exec $DO_ECHO
 fi
 
-PROG=`grep PROGRAM_NAME $CONF_FILE | grep -v ^\/\/ | awk '{print $3}'`
+PROG=`grep PROGRAM_NAME $CONF_FILE | sed -e 's/\t/ /g' -e 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | cut -d '"' -f 2`
 [ "$PROG" = "" ] && PROG=evilvte
 
 SUSE_LD=`ld -v 2>&1 | tr A-Z a-z | grep suse`
@@ -71,12 +71,14 @@ if [ "$with_gtk" = "2.0" ]; then
   VTEINC=`pkg-config --cflags vte 2> /dev/null`
   [ $? != 0 ] && exec pkg-config --cflags vte
   LIBS_VTE="-lgdk-x11-2.0 -lgtk-x11-2.0 -lvte"
+  LIBS_VTE_L=`pkg-config --libs-only-L vte 2> /dev/null`
 fi
 
 if [ "$with_gtk" = "3.0" ]; then
   VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
   [ $? != 0 ] && exec pkg-config --cflags vte-2.90
   LIBS_VTE="-lgdk-x11-3.0 -lgtk-x11-3.0 -lvte2_90"
+  LIBS_VTE_L=`pkg-config --libs-only-L vte-2.90 2> /dev/null`
 fi
 
   $DO_ECHO
@@ -93,7 +95,7 @@ fi
   else
     $DO_ECHO
   fi
-  $DO_CAT $CONF_FILE | tr '\t' ' ' | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | \
+  $DO_CAT $CONF_FILE | tr '\t' ' ' | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | grep -v \*\/ | \
   sed -e 's/$/[m/' \
       -e 's/"/[1m[32m"/' \
       -e 's/ 0/[1m[32m 0/' \
@@ -141,6 +143,7 @@ EVILVTE_VERSION=`head -n 1 ChangeLog`
 
 echo "VTEINC=$VTEINC" >> src/config.o
 echo "LIBS_VTE=$LIBS_VTE" >> src/config.o
+echo "LIBS_VTE_L=$LIBS_VTE_L" >> src/config.o
 echo "prefix=$prefix" >> src/config.o
 echo "bindir=\$(DESTDIR)$bindir" >> src/config.o
 echo "mandir=\$(DESTDIR)$mandir" >> src/config.o

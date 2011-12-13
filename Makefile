@@ -9,7 +9,7 @@ ifeq ($(LDFLAGS),)
 endif
 
 ifeq ($(LDLIBS),)
-	LDLIBS = -L/usr/local/lib -lglib-2.0 -lgobject-2.0 $(LIBS_VTE)
+	LDLIBS = -L/usr/local/lib $(LIBS_VTE_L) -lglib-2.0 -lgobject-2.0 $(LIBS_VTE)
 endif
 
 CFLAGS += $(OPTFLAGS) $(VTEINC)
