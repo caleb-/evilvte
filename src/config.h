@@ -58,7 +58,7 @@
 // #define SCROLL_LINES           1000  /* Negative value means unlimited     */
 // #define SCROLL_ON_KEYSTROKE    TRUE
 // #define SCROLL_ON_OUTPUT       TRUE
-#define    SCROLLBAR              RIGHT /* Options: LEFT, RIGHT               */
+#define    SCROLLBAR              RIGHT /* Options: LEFT, RIGHT, OFF_L, OFF_R */
 // #define SHOW_WINDOW_BORDER     TRUE
 // #define SHOW_WINDOW_DECORATED  TRUE
 #define    SHOW_WINDOW_ICON       TRUE

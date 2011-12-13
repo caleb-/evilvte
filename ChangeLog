@@ -1,16 +1,25 @@
+0.4.8~pre1
+ * Status bar and scrollbar can be hidden initially and be toggled on later
+ * Better behavior for *_TOGGLE_TABBAR with TABBAR_AUTOHIDE enabled
+ * Sync window state with window manager
+ * Fix some cross-platform issues
+   Thanks to Aragon Gouveia <aragon AT phat DOT za DOT net>
+ * Initial support for new VTE resizing behavior
+   If you are using GTK+ version >= 2.91.1 and VTE version >= 0.27.1,
+   the window size of evilvte is not always correct currently.
+ * Make everything GTK+ 2.91.4 compatible
+
 0.4.7.1
  * Fix a segfault bug of HOTKEY_MIMIC_SCROLL_UP and HOTKEY_MIMIC_SCROLL_DOWN
 
 0.4.7
  * Better compatibility with WM_CLASS
    - Accept environment variable RESOURCE_NAME
-   - You may use --name and --class command line option to set WM_CLASS,
-     both are provided by GTK+
+   - Document --name and --class command line options in manpage
    - Note that -title and -T no longer changes WM_CLASS
    - Thanks to Zveroy <zveroy AT gmail DOT com> and
                Tetralet <tetralet AT gmail DOT com>
- * Accept environment variable PKG_CONFIG_PATH
-   Thanks to letoh
+ * Accept environment variable PKG_CONFIG_PATH, thanks to letoh
  * Support -g +X+Y command line option to assign initial window geometry
  * Prevent tab labels getting focus
  * Make everything GTK+ 2.91.0 compatible
@@ -20,22 +29,18 @@
  * Better compatibility with configure options
 
 0.4.7~pre4
- * Support HOTKEY_MIMIC_SCROLL_*
-   Thanks to qotsa
+ * Support HOTKEY_MIMIC_SCROLL_*, thanks to qotsa
  * New configure option: --with-gtk=2.0|3.0
  * Rename make target installstrip to install-strip
 
 0.4.7~pre3
- * Support vte_terminal_fork_command_full (VTE >= 0.25.1)
+ * Support vte_terminal_fork_command_full on VTE version >= 0.25.1
  * Support all positive integer font size
- * Drop gdk-pixbuf dependency because it is a standalone library now.
-   It was only used for an VTE 0.24.0 bug. VTE 0.24.1 and later ones had fixed
-   that bug.
+ * Drop gdk-pixbuf dependency. It was used for a bug only exists in VTE 0.24.0.
  * Code clean up
 
 0.4.7~pre2
- * Support BELL_URGENT, aka WM_URGENT hint
-   Thanks to L29Ah
+ * Support BELL_URGENT, aka WM_URGENT hint. Thanks to L29Ah.
  * Make everything GTK+ 2.90.0 compatible
  * Sync gpl-2.0.txt with http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
@@ -44,7 +49,6 @@
  The "Thanks to Aragon!" Release
 
  * Rename MATCH_STRING_EXEC to MATCH_STRING_L
-   MATCH_STRING_EXEC in old conffile will be mapped to MATCH_STRING_L
  * Provide MATCH_STRING_M
    You may middle-click an URL to open it without menu
  * Fix two MATCH_STRING_* bugs
@@ -58,8 +62,6 @@
 0.4.6~pre6
  * Support CURSOR_SHAPE
  * New BACKSPACE_KEY and DELETE_KEY option: ERASE_TTY
- * Make everything GSEAL_ENABLE compatible
-   Further information: http://live.gnome.org/GnomeGoals/UseGseal
  * Simplify Makefile and configure
 
 0.4.6~pre5
@@ -72,16 +74,11 @@
 0.4.6~pre4
  * Support MATCH_STRING_EXEC
    You may click an URL to open it without menu
- * Fix an Arch Linux bug.
-   When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
-   crash.
-   Fix this by defining TAB_LABEL when Arch Linux is detected.
-   Thanks to Ethan.
+ * Define TAB_LABEL when Arch Linux is detected, thanks to Ethan
  * Remove evilvte.xpm
 
 0.4.6~pre3
  * Respect CC
-   Switch auto-detect-SUSE from gcc to ld
  * Support gnome-default-applications
  * Support "make uninstall"
  * VTE_FIXED color style will be disabled if VTE version >= 0.17.1
@@ -89,7 +86,7 @@
 
 0.4.6~pre2
  * Support -d command line option to run as a dock
- * Support WINDOW_TITLE_DYNAMIC for xterm escape sequences, Thanks to IllvilJa
+ * Support WINDOW_TITLE_DYNAMIC for xterm escape sequences, thanks to IllvilJa
  * Support personal configuration file other than src/config.h. For example:
    "make distclean ; ./configure --config=/dev/null ; make strip"
  * Drop useless option SHOW_WINDOW_TITLE and LABEL_DIALOG_SATURATION
@@ -97,12 +94,10 @@
 0.4.6~pre1
  * Support PROGRAM_ICON so users can put their own icons at $HOME
  * Respect CFLAGS and OPTFLAGS
- * Drop obsolete option "Select_all" in MENU_CUSTOM
-   Please use "Select all" instead
+ * Drop "Select_all" in MENU_CUSTOM. Use "Select all" instead.
  * Auto-detect GNU gold linker to avoid unnecessary libraries linking
  * Improve coloring of showvte and configure script
  * Improve man page description. Thanks to editors of http://freshmeat.net.
- * Drop environment variable EVILVTE=min
 
 0.4.5
  * Support -ls command line option to enable login shell in all tabs
@@ -110,8 +105,7 @@
  * Make TAB_LABEL more customizable and support internationalization (i18n)
  * Remove TAB_LABEL_NUMBER
  * Remove TAB_LABEL_POEM since it can be replaced by TAB_LABEL_CUSTOM
- * Hide DEFAULT_ARGV and DEFAULT_ENVV since they are almost impossible to be
-   defined manually.
+ * Hide DEFAULT_ARGV and DEFAULT_ENVV
  * Fix build failure when linked by GNU gold linker
    Thanks to Peter Fritzsche <peter DOT fritzsche AT gmx DOT de>
 
@@ -120,8 +114,7 @@
  * Fix gcc -Wall -Wextra warnings
 
 0.4.5~pre6
- * Support TAB_LABEL_DYNAMIC for xterm escape sequences
-   Thanks to Pavel Plesov
+ * Support TAB_LABEL_DYNAMIC for xterm escape sequences, thanks to Pavel Plesov
  * Relicense icons to GNU General Public License version 2 with permission
    from the author, Tetralet <tetralet AT gmail DOT com>
 
@@ -132,12 +125,10 @@
  * New option DEFAULT_TERMINAL_SIZE, remove DEFAULT_COLUMNS and DEFAULT_ROWS
  * New option SCROLLBAR, remove SCROLLBAR_LEFT and SCROLLBAR_RIGHT
  * Remove FONT_SIZE
-   You may define font size in FONT option.
 
 0.4.5~pre3
  * Improve command line option support
- * Improve hotkey customization a bit
-   Please note that almost all CTRL_* in src/config.h are renamed to HOTKEY_*.
+ * Improve hotkey customization
  * Limit font size range. Only 1 to 99 are accepted.
 
 0.4.5~pre2
@@ -149,7 +140,6 @@
 0.4.5~pre1
  * Detect VTE version and disable unsupported options automatically.
  * Enable deprecated VTE functions that were disabled in evilvte 0.4.4.
- * Support environment variable EVILVTE=min to build a minimal usable terminal.
  * Disable deprecated GLib, GDK and GTK+ functions.
 
 0.4.4.2
@@ -160,8 +150,7 @@
  * Support "make distclean"
 
 0.4.4.1
- * Support command line -T option to assign program title.
-   You may use -title as before.
+ * Support command line -T option to assign program title
 
 0.4.4
  * Disable deprecated VTE functions if VTE version >= 0.19.4
@@ -194,7 +183,6 @@
 
 0.4.4~pre5
  * Support CTRL_TOGGLE_FULLSCREEN and "Toggle fullscreen" item in menu
-   I tested this feature in jwm and kwin.
  * Fix a do-no-harm message when trying to rename a null tab label
    Thanks to Bernhard R. Link <brlink AT debian DOT org>
  * Fix number_char redefinition error if built with gcc 4.3.1
@@ -218,7 +206,6 @@
  * Support command line -r option to run in root window
  * Support command line -h option to show help messages
  * Support command line -2 to -9 options to set initial tab numbers
- * Remove TAB_INITIAL_NUMBER
  * Make icons smaller, and update their copyright to year 2008 with permission
    from the author, Tetralet <tetralet AT gmail DOT com>
  * Make manpage of evilvte according to options in src/config.h
@@ -247,14 +234,12 @@
  * Support CTRL_TOGGLE_HOTKEYS and "Toggle hotkeys locking" item in menu
    When hotkeys are locked, all evilvte hotkeys will be disabled, except
    CTRL_TOGGLE_HOTKEYS.
-   Default CTRL_TOGGLE_HOTKEYS is "Ctrl + `" (left quote).
  * Fix a focus bug
  * Let all tabs share the same background setting and saturation level
  * Adjust saturation of opacity to match the saturation of background image
 
 0.3.9
  * Parse src/config.h to make binary smaller.
-   Only defined menu items will be compiled.
  * Support CTRL_TOGGLE_ANTI_ALIAS
  * Support CTRL_TOGGLE_DECORATED
  * Support CTRL_TOGGLE_SCROLLBAR
@@ -264,7 +249,6 @@
 
 0.3.8
  * Support CLOSE_DIALOG
-   Let user confirm close event.
  * Support "Toggle window decorated" item in menu
  * Support "Toggle anti-alias" item in menu
  * Support "make strip" and "make installstrip"
@@ -291,8 +275,6 @@
  * Support "Toggle background" item in menu
  * Remove "Quit" item in menu
  * Remove QT_STYLE button order
-   Please enable BUTTON_ORDER_BY_RCFILE and set gtk-alternative-button-order=1
-   in $HOME/.gtkrc-2.0 instead.
 
 0.3.4
  * Support MENU_MATCH_STRING_EXEC
@@ -309,26 +291,18 @@
  * Remove an useless variable in the struct terminal.
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
  * Fix an TABBAR_SCROLLABLE bug
-   I misunderstood gtk_notebook_set_scrollable. :-P
    Thanks to marianoguerra <http://marianoguerra.blogspot.com>
  * Fix a label editing bug when scrollbar is not enabled
  * Support TAB_EXPANDED_WIDTH
 
 0.3.2
  * Fix the auto-detect-SUSE failure in openSUSE Build Service.
-   The openSUSE-release package is not installed in the service, so there is no
-   /etc/SuSE-release nor /etc/issue.
    Thanks to swyear <swyear AT gmail DOT com>
  * Support "New window" and "Edit label" items in menu
  * Support "Zoom in", "Zoom out", and "Zoom default" items in menu
- * Remove useless variables and functions in TABBAR_AUTOHIDE and
-   FONT_CHANGE_SIZE
 
 0.3.1
- * Fix an openSUSE 10.3 KDE bug.
-   When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
-   crash.
-   Fix this by defining TAB_LABEL when SUSE system is detected.
+ * Define TAB_LABEL when SUSE system is detected
    Thanks to swyear <swyear AT gmail DOT com>
  * Support MENU_CUSTOM
  * Support "Reset terminal", "Quit", and "Separator" items in menu
@@ -339,8 +313,7 @@
  * Support "Reset and clear" item in menu
  * Support CTRL_OPEN_NEW_WINDOW
  * Support CTRL_EDIT_ENCODING
- * Support QT_STYLE button order and gtk-alternative-button-order setting in
-   GTK+ rc file.
+ * Support QT_STYLE button order and gtk-alternative-button-order setting
  * Fix a dialog title bug
  * Fix an CTRL_TAB_EDIT_LABEL hotkey bug
 
@@ -350,7 +323,7 @@
  * Support new tab with current tab's working directory
 
 0.2.8
- * Support TAB_LABEL_STYLE_*, Thanks to BV1AL.
+ * Support TAB_LABEL_STYLE_*, thanks to BV1AL.
  * Support CTRL_TOGGLE_BACKGROUND
  * Support CTRL_TAB_FIRST and CTRL_TAB_LAST
  * Support CTRL_TAB_GO_TO_NUMBER
@@ -365,8 +338,6 @@
 0.2.6
  * Support CTRL_SATURATION_MORE and CTRL_SATURATION_LESS
  * Support LABEL_DEFAULT_ENCODING
- * Auto-detect FONT_CHANGE_SIZE and remove the option from src/config.h
-   Just define CTRL_FONT_BIGGER or CTRL_FONT_SMALLER to enable it
 
 0.2.5
  * Support all arguments in -e option
@@ -381,7 +352,7 @@
  * New option TABBAR
  * Support TAB_SHOW_INFO_AT_TITLE
  * Fix an CLOSE_SAFELY bug for i386 architecture
- * Fix a statusbar size bug
+ * Fix a status bar size bug
  * Add a .desktop file
  * New icon with BSD License, misc/evilvte.xpm
 
@@ -427,7 +398,6 @@
 
 0.1.2
  * Support DOUBLE_PRESS_HOTKEY
-   Applications can keep using Ctrl + T/W as hotkey
 
 0.1.1
  * Remove an useless g_signal_connect

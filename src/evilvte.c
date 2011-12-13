@@ -56,6 +56,8 @@
 #define RIGHT  1
 #define TOP    2
 #define BOTTOM 3
+#define OFF_L  4
+#define OFF_R  5
 
 #define CTRL event->keyval ==
 
@@ -91,6 +93,18 @@
 #define gdk_screen_get_rgba_colormap gdk_screen_get_rgba_visual
 #endif
 
+#if !GTK_CHECK_VERSION(2,91,1)
+#define gtk_window_set_has_resize_grip(x,y)
+#endif
+
+#ifndef VTE_FUNNY
+#define VTE_FUNNY 1
+#endif
+
+#if !VTE_FUNNY || !VTE_CHECK_VERSION(0,27,1) || !GTK_CHECK_VERSION(2,91,1)
+#undef VTE_FUNNY
+#endif
+
 #if VTE_CHECK_VERSION(0,17,1) && (COLOR_STYLE == VTE_FIXED)
 #undef COLOR_STYLE
 #endif
@@ -100,6 +114,21 @@
 #if VTE_CHECK_VERSION(0,25,1)
 #undef VTE_FORK_CMD_OLD
 #define VTE_FORK_CMD_OLD 0
+#endif
+#endif
+
+#define VTE_WINDOW_RESIZE(x,y,z) gtk_window_resize(x,y,z)
+#if VTE_CHECK_VERSION(0,27,1) && GTK_CHECK_VERSION(2,91,1)
+#ifndef VTE_FUNNY
+#undef VTE_WINDOW_RESIZE
+#define VTE_WINDOW_RESIZE(x,y,z)
+#endif
+GtkBorder *inner_border;
+#ifndef VTE_COLUMNS
+#define VTE_COLUMNS 80
+#endif
+#ifndef VTE_ROWS
+#define VTE_ROWS 24
 #endif
 #endif
 
@@ -473,9 +502,14 @@ GdkColor color_tint;
 #endif
 
 #if defined(HOTKEY_TOGGLE_SCROLLBAR) || MENU_TOGGLE_SCROLLBAR
-#ifdef SCROLLBAR
-#define DO_TOGGLE_SCROLLBAR 1
-int scrollbar_status = 0;
+#ifndef SCROLLBAR
+#define SCROLLBAR RIGHT
+#endif
+#if (SCROLLBAR == LEFT) || (SCROLLBAR == RIGHT)
+int scrollbar_status = 1 ;
+#endif
+#if (SCROLLBAR == OFF_L) || (SCROLLBAR == OFF_R)
+int scrollbar_status = 0 ;
 #endif
 #endif
 
@@ -487,22 +521,23 @@ int scrollbar_status = 0;
 #endif
 
 #if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
-#ifdef STATUS_BAR
-#define DO_TOGGLE_STATUS_BAR 1
-int status_bar_status = 0;
+#ifndef STATUS_BAR
+#define STATUS_BAR 1
 #endif
+int status_bar_status = STATUS_BAR;
+int status_bar_resize_grip = 0;
 #endif
 
 #if defined(HOTKEY_TOGGLE_DECORATED) || MENU_TOGGLE_DECORATED
 #ifdef SHOW_WINDOW_DECORATED
-int window_decorated_status = !SHOW_WINDOW_DECORATED;
+int window_decorated_status = SHOW_WINDOW_DECORATED;
 #endif
 #ifndef SHOW_WINDOW_DECORATED
-int window_decorated_status = 0;
+int window_decorated_status = 1;
 #endif
 #endif
 
-#if defined(HOTKEY_TOGGLE_FULLSCREEN) || MENU_TOGGLE_FULLSCREEN
+#if defined(HOTKEY_TOGGLE_FULLSCREEN) || MENU_TOGGLE_FULLSCREEN || defined(VTE_FUNNY)
 int window_fullscreen_status = 0;
 #endif
 
@@ -520,31 +555,22 @@ const char *menu_custom[] = { MENU_CUSTOM };
 int menu_item_success = 0;
 #endif
 
-#if defined(HOTKEY_TOGGLE_TABBAR) || MENU_TOGGLE_TABBAR
-#define INT_TABBAR_STATUS 1
-#endif
-
 #if TABBAR_AUTOHIDE && !defined(TABBAR)
 #define TABBAR 1
 #endif
 
-#if INT_TABBAR_STATUS
+#if defined(HOTKEY_TOGGLE_TABBAR) || MENU_TOGGLE_TABBAR
 #ifdef TABBAR
-int tabbar_status = !TABBAR;
+int tabbar_status = TABBAR;
 #endif
 #ifndef TABBAR
-int tabbar_status = 0;
+int tabbar_status = 1;
 #endif
-#define VTE_TABBAR !tabbar_status
+#define VTE_TABBAR tabbar_status
 #endif
 
-#if !INT_TABBAR_STATUS
-#if TABBAR
-#define VTE_TABBAR 1
-#endif
-#if !TABBAR
-#define VTE_TABBAR 0
-#endif
+#if !defined(HOTKEY_TOGGLE_TABBAR) && !MENU_TOGGLE_TABBAR
+#define VTE_TABBAR TABBAR
 #endif
 
 #if defined(MATCH_STRING_EXEC) && !defined(MATCH_STRING_L)
@@ -807,7 +833,7 @@ GtkWidget *match_item;
 char *matched_url = (char*)NULL;
 #endif
 
-#if STATUS_BAR
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
 GtkWidget *statusbar;
 GtkWidget *vbox;
 #endif
@@ -923,7 +949,10 @@ void DEL_TAB(GtkWidget *widget, int do_close_dialog)
 #if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#ifdef VTE_FUNNY
+    if (!window_fullscreen_status)
+#endif
+      VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
   }
 #endif
 }
@@ -1135,7 +1164,7 @@ int scroll_event(GtkWidget *widget, GdkEventScroll *event)
 }
 #endif
 
-#if DO_TOGGLE_SCROLLBAR
+#if defined(HOTKEY_TOGGLE_SCROLLBAR) || MENU_TOGGLE_SCROLLBAR
 void hide_scrollbar()
 {
 #if TAB
@@ -1194,11 +1223,11 @@ void add_tab()
 #endif
 
 #ifdef SCROLLBAR
-#if !SCROLLBAR
+#if (SCROLLBAR == LEFT) || (SCROLLBAR == OFF_L)
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
 #endif
   gtk_box_pack_start(GTK_BOX(term->hbox), term->vte, 1, 1, 0);
-#if SCROLLBAR
+#if (SCROLLBAR == RIGHT) || (SCROLLBAR == OFF_R)
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
 #endif
 #endif
@@ -1378,8 +1407,10 @@ void add_tab()
   vte_terminal_set_scrollback_lines(VTE_TERMINAL(term->vte), SCROLL_LINES);
 #endif
 
+#if !VTE_CHECK_VERSION(0,27,1) || !GTK_CHECK_VERSION(2,91,1)
 #if VTE_COLUMNS && VTE_ROWS
   vte_terminal_set_size(VTE_TERMINAL(term->vte), VTE_COLUMNS, VTE_ROWS);
+#endif
 #endif
 
 #ifdef WORD_CHARS
@@ -1416,7 +1447,9 @@ void add_tab()
 
 #if TABBAR_AUTOHIDE
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) ? 0 : VTE_TABBAR);
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
 #if GTK_CHECK_VERSION(2,17,5)
   gtk_widget_set_can_focus(notebook, 0);
 #endif
@@ -1451,12 +1484,18 @@ void add_tab()
 #endif
 #endif
 
+#if VTE_CHECK_VERSION(0,27,1) && GTK_CHECK_VERSION(2,91,1) && defined(VTE_FUNNY)
+  gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->left + inner_border->right) : 0), VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->top + inner_border->bottom) : 0));
+#endif
+
   gtk_widget_show_all(notebook);
 
-#if DO_TOGGLE_SCROLLBAR
-  if (scrollbar_status) {
+#if defined(HOTKEY_TOGGLE_SCROLLBAR) || MENU_TOGGLE_SCROLLBAR
+  if (!scrollbar_status) {
     hide_scrollbar();
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#ifndef VTE_FUNNY
+    VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
   }
 #endif
 
@@ -1628,10 +1667,15 @@ void do_zoom_routine()
     term = CURRENT_TAB(i);
 #endif
     vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
+#ifdef VTE_FUNNY
+    gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->left + inner_border->right) : 0), VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->top + inner_border->bottom) : 0));
+#endif
 #if TAB
   }
 #endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
 }
 #endif
 
@@ -1737,23 +1781,31 @@ void do_toggle_bg()
 #if defined(HOTKEY_TOGGLE_DECORATED) || MENU_TOGGLE_DECORATED
 void do_toggle_decorated()
 {
-  gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status);
   window_decorated_status ^= 1;
+  gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status);
 #if TAB
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
   term = CURRENT_TAB(index);
 #endif
-  gtk_widget_hide_all(main_window);
+  gtk_widget_hide(main_window);
   gtk_widget_show_all(main_window);
-#if DO_TOGGLE_SCROLLBAR
-  if (scrollbar_status)
+#if defined(HOTKEY_TOGGLE_SCROLLBAR) || MENU_TOGGLE_SCROLLBAR
+  if (!scrollbar_status)
     hide_scrollbar();
 #endif
-#if DO_TOGGLE_STATUS_BAR
-  if (status_bar_status)
+#if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
+  if (!status_bar_status) {
     gtk_widget_hide(statusbar);
+#if GTK_CHECK_VERSION(2,91,1)
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
+  } else {
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
 #endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
 #if TAB
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
 #endif
@@ -1761,13 +1813,11 @@ void do_toggle_decorated()
 }
 #endif
 
-#if DO_TOGGLE_SCROLLBAR
+#if defined(HOTKEY_TOGGLE_SCROLLBAR) || MENU_TOGGLE_SCROLLBAR
 void do_toggle_scrollbar()
 {
   scrollbar_status ^= 1;
-  if (scrollbar_status)
-    hide_scrollbar();
-  else {
+  if (scrollbar_status) {
 #if TAB
     int i = 0;
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
@@ -1777,21 +1827,25 @@ void do_toggle_scrollbar()
 #if TAB
     }
 #endif
-  }
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  } else
+    hide_scrollbar();
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
 }
 #endif
 
 #if defined(HOTKEY_TOGGLE_TABBAR) || MENU_TOGGLE_TABBAR
 void do_toggle_tabbar()
 {
-  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), tabbar_status);
-  tabbar_status ^= 1;
 #if TABBAR_AUTOHIDE
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1)
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
+  tabbar_status = gtk_notebook_get_show_tabs(GTK_NOTEBOOK(notebook));
 #endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  tabbar_status ^= 1;
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), tabbar_status);
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
 #if GTK_CHECK_VERSION(2,17,5)
   gtk_widget_set_can_focus(notebook, 0);
 #endif
@@ -1890,8 +1944,16 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef HOTKEY_TOGGLE_STATUS_BAR
       if (HOTKEY_TOGGLE_STATUS_BAR) {
         status_bar_status ^= 1;
-        status_bar_status ? gtk_widget_hide(statusbar) : gtk_widget_show(statusbar);
-        gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+        if (status_bar_status) {
+          gtk_widget_show(statusbar);
+          gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
+        } else {
+          gtk_widget_hide(statusbar);
+          gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
+        }
+#ifndef VTE_FUNNY
+        VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
         return TRUE;
       }
 #endif
@@ -1944,7 +2006,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         gtk_widget_show_all(encoding_dialog);
         if (gtk_dialog_run(GTK_DIALOG(encoding_dialog)) == GTK_RESPONSE_OK) {
           vte_terminal_set_encoding(VTE_TERMINAL(term->vte), gtk_entry_get_text(GTK_ENTRY(encoding_entry)));
-#if STATUS_BAR
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
           gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term->vte)));
 #endif
         }
@@ -2282,12 +2344,20 @@ void do_toggle_hotkeys()
 }
 #endif
 
-#if MENU_TOGGLE_STATUS_BAR && STATUS_BAR
+#if MENU_TOGGLE_STATUS_BAR
 void do_toggle_status_bar()
 {
   status_bar_status ^= 1;
-  status_bar_status ? gtk_widget_hide(statusbar) : gtk_widget_show(statusbar);
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  if (status_bar_status) {
+    gtk_widget_show(statusbar);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
+  } else {
+    gtk_widget_hide(statusbar);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
+  }
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
 }
 #endif
 
@@ -2296,7 +2366,7 @@ void set_encoding(GtkWidget *widget, void *data)
 {
   GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
   vte_terminal_set_encoding(VTE_TERMINAL(term->vte), (char*)data);
-#if STATUS_BAR
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
   gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, (char*)data);
 #endif
 }
@@ -2305,10 +2375,10 @@ void set_encoding(GtkWidget *widget, void *data)
 #if TAB
 void switch_page()
 {
-#if STATUS_BAR || WINDOW_TITLE_DYNAMIC
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR || WINDOW_TITLE_DYNAMIC
   term = CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
 #endif
-#if STATUS_BAR
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
   gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term->vte)));
 #endif
 #if TAB_SHOW_INFO_AT_TITLE
@@ -2324,6 +2394,16 @@ void switch_page()
 #if WINDOW_TITLE_DYNAMIC
   gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
 #endif
+}
+#endif
+
+#if defined(HOTKEY_TOGGLE_FULLSCREEN) || MENU_TOGGLE_FULLSCREEN || defined(VTE_FUNNY)
+void window_state_event(GtkWidget *widget, GdkEventWindowState *event)
+{
+    if (event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED)
+      window_fullscreen_status = 1;
+    else
+      window_fullscreen_status = 0;
 }
 #endif
 
@@ -2537,9 +2617,15 @@ int at_dock_mode = 0;
 
   main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-#if COMMAND_GEOMETRY
-  if (command_geometry)
-    gtk_window_parse_geometry(GTK_WINDOW(main_window), command_geometry);
+#if GTK_CHECK_VERSION(2,91,1)
+#if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
+  status_bar_resize_grip = gtk_window_resize_grip_is_visible(GTK_WINDOW(main_window));
+  if (!status_bar_status)
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
+#endif
+#if !STATUS_BAR && !defined(HOTKEY_TOGGLE_STATUS_BAR) && !MENU_TOGGLE_STATUS_BAR
+  gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
+#endif
 #endif
 
 #if PROGRAM_WM_CLASS
@@ -2563,7 +2649,7 @@ int at_dock_mode = 0;
   gtk_window_set_icon_from_file(GTK_WINDOW(main_window), ICON_DIR"/evilvte.png", NULL);
 #endif
 
-#if STATUS_BAR
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
   vbox = gtk_vbox_new(0, 0);
   gtk_container_add(GTK_CONTAINER(main_window), vbox);
 #endif
@@ -2634,14 +2720,14 @@ int at_dock_mode = 0;
   gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
 #endif
 
-#if STATUS_BAR
+#if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
   gtk_box_pack_start(GTK_BOX(vbox), notebook, 1, 1, 0);
   statusbar = gtk_statusbar_new();
   GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
   gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term->vte)));
   gtk_box_pack_start(GTK_BOX(vbox), statusbar, 0, 1, 0);
 #endif
-#if !STATUS_BAR
+#if !STATUS_BAR && !defined(HOTKEY_TOGGLE_STATUS_BAR) && !MENU_TOGGLE_STATUS_BAR
   gtk_container_add(GTK_CONTAINER(main_window), notebook);
 #endif
 
@@ -2655,6 +2741,10 @@ int at_dock_mode = 0;
   g_signal_connect(main_window, "focus-in-event", G_CALLBACK(focus_in_event), NULL);
 #endif
 
+#if defined(HOTKEY_TOGGLE_FULLSCREEN) || MENU_TOGGLE_FULLSCREEN || defined(VTE_FUNNY)
+  g_signal_connect(main_window, "window_state_event", G_CALLBACK(window_state_event), NULL);
+#endif
+
 #if TAB
   g_signal_connect_after(notebook, "switch-page", switch_page, NULL);
 #endif
@@ -2666,10 +2756,10 @@ int at_dock_mode = 0;
 #if COMMAND_AT_ROOT_WINDOW
   if (at_root_window) {
     gtk_window_set_keep_below(GTK_WINDOW(main_window), 1);
-    gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
 #if defined(HOTKEY_TOGGLE_DECORATED) || MENU_TOGGLE_DECORATED
-    window_decorated_status = 1;
+    window_decorated_status = 0;
 #endif
+    gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
     gtk_window_set_skip_taskbar_hint(GTK_WINDOW(main_window), 1);
     gtk_window_set_skip_pager_hint(GTK_WINDOW(main_window), 1);
   }
@@ -2687,17 +2777,49 @@ int at_dock_mode = 0;
     gtk_window_set_type_hint(GTK_WINDOW(main_window), GDK_WINDOW_TYPE_HINT_DOCK);
 #endif
 
+#if COMMAND_GEOMETRY
+  if (command_geometry)
+    gtk_window_parse_geometry(GTK_WINDOW(main_window), command_geometry);
+#endif
+
+#if VTE_CHECK_VERSION(0,27,1) && GTK_CHECK_VERSION(2,91,1)
+  gtk_widget_style_get (term->vte, "inner-border", &inner_border, NULL);
+#ifndef VTE_FUNNY
+  gtk_window_set_default_geometry(GTK_WINDOW(main_window), VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->left + inner_border->right) : 0), VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->top + inner_border->bottom) : 0));
+#endif
+#ifdef VTE_FUNNY
+#if COMMAND_TAB_NUMBERS
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = CURRENT_TAB(i);
+#endif
+    gtk_widget_set_size_request(term->vte, VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->left + inner_border->right) : 0), VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + (inner_border ? (inner_border->top + inner_border->bottom) : 0));
+#if COMMAND_TAB_NUMBERS
+  }
+#endif
+#endif
+#endif
+
   gtk_widget_show_all(main_window);
+
+#if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
+  if (!status_bar_status) {
+    gtk_widget_hide(statusbar);
+    VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
+
+#if defined(HOTKEY_TOGGLE_SCROLLBAR) || MENU_TOGGLE_SCROLLBAR
+  if (!scrollbar_status) {
+    hide_scrollbar();
+    VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
 
 #if COMMAND_FULLSCREEN
   j = 1;
   while ((j < argc) && strncmp(argv[j], "-e", 3)) {
-    if (!strncmp(argv[j], "-f", 3)) {
+    if (!strncmp(argv[j], "-f", 3))
       gtk_window_maximize(GTK_WINDOW(main_window));
-#if defined(HOTKEY_TOGGLE_FULLSCREEN) || MENU_TOGGLE_FULLSCREEN
-      window_fullscreen_status = 1;
-#endif
-    }
     j++;
   }
 #endif
@@ -2901,7 +3023,7 @@ int at_dock_mode = 0;
     }
 #endif
 
-#if MENU_TOGGLE_STATUS_BAR && STATUS_BAR
+#if MENU_TOGGLE_STATUS_BAR
     if (!strncmp(menu_custom[j], "Toggle status bar", 18)) {
       GtkWidget *menu_toggle_status_bar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_STATUS_BAR);
       GtkWidget *image_toggle_status_bar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
