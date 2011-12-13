@@ -36,11 +36,19 @@
 // #define TAB_LABEL_NUMBER    TRUE /* This option depends on TAB_LABEL */
 // #define WORD_CHARS          "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 
+/* Some applications use Ctrl + T/W as hotkey.
+ * Enable DOUBLE_PRESS_HOTKEY makes them still useful.
+ * Press Ctrl + T/W twice quickly to add or remove tabs.
+ */
+
+// #define DOUBLE_PRESS_HOTKEY TRUE
+// #define DOUBLE_PRESS_TIME   300000 /* Do not set it a too small number */
+
 /* Do not comment out options below */
 
-#define ENABLE_LASTLOG      TRUE
-#define ENABLE_UTMP         TRUE
-#define ENABLE_WTMP         TRUE
+#define ENABLE_LASTLOG         TRUE
+#define ENABLE_UTMP            TRUE
+#define ENABLE_WTMP            TRUE
 #ifdef SWITCH_ENCODING
 static char *encoding[] = {"UTF-8"}; /* Add encoding options as you like */
 // static char *encoding[] = {"UTF-8", "BIG-5", "GBK", "EUC-JP", "SHIFT-JIS"};
@@ -48,10 +56,10 @@ static char *encoding[] = {"UTF-8"}; /* Add encoding options as you like */
 
 /* Do not edit options below unless you know what you are doing */
 
-#define DEFAULT_COMMAND     g_getenv("SHELL")
-#define DEFAULT_ARGV        NULL
-#define DEFAULT_ENVV        NULL
-#define DEFAULT_DIRECTORY   g_getenv("PWD")
+#define DEFAULT_COMMAND        g_getenv("SHELL")
+#define DEFAULT_ARGV           NULL
+#define DEFAULT_ENVV           NULL
+#define DEFAULT_DIRECTORY      g_getenv("PWD")
 
 /* uncomment those options to reduce binary size */
 

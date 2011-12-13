@@ -1,3 +1,7 @@
+0.1.2
+ * Support DOUBLE_PRESS_HOTKEY
+   Applications can keep using Ctrl + T/W as hotkey
+
 0.1.1
  * Remove an useless g_signal_connect
  * New icon with BSD License
