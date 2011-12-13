@@ -1,3 +1,13 @@
+0.3.3
+ * Remove an useless variable in the struct terminal.
+   This is inspired from nicevte 0.1.
+   Thanks to marianoguerra <http://marianoguerra.blogspot.com/>
+ * Fix a TABBAR_MOUSE_SCROLLABLE bug
+   I misunderstanded gtk_notebook_set_scrollable. :-P
+   Thanks to marianoguerra <http://marianoguerra.blogspot.com/>
+ * Fix a label editing bug when scrollbar is not enabled
+ * Support TAB_EXPAND
+
 0.3.2
  * Fix the auto-detect-SUSE failure in openSUSE Build Service.
    The openSUSE-release package is not installed in the service, so there is no

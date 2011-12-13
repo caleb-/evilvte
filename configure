@@ -30,6 +30,14 @@ for opt do
   esac
 done
 
+SUSE_GCC=`gcc -v 2>&1 | tr A-Z a-z | grep suse`
+
+if [ "$SUSE_GCC" != "" ]; then
+  SUSE_DETECTED=TRUE
+else
+  SUSE_DETECTED=FALSE
+fi
+
 VTE=vte
 
 VTEINC=`pkg-config --cflags $VTE`
@@ -39,14 +47,6 @@ if [ $? != 0 ]; then
 fi
 
 VTELDFLAGS=`pkg-config --libs $VTE`
-
-SUSE_GCC=`gcc -v 2>&1 | tr A-Z a-z | grep suse`
-
-if [ "$SUSE_GCC" != "" ]; then
-  SUSE_DETECTED=TRUE
-else
-  SUSE_DETECTED=FALSE
-fi
 
 if [ $? != 0 ]; then
   exit

@@ -116,6 +116,7 @@
 // #define TAB_BORDER              0
 // #define TAB_BORDER_HORIZONTAL   0
 // #define TAB_BORDER_VERTICAL     0
+// #define TAB_EXPAND              TRUE /* Dynamic tab width */
 // #define TAB_INFO_AT_TITLE       TRUE /* Show tab info at window title */
 // #define TAB_INITIAL_NUMBER      1
 // #define TAB_LABEL               "Page"

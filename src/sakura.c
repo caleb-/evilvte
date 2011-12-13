@@ -142,6 +142,7 @@ int background_status = 0;
 #undef TAB_BORDER
 #undef TAB_BORDER_HORIZONTAL
 #undef TAB_BORDER_VERTICAL
+#undef TAB_EXPAND
 #undef TAB_INFO_AT_TITLE
 #undef TAB_INITIAL_NUMBER
 #undef TAB_LABEL
@@ -165,6 +166,7 @@ int background_status = 0;
 #undef TAB_BORDER
 #undef TAB_BORDER_HORIZONTAL
 #undef TAB_BORDER_VERTICAL
+#undef TAB_EXPAND
 #undef TABBAR_AUTOHIDE
 #undef TABBAR_MENU_SELECT_TAB
 #undef TABBAR_MOUSE_SCROLLABLE
@@ -551,9 +553,6 @@ struct terminal {
 #if GET_VTE_CHILD_PID
   int pid;
 #endif
-#ifdef TAB_LABEL_INIT
-  GtkWidget *label;
-#endif
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   GtkWidget *hbox;
   GtkWidget *scrollbar;
@@ -577,7 +576,6 @@ void do_zoom_in();
 void do_zoom_out();
 void sakura_add_tab();
 void sakura_del_tab();
-void scroll_event();
 void set_encoding(GtkWidget *widget, void *data);
 
 #if CTRL
@@ -651,7 +649,11 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), entry);
       gtk_widget_show_all (dialog);
       if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
         gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
+#else
+        gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.vte, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
+#endif
       gtk_widget_destroy(dialog);
       return TRUE;
     }
@@ -1057,7 +1059,11 @@ void do_edit_label()
   gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), entry);
   gtk_widget_show_all (dialog);
   if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
     gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
+#else
+    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.vte, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
+#endif
   gtk_widget_destroy(dialog);
 }
 #endif
@@ -1141,26 +1147,29 @@ void do_zoom_out()
 
 void sakura_add_tab()
 {
+#ifdef TAB_LABEL_INIT
+  GtkWidget *label;
+#endif
 #ifdef TAB_LABEL
 #if TAB_LABEL_NUMBER
-  term.label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) + 1)));
+  label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) + 1)));
 #else
-  term.label = gtk_label_new(TAB_LABEL);
+  label = gtk_label_new(TAB_LABEL);
 #endif
 #endif
 
 #ifdef TAB_LABEL_STYLE_CUSTOM
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size)
-    term.label = gtk_label_new(g_strdup_printf("%s", label_style_custom[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
+    label = gtk_label_new(g_strdup_printf("%s", label_style_custom[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
   else
-    term.label = NULL;
+    label = NULL;
 #endif
 
 #if TAB_LABEL_STYLE_POEM
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size)
-    term.label = gtk_label_new(g_strdup_printf("%s", label_style_poem[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
+    label = gtk_label_new(g_strdup_printf("%s", label_style_poem[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
   else
-    term.label = NULL;
+    label = NULL;
 #endif
 
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
@@ -1356,9 +1365,9 @@ void sakura_add_tab()
 
 #ifdef TAB_LABEL_INIT
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.hbox, term.label);
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.hbox, label);
 #else
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.vte, term.label);
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term.vte, label);
 #endif
 #else /* TAB_LABEL_INIT */
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
@@ -1392,11 +1401,22 @@ void sakura_add_tab()
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
 #endif
 
+#if TAB_EXPAND
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+  gtk_container_child_set(GTK_CONTAINER(notebook), term.hbox, "tab-expand", TRUE, NULL);
+#else
+  gtk_container_child_set(GTK_CONTAINER(notebook), term.vte, "tab-expand", TRUE, NULL);
+#endif
+#endif /* TAB_EXPAND */
+
   gtk_window_set_focus(GTK_WINDOW(main_window), term.vte);
 }
 
 void sakura_del_tab()
 {
+#ifdef TAB_LABEL_INIT
+  GtkWidget *label;
+#endif
   int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 
 #if CLOSE_SAFELY
@@ -1432,18 +1452,26 @@ void sakura_del_tab()
   int i;
   for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
     term = g_array_index(terminals, struct terminal, i);
-    term.label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (i + 1)));
-    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
-  }
+    label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (i + 1)));
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, label);
+#else
+    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.vte, label);
 #endif
+  }
+#endif /* TAB_LABEL_NUMBER */
 
 #ifdef TAB_LABEL_STYLE_CUSTOM
   int i;
   for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
     term = g_array_index(terminals, struct terminal, i);
     if (i < label_style_size) {
-      term.label = gtk_label_new(g_strdup_printf("%s", label_style_custom[i]));
-      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
+      label = gtk_label_new(g_strdup_printf("%s", label_style_custom[i]));
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, label);
+#else
+      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.vte, label);
+#endif
     }
   }
 #endif
@@ -1453,8 +1481,12 @@ void sakura_del_tab()
   for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
     term = g_array_index(terminals, struct terminal, i);
     if (i < label_style_size) {
-      term.label = gtk_label_new(g_strdup_printf("%s", label_style_poem[i]));
-      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
+      label = gtk_label_new(g_strdup_printf("%s", label_style_poem[i]));
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, label);
+#else
+      gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.vte, label);
+#endif
     }
   }
 #endif
@@ -1466,14 +1498,6 @@ void sakura_del_tab()
   change_window_title();
 #endif
 }
-
-#ifdef TABBAR_MOUSE_SCROLLABLE
-#if !TABBAR_MOUSE_SCROLLABLE
-void scroll_event()
-{
-}
-#endif
-#endif
 
 void set_encoding(GtkWidget *widget, void *data)
 {
@@ -1565,15 +1589,9 @@ int main(int argc, char **argv)
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
 #endif
 
-#ifdef TABBAR_MOUSE_SCROLLABLE
-#if !TABBAR_MOUSE_SCROLLABLE
-  /* A work around to disable scrollable tabs */
-  g_signal_connect(notebook, "scroll-event", scroll_event, NULL);
-#endif
-#if 0 /* It is always scrollable in GTK+ 2.12.9, no matter what the value of TABBAR_MOUSE_SCROLLABLE is. */
+#if TABBAR_MOUSE_SCROLLABLE
   gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TABBAR_MOUSE_SCROLLABLE);
 #endif
-#endif /* TABBAR_MOUSE_SCROLLABLE */
 
 #if TABBAR_MENU_SELECT_TAB
   gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
