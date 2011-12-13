@@ -1,3 +1,8 @@
+0.1.7
+ * Support font size change with hotkey
+ * Support "Default" in encoding switching menu
+ * Support CLOSE_SAFE option
+
 0.1.6
  * Close a tab will not close background applications now
  * Support command line -v option to show program version

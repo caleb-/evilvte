@@ -32,6 +32,10 @@
 #undef SCROLLBAR_RIGHT
 #endif
 
+#if TAB
+#define ENABLE_KEY_PRESS TRUE
+#endif
+
 #if !TAB
 #undef SHOW_WINDOW_BORDER
 #undef TAB_AUTOHIDE
@@ -199,6 +203,30 @@ const GdkColor color_xterm[16] =
 };
 #endif
 
+#ifdef DEFAULT_FONT_SIMPLE
+#undef DEFAULT_FONT_1
+#endif
+
+#ifdef FONT_CHANGE_SIZE
+#ifndef DEFAULT_FONT_1
+#define DEFAULT_FONT_1 "Monospace"
+#endif
+#undef DEFAULT_FONT_SIMPLE
+#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#define ENABLE_KEY_PRESS TRUE
+  int width_f;
+  int height_f;
+#endif /* FONT_CHANGE_SIZE */
+
+#ifdef DEFAULT_FONT_1
+#ifndef DEFAULT_FONT_1_SIZE
+#define DEFAULT_FONT_1_SIZE 10
+#endif
+  char font1_font[32] = DEFAULT_FONT_1;
+  char font1str[32];
+  int font1_size = DEFAULT_FONT_1_SIZE;
+#endif /* DEFAULT_FONT_1 */
+
 #if TAB
 GArray *terminals;
 #endif
@@ -230,7 +258,9 @@ gint64 last_time_2 = 0;
 
 struct terminal {
   GtkWidget *vte;
+#if CLOSE_SAFE
   int pid;
+#endif 
 #ifdef TAB_LABEL
   GtkWidget *label;
 #endif
@@ -244,14 +274,40 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 gboolean sakura_popup(GtkWidget *widget, GdkEvent *event);
 gint64 current_time();
 void change_statusbar_encoding();
+void delete_event();
 void sakura_add_tab();
 void sakura_del_tab();
 void set_encoding(GtkWidget *widget, void *data);
 
-#if TAB
+#if ENABLE_KEY_PRESS
 gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
+
+#if FONT_CHANGE_SIZE
+#ifdef CTRL_FONT_BIGGER
+    if CTRL_FONT_BIGGER {
+      font1_size++;
+      goto font_size_changed;
+    }
+#endif /* CTRL_FONT_BIGGER */
+
+#ifdef CTRL_FONT_SMALLER
+    if CTRL_FONT_SMALLER {
+      font1_size--;
+      goto font_size_changed;
+    }
+#endif /* CTRL_FONT_SMALLER */
+
+#ifdef CTRL_FONT_DEFAULT
+    if CTRL_FONT_DEFAULT {
+      font1_size = DEFAULT_FONT_1_SIZE;
+      goto font_size_changed;
+    }
+#endif /* CTRL_FONT_DEFAULT */
+#endif /* FONT_CHANGE_SIZE */
+
+#if TAB
 #ifdef CTRL_PREVIOUS_TAB
     if CTRL_PREVIOUS_TAB {
       int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
@@ -330,10 +386,28 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       return FALSE;
 #endif /* CTRL_REMOVE_TAB */
     }
+#endif /* TAB */
+
   }
   return FALSE;
+
+#if FONT_CHANGE_SIZE
+font_size_changed:
+  sprintf(font1str, "%s %d", font1_font, font1_size);
+#if TAB
+  int i;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    term = g_array_index(terminals, struct terminal, i);
+#endif
+    vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), font1str);
+#if TAB
+  }
+#endif
+    gtk_window_resize(GTK_WINDOW(main_window), width_f, height_f);
+    return TRUE;
+#endif /* FONT_CHANGE_SIZE */
 }
-#endif /* TAB */
+#endif /* ENABLE_KEY_PRESS */
 
 #if SWITCH_ENCODING
 gboolean sakura_popup(GtkWidget *widget, GdkEvent *event)
@@ -369,6 +443,14 @@ void change_statusbar_encoding()
 }
 #endif
 
+#if CLOSE_SAFE
+void delete_event()
+{
+  while (1)
+    sakura_del_tab();
+}
+#endif
+
 void sakura_add_tab()
 {
 #ifdef TAB_LABEL
@@ -399,7 +481,11 @@ void sakura_add_tab()
   gtk_box_pack_start(GTK_BOX(term.hbox), term.scrollbar, FALSE, FALSE, 0);
 #endif
 
+#if CLOSE_SAFE
   term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+#else
+  vte_terminal_fork_command(VTE_TERMINAL(term.vte), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+#endif
 
 #ifdef ALLOW_BOLD
   vte_terminal_set_allow_bold(VTE_TERMINAL(term.vte), ALLOW_BOLD);
@@ -473,11 +559,19 @@ void sakura_add_tab()
   vte_terminal_set_encoding(VTE_TERMINAL(term.vte), DEFAULT_ENCODING);
 #endif
 
-#ifdef DEFAULT_FONT
+#ifdef DEFAULT_FONT_SIMPLE
 #ifdef ANTI_ALIAS
-  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term.vte), DEFAULT_FONT, ANTI_ALIAS);
+  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term.vte), DEFAULT_FONT_SIMPLE, ANTI_ALIAS);
 #else
-  vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), DEFAULT_FONT);
+  vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), DEFAULT_FONT_SIMPLE);
+#endif
+#endif
+
+#ifdef DEFAULT_FONT_1
+#ifdef ANTI_ALIAS
+  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term.vte), font1str, ANTI_ALIAS);
+#else
+  vte_terminal_set_font_from_string(VTE_TERMINAL(term.vte), font1str);
 #endif
 #endif
 
@@ -555,14 +649,15 @@ void sakura_del_tab()
 {
   int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 
+#if CLOSE_SAFE
 #if TAB
   term = g_array_index(terminals, struct terminal, npages);
 #endif
-
   /* Dirty hack. Prevent background applications close with tab */
   char pidstr[32];
   sprintf(pidstr, "kill -KILL %d", term.pid);
   system(pidstr);
+#endif /* CLOSE_SAFE */
 
 #if TAB
   g_array_remove_index(terminals, npages);
@@ -613,23 +708,14 @@ int main(int argc, char **argv)
   }
 #endif
 
+#ifdef DEFAULT_FONT_1
+  sprintf(font1str, "%s %d", font1_font, font1_size);
+#endif
+
   gtk_init(NULL, NULL);
 
 #if TAB
   terminals = g_array_new(FALSE, TRUE, sizeof(struct terminal));
-#endif
-
-#if SWITCH_ENCODING
-  menu = gtk_menu_new();
-  int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
-  GtkWidget *encoding_item[encoding_size];
-  int i = 0;
-  for (i = 0 ; i < encoding_size ; i++) {
-    encoding_item[i] = gtk_menu_item_new_with_label(encoding[i]);
-    gtk_menu_append(GTK_MENU(menu), encoding_item[i]);
-    g_signal_connect(encoding_item[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
-  }
-  gtk_widget_show_all(menu);
 #endif
 
   main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -681,12 +767,39 @@ int main(int argc, char **argv)
   gtk_container_add(GTK_CONTAINER(main_window), notebook);
 #endif
 
-#if TAB
+#if CLOSE_SAFE
+  g_signal_connect(main_window, "delete_event", delete_event, NULL);
+#endif
+
+#if ENABLE_KEY_PRESS
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(sakura_key_press), NULL);
 #endif
 
 #if !TAB
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
+#endif
+
+#if FONT_CHANGE_SIZE
+  gtk_window_get_size(GTK_WINDOW(main_window), &width_f, &height_f);
+#endif
+
+#if SWITCH_ENCODING
+  menu = gtk_menu_new();
+  int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
+  GtkWidget *encoding_item[encoding_size];
+  int i = 0;
+  for (i = 0 ; i < encoding_size ; i++) {
+#if MENU_PARSE_DEFAULT
+    if (encoding[i] == "Default") {
+      encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term.vte));
+      encoding_item[i] = gtk_menu_item_new_with_label("Default");
+    } else
+#endif
+      encoding_item[i] = gtk_menu_item_new_with_label(encoding[i]);
+    gtk_menu_append(GTK_MENU(menu), encoding_item[i]);
+    g_signal_connect(encoding_item[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
+  }
+  gtk_widget_show_all(menu);
 #endif
 
   gtk_widget_show_all(main_window);

@@ -3,6 +3,7 @@
 // #define ALLOW_BOLD          TRUE
 // #define BELL_AUDIBLE        TRUE
 // #define BELL_VISIBLE        TRUE
+// #define CLOSE_SAFE          TRUE /* Do not kill background applications */
 // #define COLOR_STYLE_LINUX   TRUE
 // #define COLOR_STYLE_RXVT    TRUE
 // #define COLOR_STYLE_TANGO   TRUE
@@ -16,10 +17,13 @@
 // #define DEFAULT_COLUMNS     80
 // #define DEFAULT_ROWS        24
 // #define DEFAULT_ENCODING    "UTF-8"
-// #define DEFAULT_FONT        "Monospace 10"
+// #define DEFAULT_FONT_1      "Monospace" /* Supports FONT_CHANGE_SIZE */
+// #define DEFAULT_FONT_1_SIZE 10
+// #define DEFAULT_FONT_SIMPLE "Monospace 10" /* Can not change font size */
 // #define ANTI_ALIAS          VTE_ANTI_ALIAS_USE_DEFAULT
 // #define ANTI_ALIAS          VTE_ANTI_ALIAS_FORCE_ENABLE
 // #define ANTI_ALIAS          VTE_ANTI_ALIAS_FORCE_DISABLE
+// #define FONT_CHANGE_SIZE    TRUE /* Change font size with hotkey */
 // #define MOUSE_AUTOHIDE      TRUE
 // #define SCROLL_BACKGROUND   TRUE
 // #define SCROLL_LINES        60
@@ -43,32 +47,38 @@
 // #define TAB_LABEL_NUMBER    TRUE /* This option depends on TAB_LABEL */
 // #define WORD_CHARS          "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 
-/* Some applications use Ctrl + T/W as hotkey.
- * Enable DOUBLE_PRESS_HOTKEY makes them still useful.
- * Press Ctrl + T/W twice quickly to add or remove tabs.
- */
-
-// #define DOUBLE_PRESS_HOTKEY TRUE
-// #define DOUBLE_PRESS_TIME   300000 /* 0.3 second = 300000 microseconds */
-
 /* Do not comment out options below */
 
 #define ENABLE_LASTLOG         TRUE
 #define ENABLE_UTMP            TRUE
 #define ENABLE_WTMP            TRUE
 #ifdef SWITCH_ENCODING
-static char *encoding[] = {"UTF-8"}; /* Add encoding options as you like */
-// static char *encoding[] = {"UTF-8", "BIG-5", "GBK", "EUC-JP", "SHIFT-JIS"};
+// #define MENU_PARSE_DEFAULT  TRUE /* You can define "Default" below */
+char *encoding[] = {           "UTF-8"           };
+// char *encoding[] = {"BIG-5", "Default", "GBK", "EUC-JP", "SHIFT-JIS"};
 #endif
 
 /* Hotkey definitions. Please see /usr/include/gtk-2.0/gdk/gdkkeysyms.h
  * GDK_A = "Shift + a", so hotkey will be "Ctrl + Shift + a"
+ *
+ * You can use || to define multiple keys
+ * Example: (event->keyval == GDK_a || event->keyval == GDK_A)
  */
 
-#define CTRL_PREVIOUS_TAB (event->keyval == GDK_Page_Up) /* Ctrl + Page Up */
-#define CTRL_NEXT_TAB     (event->keyval == GDK_Page_Down)
-#define CTRL_NEW_TAB      (event->keyval == GDK_t || event->keyval == GDK_T)
-#define CTRL_REMOVE_TAB   (event->keyval == GDK_w || event->keyval == GDK_W)
+#define CTRL_PREVIOUS_TAB      (event->keyval == GDK_Page_Up)
+#define CTRL_NEXT_TAB          (event->keyval == GDK_Page_Down)
+#define CTRL_NEW_TAB           (event->keyval == GDK_T) /* Ctrl + Shift + t */
+#define CTRL_REMOVE_TAB        (event->keyval == GDK_W) /* Ctrl + Shift + w */
+#define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
+#define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
+// #define CTRL_FONT_DEFAULT   (event->keyval == GDK_KP_Insert)
+
+/* If you enable DOUBLE_PRESS_HOTKEY,
+ * press CTRL_NEW_TAB or CTRL_REMOVE_TAB twice quickly to add or remove a tab
+ */
+
+// #define DOUBLE_PRESS_HOTKEY TRUE
+// #define DOUBLE_PRESS_TIME   300000 /* 0.3 second = 300000 microseconds */
 
 /* Do not edit options below unless you know what you are doing */
 
