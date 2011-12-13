@@ -1,3 +1,7 @@
+0.4.4.1
+ * Support command line -T option to assign program title.
+   You may use -title as before.
+
 0.4.4
  * Disable deprecated VTE functions if VTE version >= 0.19.4
    Latest VTE no longer supports ANTI_ALIAS associated options.

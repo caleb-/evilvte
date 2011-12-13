@@ -2984,9 +2984,9 @@ int main(int argc, char **argv)
 
 #if COMMAND_SET_TITLE
   sprintf(program_name, "%s", PROGRAM_NAME);
-  if (argc > 2 && !strcmp(argv[1], "-title"))
+  if (argc > 2 && (!strcmp(argv[1], "-title") || !strcmp(argv[1], "-T")))
     sprintf(program_name, "%s", argv[2]);
-  if (argc > 3 && !strcmp(argv[2], "-title"))
+  if (argc > 3 && (!strcmp(argv[2], "-title") || !strcmp(argv[2], "-T")))
     sprintf(program_name, "%s", argv[3]);
 #endif
 
@@ -3026,6 +3026,7 @@ int main(int argc, char **argv)
     printf("\t-2 to -9              \tspecify the initial tab numbers\n");
 #endif
 #if COMMAND_SET_TITLE
+    printf("\t-T [string]           \tset program title\n");
     printf("\t-title [string]       \tset program title\n");
 #endif
 #ifdef BACKGROUND_IMAGE
