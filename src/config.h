@@ -8,7 +8,11 @@
 // #define COLOR_STYLE_TANGO   TRUE
 // #define COLOR_STYLE_XTERM   TRUE
 // #define COLOR_BACKGROUND    "white" /* "#FFFFFF" */
+// #define COLOR_BOLD          "red"
+// #define COLOR_CURSOR        "blue"
+// #define COLOR_DIM           "yellow"
 // #define COLOR_FOREGROUND    "black"
+// #define COLOR_HIGHLIGHT     "green"
 // #define DEFAULT_COLUMNS     80
 // #define DEFAULT_ROWS        24
 // #define DEFAULT_ENCODING    "UTF-8"
@@ -56,8 +60,9 @@ static char *encoding[] = {"UTF-8"}; /* Add encoding options as you like */
 // static char *encoding[] = {"UTF-8", "BIG-5", "GBK", "EUC-JP", "SHIFT-JIS"};
 #endif
 
-/* Hotkey definitions. Please see /usr/include/gtk-2.0/gdk/gdkkeysyms.h */
-/* GDK_A = "Shift + a", so hotkey will be "Ctrl + Shift + a" */
+/* Hotkey definitions. Please see /usr/include/gtk-2.0/gdk/gdkkeysyms.h
+ * GDK_A = "Shift + a", so hotkey will be "Ctrl + Shift + a"
+ */
 
 #define CTRL_PREVIOUS_TAB (event->keyval == GDK_Page_Up) /* Ctrl + Page Up */
 #define CTRL_NEXT_TAB     (event->keyval == GDK_Page_Down)
@@ -71,7 +76,9 @@ static char *encoding[] = {"UTF-8"}; /* Add encoding options as you like */
 #define DEFAULT_ENVV           NULL
 #define DEFAULT_DIRECTORY      g_getenv("PWD")
 
-/* uncomment those options to reduce binary size */
+/* uncomment options below to reduce binary size
+ * WARNING: may cause compatibility problems
+ */
 
 /*
 #undef GTK_BOX

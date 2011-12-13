@@ -1,5 +1,8 @@
+0.1.5
+ * Support all VTE color settings
+
 0.1.4
-  Support foreground and background colors
+ * Support foreground and background colors
 
 0.1.3
  * Configurable hotkeys

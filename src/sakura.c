@@ -57,7 +57,27 @@
 #define SET_DEFAULT_COLORS 1
 #endif
 
+#ifdef COLOR_BOLD
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 1
+#endif
+
+#ifdef COLOR_CURSOR
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 1
+#endif
+
+#ifdef COLOR_DIM
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 1
+#endif
+
 #ifdef COLOR_FOREGROUND
+#undef SET_DEFAULT_COLORS
+#define SET_DEFAULT_COLORS 1
+#endif
+
+#ifdef COLOR_HIGHLIGHT
 #undef SET_DEFAULT_COLORS
 #define SET_DEFAULT_COLORS 1
 #endif
@@ -85,28 +105,6 @@
 GtkWidget *main_window;
 GtkWidget *notebook;
 
-#if COLOR_STYLE_TANGO
-const GdkColor color_tango[16] =
-{
-  { 0, 0x2e2e, 0x3434, 0x3636 },
-  { 0, 0xcccc, 0x0000, 0x0000 },
-  { 0, 0x4e4e, 0x9a9a, 0x0606 },
-  { 0, 0xc4c4, 0xa0a0, 0x0000 },
-  { 0, 0x3434, 0x6565, 0xa4a4 },
-  { 0, 0x7575, 0x5050, 0x7b7b },
-  { 0, 0x0606, 0x9820, 0x9a9a },
-  { 0, 0xd3d3, 0xd7d7, 0xcfcf },
-  { 0, 0x5555, 0x5757, 0x5353 },
-  { 0, 0xefef, 0x2929, 0x2929 },
-  { 0, 0x8a8a, 0xe2e2, 0x3434 },
-  { 0, 0xfcfc, 0xe9e9, 0x4f4f },
-  { 0, 0x7272, 0x9f9f, 0xcfcf },
-  { 0, 0xadad, 0x7f7f, 0xa8a8 },
-  { 0, 0x3434, 0xe2e2, 0xe2e2 },
-  { 0, 0xeeee, 0xeeee, 0xecec }
-};
-#endif
-
 #if COLOR_STYLE_LINUX
 const GdkColor color_linux[16] =
 {
@@ -129,28 +127,6 @@ const GdkColor color_linux[16] =
 };
 #endif
 
-#if COLOR_STYLE_XTERM
-const GdkColor color_xterm[16] =
-{
-    {0, 0x0000, 0x0000, 0x0000 },
-    {0, 0xcdcb, 0x0000, 0x0000 },
-    {0, 0x0000, 0xcdcb, 0x0000 },
-    {0, 0xcdcb, 0xcdcb, 0x0000 },
-    {0, 0x1e1a, 0x908f, 0xffff },
-    {0, 0xcdcb, 0x0000, 0xcdcb },
-    {0, 0x0000, 0xcdcb, 0xcdcb },
-    {0, 0xe5e2, 0xe5e2, 0xe5e2 },
-    {0, 0x4ccc, 0x4ccc, 0x4ccc },
-    {0, 0xffff, 0x0000, 0x0000 },
-    {0, 0x0000, 0xffff, 0x0000 },
-    {0, 0xffff, 0xffff, 0x0000 },
-    {0, 0x4645, 0x8281, 0xb4ae },
-    {0, 0xffff, 0x0000, 0xffff },
-    {0, 0x0000, 0xffff, 0xffff },
-    {0, 0xffff, 0xffff, 0xffff }
-};
-#endif
-
 #if COLOR_STYLE_RXVT
 const GdkColor color_rxvt[16] =
 {
@@ -170,6 +146,50 @@ const GdkColor color_rxvt[16] =
   { 0, 0xffff, 0x0000, 0xffff },
   { 0, 0x0000, 0xffff, 0xffff },
   { 0, 0xffff, 0xffff, 0xffff }
+};
+#endif
+
+#if COLOR_STYLE_TANGO
+const GdkColor color_tango[16] =
+{
+  { 0, 0x2e2e, 0x3434, 0x3636 },
+  { 0, 0xcccc, 0x0000, 0x0000 },
+  { 0, 0x4e4e, 0x9a9a, 0x0606 },
+  { 0, 0xc4c4, 0xa0a0, 0x0000 },
+  { 0, 0x3434, 0x6565, 0xa4a4 },
+  { 0, 0x7575, 0x5050, 0x7b7b },
+  { 0, 0x0606, 0x9820, 0x9a9a },
+  { 0, 0xd3d3, 0xd7d7, 0xcfcf },
+  { 0, 0x5555, 0x5757, 0x5353 },
+  { 0, 0xefef, 0x2929, 0x2929 },
+  { 0, 0x8a8a, 0xe2e2, 0x3434 },
+  { 0, 0xfcfc, 0xe9e9, 0x4f4f },
+  { 0, 0x7272, 0x9f9f, 0xcfcf },
+  { 0, 0xadad, 0x7f7f, 0xa8a8 },
+  { 0, 0x3434, 0xe2e2, 0xe2e2 },
+  { 0, 0xeeee, 0xeeee, 0xecec }
+};
+#endif
+
+#if COLOR_STYLE_XTERM
+const GdkColor color_xterm[16] =
+{
+    {0, 0x0000, 0x0000, 0x0000 },
+    {0, 0xcdcb, 0x0000, 0x0000 },
+    {0, 0x0000, 0xcdcb, 0x0000 },
+    {0, 0xcdcb, 0xcdcb, 0x0000 },
+    {0, 0x1e1a, 0x908f, 0xffff },
+    {0, 0xcdcb, 0x0000, 0xcdcb },
+    {0, 0x0000, 0xcdcb, 0xcdcb },
+    {0, 0xe5e2, 0xe5e2, 0xe5e2 },
+    {0, 0x4ccc, 0x4ccc, 0x4ccc },
+    {0, 0xffff, 0x0000, 0x0000 },
+    {0, 0x0000, 0xffff, 0x0000 },
+    {0, 0xffff, 0xffff, 0x0000 },
+    {0, 0x4645, 0x8281, 0xb4ae },
+    {0, 0xffff, 0x0000, 0xffff },
+    {0, 0x0000, 0xffff, 0xffff },
+    {0, 0xffff, 0xffff, 0xffff }
 };
 #endif
 
@@ -412,10 +432,34 @@ void sakura_add_tab()
   vte_terminal_set_color_background(VTE_TERMINAL(term.vte), &color_bg);
 #endif
 
+#ifdef COLOR_BOLD
+  GdkColor color_bold;
+  gdk_color_parse(COLOR_BOLD, &color_bold);
+  vte_terminal_set_color_bold(VTE_TERMINAL(term.vte), &color_bold);
+#endif
+
+#ifdef COLOR_CURSOR
+  GdkColor color_cursor;
+  gdk_color_parse(COLOR_CURSOR, &color_cursor);
+  vte_terminal_set_color_cursor(VTE_TERMINAL(term.vte), &color_cursor);
+#endif
+
+#ifdef COLOR_DIM
+  GdkColor color_dim;
+  gdk_color_parse(COLOR_DIM, &color_dim);
+  vte_terminal_set_color_dim(VTE_TERMINAL(term.vte), &color_dim);
+#endif
+
 #ifdef COLOR_FOREGROUND
   GdkColor color_fg;
   gdk_color_parse(COLOR_FOREGROUND, &color_fg);
   vte_terminal_set_color_foreground(VTE_TERMINAL(term.vte), &color_fg);
+#endif
+
+#ifdef COLOR_HIGHLIGHT
+  GdkColor color_highlight;
+  gdk_color_parse(COLOR_HIGHLIGHT, &color_highlight);
+  vte_terminal_set_color_highlight(VTE_TERMINAL(term.vte), &color_highlight);
 #endif
 
 #ifdef DEFAULT_ENCODING
