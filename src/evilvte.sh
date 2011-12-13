@@ -14,18 +14,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-OLDCONFFILE=$1
 NEWCONFFILE=src/evilvte.h
 
 cat /dev/null > $NEWCONFFILE
-rm -f $2 src/sakura.o
+rm -f $1 src/sakura.o
 
-MENU_DEFAULT_ENCODING=`grep MENU_ENCODING_LIST $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
+MENU_DEFAULT_ENCODING=`grep MENU_ENCODING_LIST src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
 if [ "$MENU_DEFAULT_ENCODING" != "" ]; then
   echo \#define MENU_DEFAULT_ENCODING 1 >> $NEWCONFFILE
 fi
 
-COLOR_STYLE_DEFINE=`grep COLOR_STYLE $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | awk '{print $3}'`
+COLOR_STYLE_DEFINE=`grep COLOR_STYLE src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | awk '{print $3}'`
 if [ "$COLOR_STYLE_DEFINE" = "VTE_FIXED" ]; then
   echo \#define COLOR_VTE_FIXED 1 >> $NEWCONFFILE
 fi
@@ -42,7 +41,7 @@ if [ "$COLOR_STYLE_DEFINE" = "XTERM" ]; then
   echo \#define COLOR_XTERM 1 >> $NEWCONFFILE
 fi
 
-DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
 if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
   COLUMNS_DEFINE=`echo $DEFAULT_TERMINAL_SIZE_DEFINE | awk '{print $3}' | cut -d x -f 1`
   ROWS_DEFINE=`echo $DEFAULT_TERMINAL_SIZE_DEFINE | grep x - | cut -d x -f 2`
@@ -53,13 +52,7 @@ if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
   echo \#define VTE_ROWS $ROWS_DEFINE >> $NEWCONFFILE
 fi
 
-TOGGLE_BG_ORDER_DEFINE=`grep TOGGLE_BG_ORDER $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
-if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
-  echo \#define TOGGLE_BG_IMAGE 1 >> $NEWCONFFILE
-  echo \#define TOGGLE_BG_TRANSPARENT 1 >> $NEWCONFFILE
-  echo \#define TOGGLE_BG_NO_BACKGROUND 1 >> $NEWCONFFILE
-  echo \#define TOGGLE_BG_OPACITY 1 >> $NEWCONFFILE
-fi
+TOGGLE_BG_ORDER_DEFINE=`grep TOGGLE_BG_ORDER src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
 
 TOGGLE_BG_IMAGE=`echo $TOGGLE_BG_ORDER_DEFINE | grep Image`
 if [ "$TOGGLE_BG_IMAGE" != "" ]; then
@@ -81,19 +74,7 @@ if [ "$TOGGLE_BG_OPACITY" != "" ]; then
   echo \#define TOGGLE_BG_OPACITY 1 >> $NEWCONFFILE
 fi
 
-HOTKEY_TOGGLE_BACKGROUND_DEFINE=`grep HOTKEY_TOGGLE_BACKGROUND $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
-if [ "$HOTKEY_TOGGLE_BACKGROUND_DEFINE" != "" ]; then
-  if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
-    echo \#undef INIT_OPACITY >> $NEWCONFFILE
-    echo \#define INIT_OPACITY 1 >> $NEWCONFFILE
-  fi
-  if [ "$TOGGLE_BG_OPACITY" != "" ]; then
-    echo \#undef INIT_OPACITY >> $NEWCONFFILE
-    echo \#define INIT_OPACITY 1 >> $NEWCONFFILE
-  fi
-fi
-
-MENU_CUSTOM_DEFINE=`grep MENU_CUSTOM $OLDCONFFILE | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+MENU_CUSTOM_DEFINE=`grep MENU_CUSTOM src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
 
 MENU_COPY=`echo $MENU_CUSTOM_DEFINE | grep Copy`
 if [ "$MENU_COPY" != "" ]; then
@@ -188,14 +169,6 @@ fi
 MENU_TOGGLE_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle background'`
 if [ "$MENU_TOGGLE_BACKGROUND" != "" ]; then
   echo \#define MENU_TOGGLE_BACKGROUND 1 >> $NEWCONFFILE
-  if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
-    echo \#undef INIT_OPACITY >> $NEWCONFFILE
-    echo \#define INIT_OPACITY 1 >> $NEWCONFFILE
-  fi
-  if [ "$TOGGLE_BG_OPACITY" != "" ]; then
-    echo \#undef INIT_OPACITY >> $NEWCONFFILE
-    echo \#define INIT_OPACITY 1 >> $NEWCONFFILE
-  fi
 fi
 
 MENU_TOGGLE_HOTKEYS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle hotkeys locking'`

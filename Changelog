@@ -1,6 +1,14 @@
+0.4.6~pre3
+ * Respect CC
+   Switch auto-detect-SUSE from gcc to ld
+ * Support gnome-default-applications
+ * Support "make uninstall"
+ * VTE_FIXED color style will be disabled if VTE version >= 0.17.1
+ * Do not define SHOW_WINDOW_BORDER automatically
+
 0.4.6~pre2
  * Support -d command line option to run as a dock
- * Support WINDOW_TITLE_DYNAMIC for xterm escape sequences
+ * Support WINDOW_TITLE_DYNAMIC for xterm escape sequences, Thanks to IllvilJa
  * Support personal configuration file other than src/config.h. For example:
    "make distclean ; ./configure --config=/dev/null ; make strip"
  * Drop useless option SHOW_WINDOW_TITLE and LABEL_DIALOG_SATURATION
@@ -184,7 +192,6 @@
 0.3.7
  * Support MOUSE_CTRL_SATURATION
    Scroll left to decrease saturation, and scroll right to increase it.
-   (Almost all Logitech® wheel mice support tilt left and tilt right.)
  * Support "Toggle scrollbar", "Toggle status bar", and "Toggle tabbar" items
    in menu
  * Disable menu when MENU_CUSTOM defines nothing or only separators.

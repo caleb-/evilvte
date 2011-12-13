@@ -42,14 +42,7 @@
 
 #define CTRL event->keyval ==
 
-#if !EVILVTE_CUSTOM
-#include "config.h"
-#endif
-
-#if EVILVTE_CUSTOM
 #include "custom.h"
-#endif
-
 #include "evilvte.h"
 
 #ifndef VTE_CHECK_VERSION
@@ -83,12 +76,13 @@
 #if !VTE_CHECK_VERSION(0,11,11)
 #undef COLOR_TEXT_HIGHLIGHTED
 #undef CURSOR_COLOR
-#define DISABLE_ANTI_ALIAS 1
+#undef FONT_ANTI_ALIAS
+#undef HOTKEY_TOGGLE_ANTI_ALIAS
+#undef MENU_TOGGLE_ANTI_ALIAS
 #endif
 
 #if !VTE_CHECK_VERSION(0,13,3)
 #undef BACKGROUND_OPACITY
-#undef INIT_OPACITY
 #undef TOGGLE_BG_OPACITY
 #endif
 
@@ -97,10 +91,9 @@
 #undef MENU_SELECT_ALL
 #endif
 
-#if DISABLE_ANTI_ALIAS
-#undef FONT_ANTI_ALIAS
-#undef HOTKEY_TOGGLE_ANTI_ALIAS
-#undef MENU_TOGGLE_ANTI_ALIAS
+#if VTE_CHECK_VERSION(0,17,1) && COLOR_VTE_FIXED
+#undef COLOR_VTE_FIXED
+#undef COLOR_STYLE
 #endif
 
 #define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
@@ -110,15 +103,16 @@
 #endif
 
 #ifndef DEFAULT_COMMAND
+#if COMMAND_EXEC_PROGRAM
 #define DEFAULT_COMMAND g_getenv("SHELL")
+#endif
+#if !COMMAND_EXEC_PROGRAM
+#define DEFAULT_COMMAND NULL
+#endif
 #endif
 
 #define DEFAULT_ARGV NULL
 #define DEFAULT_ENVV NULL
-
-#ifndef DEFAULT_DIRECTORY
-#define DEFAULT_DIRECTORY g_get_current_dir()
-#endif
 
 #ifndef RECORD_LASTLOG
 #define RECORD_LASTLOG 1
@@ -196,12 +190,6 @@
 #define CLOSE_DIALOG 0
 #endif
 
-#define GET_VTE_CHILD_PID
-#if CLOSE_DIALOG || CLOSE_SAFELY
-#undef GET_VTE_CHILD_PID
-#define GET_VTE_CHILD_PID term->pid =
-#endif
-
 #if SUSE_DETECTED && !defined(TAB_LABEL)
 #define TAB_LABEL "Page %u"
 #endif
@@ -241,13 +229,23 @@
 #define SHOW_WINDOW_BORDER 0
 #endif
 
-#if TAB_NEW_PATH_EQUAL_OLD
+#define GET_VTE_CHILD_PID
+#if TAB_NEW_PATH_EQUAL_OLD || CLOSE_DIALOG || CLOSE_SAFELY
 #undef GET_VTE_CHILD_PID
 #define GET_VTE_CHILD_PID term->pid =
+#endif
+
+#if TAB_NEW_PATH_EQUAL_OLD
+#ifndef DEFAULT_DIRECTORY
+#define DEFAULT_DIRECTORY g_get_current_dir()
+#endif
 #define VTE_DEFAULT_DIRECTORY default_directory
 #endif
 
 #if !TAB_NEW_PATH_EQUAL_OLD
+#ifndef DEFAULT_DIRECTORY
+#define DEFAULT_DIRECTORY NULL
+#endif
 #define VTE_DEFAULT_DIRECTORY DEFAULT_DIRECTORY
 #endif
 
@@ -293,10 +291,6 @@
 
 #if BUTTON_ORDER_BY_RCFILE
 int button_order = 0;
-#endif
-
-#if BACKGROUND_OPACITY
-#define INIT_OPACITY 1
 #endif
 
 #define MENU_INPUT_METHOD 1
@@ -372,7 +366,14 @@ GtkWidget *encoding_item;
 #endif
 #if VTE_CHECK_VERSION(0,13,3)
 #define TOGGLE_BG_ORDER "Image", "Transparent", "No background", "Opacity"
+#define TOGGLE_BG_OPACITY 1
 #endif
+#define TOGGLE_BG_IMAGE 1
+#define TOGGLE_BG_TRANSPARENT 1
+#define TOGGLE_BG_NO_BACKGROUND 1
+#endif
+#if TOGGLE_BG_OPACITY
+#define INIT_OPACITY 1
 #endif
 #define DO_TOGGLE_BACKGROUND 1
 char *background_order[] = { TOGGLE_BG_ORDER };
@@ -453,11 +454,6 @@ int menu_item_success = 0;
 
 #if defined(HOTKEY_TOGGLE_TABBAR) || MENU_TOGGLE_TABBAR
 #define INT_TABBAR_STATUS 1
-#endif
-
-#if defined(TABBAR) && !TABBAR && !INT_TABBAR_STATUS
-#undef SHOW_WINDOW_BORDER
-#define SHOW_WINDOW_BORDER 0
 #endif
 
 #if TABBAR_AUTOHIDE && !defined(TABBAR)
@@ -768,7 +764,9 @@ GtkWidget *current_tab;
 
 void del_tab(GtkWidget *widget, int do_close_dialog)
 {
+#if TAB
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+#endif
 
 #if CLOSE_DIALOG
 #if TAB
@@ -795,9 +793,9 @@ void del_tab(GtkWidget *widget, int do_close_dialog)
 #endif
           dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
         gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
-        dialog_hbox = gtk_hbox_new (0, 0);
-        dialog_icon = gtk_image_new_from_stock (GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
-        dialog_string = gtk_label_new (LABEL_DIALOG_CLOSE);
+        dialog_hbox = gtk_hbox_new(0, 0);
+        dialog_icon = gtk_image_new_from_stock(GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
+        dialog_string = gtk_label_new(LABEL_DIALOG_CLOSE);
         gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), dialog_hbox);
         gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_icon, 0, 0, 0);
         gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_string, 1, 0, 0);
@@ -845,10 +843,12 @@ void del_tab(GtkWidget *widget, int do_close_dialog)
 #endif
   g_free(term);
 
-  (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2) ? gtk_main_quit() : gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
-
 #if TAB
+  (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2) ? gtk_main_quit() : gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+#endif
+#if !TAB
+  gtk_main_quit();
 #endif
 
 #if TABBAR_AUTOHIDE
@@ -1205,7 +1205,7 @@ void add_tab()
 #endif
 
 #ifdef FONT
-#if !DISABLE_ANTI_ALIAS
+#if VTE_CHECK_VERSION(0,11,11)
 #if defined(HOTKEY_TOGGLE_ANTI_ALIAS) || MENU_TOGGLE_ANTI_ALIAS
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, antialias_status);
 #endif
@@ -1213,7 +1213,7 @@ void add_tab()
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, VTE_ANTI_ALIAS);
 #endif
 #endif
-#if DISABLE_ANTI_ALIAS
+#if !VTE_CHECK_VERSION(0,11,11)
   vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
 #endif
 #endif
@@ -1247,14 +1247,12 @@ void add_tab()
 #endif
 
   gtk_widget_show_all(VTE_HBOX);
-#if TAB
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
-#endif
+
 #if !TAB
   gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
 #endif
-
 #if TAB
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
   g_object_set_data(G_OBJECT(current_tab), "current_tab", term);
 #endif
@@ -1297,7 +1295,7 @@ void add_tab()
   if (!strncmp(background_order[background_status], "No background", 14)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
     vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-#if VTE_CHECK_VERSION(0,13,3)
+#if INIT_OPACITY || BACKGROUND_OPACITY
     vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
   }
@@ -1528,8 +1526,8 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       if (HOTKEY_TOGGLE_DECORATED) {
         window_decorated_status ^= 1;
         gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status ? 0 : 1);
-        int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if TAB
+        int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
         current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
         term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
@@ -1538,7 +1536,9 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
         recover_window_status();
 #endif
+#if TAB
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+#endif
         gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
         return TRUE;
       }
@@ -1675,10 +1675,8 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       if (HOTKEY_TAB_EDIT_LABEL) {
         char *label_name = "";
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-#if TAB
         current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
         term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
         if (term->label_exist) {
 #if TAB_CLOSE_BUTTON
           label_name = (char*)gtk_label_get_text(GTK_LABEL(term->label_edit));
@@ -1817,7 +1815,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #endif
             vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
             vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-#if VTE_CHECK_VERSION(0,13,3)
+#if INIT_OPACITY || BACKGROUND_OPACITY
             vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
 #if TAB
@@ -2156,10 +2154,8 @@ void do_edit_label()
 {
   char *label_name = "";
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-#if TAB
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
   term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
   if (term->label_exist) {
 #if TAB_CLOSE_BUTTON
     label_name = (char*)gtk_label_get_text(GTK_LABEL(term->label_edit));
@@ -2427,7 +2423,7 @@ void do_toggle_bg()
 #endif
       vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
       vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-#if VTE_CHECK_VERSION(0,13,3)
+#if INIT_OPACITY || BACKGROUND_OPACITY
       vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
 #if TAB
@@ -2458,8 +2454,8 @@ void do_toggle_decorated()
 {
   gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status);
   window_decorated_status ^= 1;
-  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if TAB
+  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
   term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
@@ -2468,7 +2464,9 @@ void do_toggle_decorated()
 #if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
   recover_window_status();
 #endif
+#if TAB
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+#endif
   gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
 }
 #endif
@@ -2865,7 +2863,7 @@ int at_dock_mode = 0;
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
 #endif
 
-#if INIT_OPACITY
+#if INIT_OPACITY || BACKGROUND_OPACITY
   gtk_widget_set_colormap(main_window, gdk_screen_get_rgba_colormap(gtk_widget_get_screen(main_window)));
 #endif
 
