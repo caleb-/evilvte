@@ -1,3 +1,8 @@
+0.4.9~pre1
+ * Support "Auto-click" when there is only one effective menu item.
+   You can assign anything to right-click now.
+ * Support embedded GTK3_CSS
+
 0.4.8
 
  The "Welcome, GTK+ 3.0.0!" Release
@@ -16,9 +21,6 @@
 0.4.8~pre3
  * Fix a bug for multiple -e options in command line
  * Fix an i18n bug when linked to GTK+ version >= 2.90.0
- * Make everything GTK+ 2.99.2 compatible
-   To build with older versions of GTK+ 2.9x, please
-   export LDLIBS=`pkg-config --libs vte-2.90`
 
 0.4.8~pre2
  * Initial support for vte_terminal_search_*
@@ -28,7 +30,6 @@
  * Drop MATCH_STRING_EXEC which was deprecated since 0.4.7~pre1
  * Hide DEFAULT_EMULATION_TYPE, TAB_BORDER_HORIZONTAL and TAB_BORDER_VERTICAL
  * Provide a clearsigned SHA1SUMS using DSA key ID E98D6159
- * Make everything GTK+ 2.91.6 compatible
 
 0.4.8~pre1
  * Status bar and scrollbar can be hidden initially and be toggled on later
@@ -53,7 +54,6 @@
  * Accept environment variable PKG_CONFIG_PATH, thanks to letoh
  * Support -g +X+Y command line option to assign initial window geometry
  * Prevent tab labels getting focus
- * Make everything GTK+ 2.91.0 compatible
 
 0.4.7~pre5
  * Support -fn command line option to assign font and font size

@@ -68,6 +68,7 @@
 #if !GTK_CHECK_VERSION(2,13,0)
 #undef HOTKEY_MIMIC_SCROLL_UP
 #undef HOTKEY_MIMIC_SCROLL_DOWN
+#undef ONLY_ONE_MENU_ITEM
 #endif
 
 #if !GTK_CHECK_VERSION(2,13,4)
@@ -1022,6 +1023,12 @@ void do_beep()
 #if MENU || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
 int menu_popup(GtkWidget *widget, GdkEventButton *event)
 {
+#ifdef ONLY_ONE_MENU_ITEM
+  int x = 0;
+  int y = 0;
+  GdkDisplay *display = gdk_display_get_default();
+#endif
+
 #if defined(MENU_MATCH_STRING_EXEC) || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
   int tag = -1;
 #endif
@@ -1076,6 +1083,14 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
         if (menu_item_success > 1000)
 #endif
           gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
+#ifdef ONLY_ONE_MENU_ITEM
+        if (menu_item_success == 1001) {
+          gdk_display_get_pointer(display, NULL, &x, &y, NULL);
+          gtk_test_widget_send_key(menu, GDK_Down, 0);
+          gtk_test_widget_send_key(menu, GDK_Return, 0);
+          gdk_display_warp_pointer(display, gdk_display_get_default_screen(display), x, y);
+        }
+#endif
       }
 #endif
 
@@ -1084,6 +1099,14 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
       if (menu_item_success > 0)
 #endif
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
+#ifdef ONLY_ONE_MENU_ITEM
+      if (menu_item_success == 1) {
+        gdk_display_get_pointer(display, NULL, &x, &y, NULL);
+        gtk_test_widget_send_key(menu, GDK_Down, 0);
+        gtk_test_widget_send_key(menu, GDK_Return, 0);
+        gdk_display_warp_pointer(display, gdk_display_get_default_screen(display), x, y);
+      }
+#endif
 #endif
       return TRUE;
   }
@@ -2706,12 +2729,19 @@ int at_dock_mode = 0;
 #endif
 
 #if GTK_CHECK_VERSION(2,91,7)
-#if defined(HOTKEY_MIMIC_SCROLL_UP) || defined(HOTKEY_MIMIC_SCROLL_DOWN)
+#if defined(HOTKEY_MIMIC_SCROLL_UP) || defined(HOTKEY_MIMIC_SCROLL_DOWN) || defined(ONLY_ONE_MENU_ITEM)
   gdk_disable_multidevice();
 #endif
 #endif
 
   gtk_init(&argc, &argv);
+
+#if defined(GTK3_CSS) && GTK_CHECK_VERSION(2,91,6)
+  GtkCssProvider *provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(provider, GTK3_CSS, -1, NULL);
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref(provider);
+#endif
 
 #ifdef TAB_LABEL
 #if GTK_CHECK_VERSION(2,90,0)
@@ -3347,12 +3377,6 @@ int at_dock_mode = 0;
 
 #if MENU
   gtk_widget_show_all(menu);
-#endif
-
-#ifdef MENU_MATCH_STRING_EXEC
-  gtk_widget_hide(match_open);
-  gtk_widget_hide(match_copy);
-  gtk_widget_hide(match_item);
 #endif
 
   gtk_main();

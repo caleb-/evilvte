@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2008-2010  Wen-Yen Chuang <caleb AT calno DOT com>
+# Copyright (C) 2008-2011  Wen-Yen Chuang <caleb AT calno DOT com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -134,6 +134,9 @@ MENU_TOGGLE_ANTI_ALIAS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle anti-alias'`
 
 MENU_CHANGE_SATURATION=`echo $MENU_CUSTOM_DEFINE | grep 'Adjust saturation'`
 [ "$MENU_CHANGE_SATURATION" != "" ] && echo \#define MENU_CHANGE_SATURATION 1 >> $CONFFILE
+
+ONLY_ONE_MENU_ITEM=`echo $MENU_CUSTOM_DEFINE | grep Auto-click`
+[ "$ONLY_ONE_MENU_ITEM" != "" ] && echo \#define ONLY_ONE_MENU_ITEM >> $CONFFILE
 
 mv $CONFFILE src/evilvte.h
 

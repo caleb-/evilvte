@@ -89,7 +89,10 @@
             *          "Toggle fullscreen",             "Quit",
             *          "Toggle always on top",
             *          "Toggle hotkeys locking",        "Reset terminal",
-            *          "Toggle window decorated",       "Reset and clear"     */
+            *          "Toggle window decorated",       "Reset and clear",
+            *
+            *          "Auto-click" (when there is only one effective menu item)
+            */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -175,3 +178,4 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "_Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "_Character Encoding"
 // #define LABEL_SUBMENU_IME            "_Input Methods"
+// #define GTK3_CSS                     "GtkNotebook GtkButton { border-width: 0; } GtkWindow GtkNotebook { padding: 0; }"
