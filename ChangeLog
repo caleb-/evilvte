@@ -1,3 +1,6 @@
+0.4.7.1
+ * Fix a segfault bug of HOTKEY_MIMIC_SCROLL_UP and HOTKEY_MIMIC_SCROLL_DOWN
+
 0.4.7
  * Better compatibility with WM_CLASS
    - Accept environment variable RESOURCE_NAME

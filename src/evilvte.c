@@ -2106,6 +2106,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_MIMIC_SCROLL_UP
       if (HOTKEY_MIMIC_SCROLL_UP) {
+        GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
         gtk_test_widget_click(term->vte, 4, 0);
         return TRUE;
       }
@@ -2113,6 +2114,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_MIMIC_SCROLL_DOWN
       if (HOTKEY_MIMIC_SCROLL_DOWN) {
+        GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
         gtk_test_widget_click(term->vte, 5, 0);
         return TRUE;
       }
