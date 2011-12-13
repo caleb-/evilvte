@@ -1,3 +1,7 @@
+0.1.8
+ * Support background image
+ * Support cursor blinks
+
 0.1.7
  * Support font size change with hotkey
  * Support "Default" in encoding switching menu

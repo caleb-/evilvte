@@ -1,6 +1,9 @@
 /* comment out options to reduce binary size and RAM consumption */
 
 // #define ALLOW_BOLD          TRUE
+// #define BACKGROUND_IMAGE    ".config/evilvte/background.png"
+// #define BACKGROUND_TINT     "brown"
+// #define BACKGROUND_SATURATE 0.5 /* Please assign it from 0 to 1 */
 // #define BELL_AUDIBLE        TRUE
 // #define BELL_VISIBLE        TRUE
 // #define CLOSE_SAFE          TRUE /* Do not kill background applications */
@@ -14,6 +17,7 @@
 // #define COLOR_DIM           "yellow"
 // #define COLOR_FOREGROUND    "black"
 // #define COLOR_HIGHLIGHT     "green"
+// #define CURSOR_BLINKS       TRUE
 // #define DEFAULT_COLUMNS     80
 // #define DEFAULT_ROWS        24
 // #define DEFAULT_ENCODING    "UTF-8"

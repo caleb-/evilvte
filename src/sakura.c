@@ -499,6 +499,22 @@ void sakura_add_tab()
   vte_terminal_set_visible_bell(VTE_TERMINAL(term.vte), BELL_VISIBLE);
 #endif
 
+#ifdef BACKGROUND_IMAGE
+  char imgstr[128];
+  sprintf(imgstr, "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
+  vte_terminal_set_background_image_file(VTE_TERMINAL(term.vte), imgstr);
+#endif
+
+#ifdef BACKGROUND_TINT
+  GdkColor color_tint;
+  gdk_color_parse(BACKGROUND_TINT, &color_tint);
+  vte_terminal_set_background_tint_color(VTE_TERMINAL(term.vte), &color_tint);
+#endif
+
+#ifdef BACKGROUND_SATURATE
+  vte_terminal_set_background_saturation(VTE_TERMINAL(term.vte), BACKGROUND_SATURATE);
+#endif
+
 #if COLOR_STYLE_LINUX
   vte_terminal_set_colors(VTE_TERMINAL(term.vte), NULL, NULL, color_linux, 16);
 #endif
@@ -553,6 +569,10 @@ void sakura_add_tab()
   GdkColor color_highlight;
   gdk_color_parse(COLOR_HIGHLIGHT, &color_highlight);
   vte_terminal_set_color_highlight(VTE_TERMINAL(term.vte), &color_highlight);
+#endif
+
+#if CURSOR_BLINKS
+  vte_terminal_set_cursor_blinks(VTE_TERMINAL(term.vte), CURSOR_BLINKS);
 #endif
 
 #ifdef DEFAULT_ENCODING
