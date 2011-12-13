@@ -1066,7 +1066,7 @@ static void change_statusbar_encoding();
 static void add_tab();
 static void button_clicked(GtkWidget *widget, void *data);
 static void del_tab(GtkWidget *widget, int do_close_dialog);
-static void delete_event();
+static gboolean delete_event();
 static void do_always_on_top();
 static void do_change_saturation();
 static void do_clear();
@@ -1899,7 +1899,7 @@ static void change_statusbar_encoding()
 }
 #endif
 
-static void delete_event()
+static gboolean delete_event()
 {
 #if CLOSE_DIALOG && TAB
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1) {
@@ -1928,7 +1928,7 @@ static void delete_event()
 #endif
     } else {
       gtk_widget_destroy(dialog);
-      return;
+      return TRUE;
     }
   }
 #endif
@@ -1942,6 +1942,7 @@ static void delete_event()
 #if !TAB
   del_tab(NULL, DO_CLOSE_DIALOG);
 #endif
+  return FALSE;
 }
 
 #if MENU_TOGGLE_ON_TOP

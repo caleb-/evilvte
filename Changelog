@@ -1,3 +1,10 @@
+0.4.4.2
+ * Fix an CLOSE_DIALOG bug which could destroy the program by accident.
+   Thanks to an anonymous guest.
+   (http://hyperrate.com/thread.php?tid=11916#11916)
+ * Do not remove src/config.o in "make clean"
+ * Support "make distclean"
+
 0.4.4.1
  * Support command line -T option to assign program title.
    You may use -title as before.
