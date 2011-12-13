@@ -1,6 +1,16 @@
+0.4.5
+ * Support -ls command line option to enable login shell in all tabs
+ * Fix an CLOSE_SAFELY bug which was in 0.4.5~pre5 to 0.4.5~pre7
+ * Make TAB_LABEL more customizable and support internationalization (i18n)
+ * Remove TAB_LABEL_NUMBER
+ * Remove TAB_LABEL_POEM since it can be replaced by TAB_LABEL_CUSTOM
+ * Hide DEFAULT_ARGV and DEFAULT_ENVV since they are almost impossible to be
+   defined manually.
+ * Fix build failure when linked by GNU gold linker
+
 0.4.5~pre7
  * Fix an HOTKEY_TOGGLE_BACKGROUND bug which was in 0.4.5~pre3 to 0.4.5~pre6
- * Enable gcc -Wall -Wextra options and fix all warnings
+ * Fix gcc -Wall -Wextra warnings
 
 0.4.5~pre6
  * Support TAB_LABEL_DYNAMIC to show current path dynamically

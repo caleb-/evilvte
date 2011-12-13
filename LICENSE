@@ -1,12 +1,11 @@
-File: src/sakura.c
+All files listed below are licensed under GNU General Public License, version 2
+
+src/sakura.c:
 Copyright: 2006-2008  David Gómez <david@pleyades.net>
            2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
-Licence: GNU General Public License, version 2
 
-Files: src/evilvte.sh, src/manpage.sh, src/showvte.sh
+src/evilvte.sh, src/manpage.sh, src/showvte.sh:
 Copyright: 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
-Licence: GNU General Public License, version 2
 
-Files: misc/evilvte.png, misc/evilvte.xpm
+misc/evilvte.png, misc/evilvte.xpm:
 Copyright: 2008  Lu, Chao-Ming (Tetralet)
-Licence: GNU General Public License, version 2

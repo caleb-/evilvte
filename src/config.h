@@ -22,6 +22,7 @@
 // #define COMMAND_AT_ROOT_WINDOW TRUE  /* -r option, run in root window      */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
 // #define COMMAND_FULLSCREEN     TRUE  /* -f option, init in fullscreen mode */
+// #define COMMAND_LOGIN_SHELL    TRUE  /* -ls option, to enable login shell  */
 // #define COMMAND_SET_TITLE      TRUE  /* -T or -title to set program title  */
 // #define COMMAND_SHOW_HELP      TRUE  /* -h option, show help               */
 #define    COMMAND_SHOW_OPTIONS   TRUE  /* -o option, show build-time options */
@@ -29,12 +30,10 @@
 // #define COMMAND_TAB_NUMBERS    TRUE  /* -[2-9] options, to set tab numbers */
 // #define CURSOR_BLINKS          TRUE
 // #define CURSOR_COLOR           "blue"
-// #define DEFAULT_ARGV           NULL
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
 // #define DEFAULT_DIRECTORY      g_get_current_dir()
 // #define DEFAULT_EMULATION_TYPE "xterm"
 // #define DEFAULT_ENCODING       "UTF-8"
-// #define DEFAULT_ENVV           NULL
 // #define DEFAULT_TERMINAL_SIZE  80x24
 // #define FONT                   "Monospace 10"
 // #define FONT_ANTI_ALIAS        TRUE
@@ -82,11 +81,9 @@
 // #define TAB_BORDER_VERTICAL    0
 // #define TAB_CLOSE_BUTTON       TRUE
 // #define TAB_EXPANDED_WIDTH     TRUE
-// #define TAB_LABEL              "Page"
-// #define TAB_LABEL_DYNAMIC      TRUE   /* Display current path dynamically  */
-// #define TAB_LABEL_NUMBER       TRUE
-// #define TAB_LABEL_POEM         TRUE
+// #define TAB_LABEL              "Page %u" /* %u will be replaced by numbers */
 // #define TAB_LABEL_CUSTOM       "One", "Two", "Three", "Four", "Five", "Six"
+// #define TAB_LABEL_DYNAMIC      TRUE   /* Display current path dynamically  */
 // #define TAB_NEW_PATH_EQUAL_OLD TRUE
 // #define TAB_REORDERABLE        TRUE
 // #define TAB_SHOW_INFO_AT_TITLE TRUE

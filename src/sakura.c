@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <libintl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vte/vte.h>
@@ -117,13 +118,8 @@
 #define DEFAULT_COMMAND g_getenv("SHELL")
 #endif
 
-#ifndef DEFAULT_ARGV
 #define DEFAULT_ARGV NULL
-#endif
-
-#ifndef DEFAULT_ENVV
 #define DEFAULT_ENVV NULL
-#endif
 
 #ifndef DEFAULT_DIRECTORY
 #define DEFAULT_DIRECTORY g_get_current_dir()
@@ -205,12 +201,18 @@
 #define LABEL_SUBMENU_IME "Input Methods"
 #endif
 
+#ifndef CLOSE_DIALOG
+#define CLOSE_DIALOG 0
+#endif
+
+#define GET_VTE_CHILD_PID
 #if CLOSE_DIALOG || CLOSE_SAFELY
-#define GET_VTE_CHILD_PID 1
+#undef GET_VTE_CHILD_PID
+#define GET_VTE_CHILD_PID term->pid =
 #endif
 
 #if SUSE_DETECTED && !defined(TAB_LABEL)
-#define TAB_LABEL "Page"
+#define TAB_LABEL "Page %u"
 #endif
 
 #if !TAB
@@ -235,7 +237,6 @@
 #undef COMMAND_TAB_NUMBERS
 #undef TAB_LABEL
 #undef TAB_LABEL_DYNAMIC
-#undef TAB_LABEL_POEM
 #undef TAB_LABEL_CUSTOM
 #undef TAB_NEW_PATH_EQUAL_OLD
 #undef TAB_REORDERABLE
@@ -250,7 +251,7 @@
 
 #if TAB_NEW_PATH_EQUAL_OLD
 #undef GET_VTE_CHILD_PID
-#define GET_VTE_CHILD_PID 1
+#define GET_VTE_CHILD_PID term->pid =
 #define VTE_DEFAULT_DIRECTORY default_directory
 #endif
 
@@ -443,7 +444,8 @@ int window_fullscreen_status = 0;
 #if defined(HOTKEY_TOGGLE_ANTI_ALIAS) || MENU_TOGGLE_ANTI_ALIAS
 #if defined(FONT_ANTI_ALIAS) && !FONT_ANTI_ALIAS
 int antialias_status = VTE_ANTI_ALIAS_FORCE_DISABLE;
-#else
+#endif
+#if !defined(FONT_ANTI_ALIAS) || FONT_ANTI_ALIAS
 int antialias_status = VTE_ANTI_ALIAS_FORCE_ENABLE;
 #endif
 #endif
@@ -513,13 +515,6 @@ int tabbar_status = 0;
 #endif
 #endif
 
-#define COMMAND_SHOW_HELP_OPTION_S ""
-
-#if COMMAND_SHOW_OPTIONS || COMMAND_TAB_NUMBERS || COMMAND_SHOW_VERSION || COMMAND_FULLSCREEN || COMMAND_SET_TITLE || COMMAND_EXEC_PROGRAM || COMMAND_AT_ROOT_WINDOW
-#undef COMMAND_SHOW_HELP_OPTION_S
-#define COMMAND_SHOW_HELP_OPTION_S "s"
-#endif
-
 #ifdef PROGRAM_VERSION
 #define EVILVTE_PROGRAM_VERSION PROGRAM_VERSION
 #endif
@@ -549,49 +544,25 @@ char *program_name = PROGRAM_NAME;
 GtkWidget *main_window;
 GtkWidget *notebook;
 
+#define VTE_LABEL NULL
+
+#if defined(TAB_LABEL) || defined(TAB_LABEL_CUSTOM)
+#undef VTE_LABEL
+#define VTE_LABEL label
+#endif
+
 #if TAB_CLOSE_BUTTON
 #ifndef TAB_LABEL
-#define TAB_LABEL "Page"
+#define TAB_LABEL "Page %u"
 #endif
+#undef VTE_LABEL
 #define VTE_LABEL term->label
 #endif
 
 #ifdef TAB_LABEL_CUSTOM
 #undef TAB_LABEL
-#undef TAB_LABEL_POEM
-#define TAB_LABEL_INIT 1
 const char *label_style_custom[] = { TAB_LABEL_CUSTOM };
 const int label_style_size = sizeof(label_style_custom) / sizeof(label_style_custom[0]);
-#endif
-
-#if TAB_LABEL_POEM
-#undef TAB_LABEL
-#define TAB_LABEL_INIT 1
-/* http://zh.wikisource.org/wiki/千字文 */
-const char *label_style_poem[] = {
-"天", "地", "玄", "黃", "宇", "宙", "洪", "荒",
-"日", "月", "盈", "昃", "辰", "宿", "列", "張",
-"寒", "來", "暑", "往", "秋", "收", "冬", "藏",
-"閏", "餘", "成", "歲", "律", "呂", "調", "陽"
-};
-const int label_style_size = sizeof(label_style_poem) / sizeof(label_style_poem[0]);
-#endif
-
-#ifdef TAB_LABEL
-#define TAB_LABEL_INIT 1
-#endif
-
-#if !TAB_CLOSE_BUTTON
-#if TAB_LABEL_INIT
-#define VTE_LABEL label
-#endif
-#if !TAB_LABEL_INIT
-#define VTE_LABEL NULL
-#endif
-#endif
-
-#ifndef TAB_LABEL
-#undef TAB_LABEL_NUMBER
 #endif
 
 #if COLOR_VTE_FIXED
@@ -730,6 +701,10 @@ const char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }
 char default_command[256];
 char **default_argv = NULL;
 #endif
+#if COMMAND_LOGIN_SHELL
+char *login_shell[] = { "-", NULL };
+int login_shell_flag = 0;
+#endif
 
 #if !COMMAND_EXEC_PROGRAM
 #define VTE_DEFAULT_COMMAND DEFAULT_COMMAND
@@ -777,7 +752,7 @@ GtkWidget *vbox;
 
 struct terminal {
   GtkWidget *vte;
-#if GET_VTE_CHILD_PID
+#if CLOSE_DIALOG || CLOSE_SAFELY || TAB_NEW_PATH_EQUAL_OLD
   int pid;
 #endif
 #if TAB_CLOSE_BUTTON
@@ -800,24 +775,655 @@ struct terminal *term;
 GtkWidget *current_tab;
 #endif
 
-void change_statusbar_encoding();
-void add_tab();
-void button_clicked(GtkWidget *widget __attribute__((unused)), void *data);
+void del_tab(GtkWidget *widget, int do_close_dialog)
+{
+  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+
 #if CLOSE_DIALOG
-void del_tab(GtkWidget *widget __attribute__((unused)), int do_close_dialog);
+#if TAB
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
-#if !CLOSE_DIALOG
-void del_tab();
+  int user_want_to_close = 0;
+  if (do_close_dialog) {
+    /* Maybe only work on GNU/Linux */
+    char *stat = NULL;
+    char **stats = NULL;
+    gsize length;
+    if (g_file_get_contents(g_strdup_printf("/proc/%d/stat", term->pid), &stat, &length, NULL)) {
+      stats = g_strsplit_set(stat, " ", 8);
+      if (atoi(stats[7]) != term->pid) {
+        GtkWidget *dialog;
+        GtkWidget *dialog_hbox;
+        GtkWidget *dialog_icon;
+        GtkWidget *dialog_string;
+#if BUTTON_ORDER_BY_RCFILE
+        if (button_order)
+          dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+        else
 #endif
-void do_change_saturation();
-void font_size_changed();
-void gtk_notebook_set_tab_border(GtkNotebook *notebook, guint border_width);
-void gtk_notebook_set_tab_hborder(GtkNotebook *notebook, guint tab_hborder);
-void gtk_notebook_set_tab_vborder(GtkNotebook *notebook, guint tab_vborder);
-void recover_window_status();
+          dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+        gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
+        dialog_hbox = gtk_hbox_new (0, 0);
+        dialog_icon = gtk_image_new_from_stock (GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
+        dialog_string = gtk_label_new (LABEL_DIALOG_CLOSE);
+        gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), dialog_hbox);
+        gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_icon, 0, 0, 0);
+        gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_string, 1, 0, 0);
+        gtk_widget_show_all(dialog);
+        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_CLOSE) {
+          gtk_widget_destroy(dialog);
+          user_want_to_close = 1;
+        } else {
+          gtk_widget_destroy(dialog);
+          return;
+        }
+      }
+    }
+  }
+#endif /* CLOSE_DIALOG */
+
+#if CLOSE_SAFELY
+#if TAB
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+#if CLOSE_DIALOG
+  if (!user_want_to_close && do_close_dialog) {
+#endif
+    /* Maybe only work on GNU/Linux */
+    char *stat = NULL;
+    char **stats = NULL;
+    gsize length;
+    if (g_file_get_contents(g_strdup_printf("/proc/%d/stat", term->pid), &stat, &length, NULL)) {
+      stats = g_strsplit_set(stat, " ", 8);
+      if (atoi(stats[7]) != term->pid)
+        return;
+      else
+        kill(term->pid, 9);
+    }
+#if CLOSE_DIALOG
+  } else
+    kill(term->pid, 9);
+#endif
+#endif /* CLOSE_SAFELY */
+
+#if TAB
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+  g_free(term);
+
+  (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2) ? gtk_main_quit() : gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
+
+#if TAB
+  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+#endif
+
+#if TABBAR_AUTOHIDE
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
+}
+
+#if TAB_CLOSE_BUTTON
+void button_clicked(GtkWidget *widget, void *data)
+{
+  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+  int i = 0;
+  int killed = 0;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+    if (data == term->button) {
+      gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i);
+      del_tab(NULL, CLOSE_DIALOG);
+      killed = i;
+    }
+  }
+  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), (killed < index) ? index - 1 : index);
+}
+#endif
+
+#if TAB_LABEL_DYNAMIC
+void do_title_changed()
+{
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#if TAB_CLOSE_BUTTON
+  term->label = gtk_hbox_new(0, 0);
+  term->button = gtk_button_new();
+  GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+  GtkRcStyle *rcstyle = gtk_rc_style_new();
+  gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+  rcstyle->xthickness = 0;
+  rcstyle->ythickness = 0;
+  gtk_widget_modify_style(term->button, rcstyle);
+  g_object_unref(rcstyle);
+  term->label_edit = gtk_label_new(vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+  gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
+  gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
+  gtk_widget_show_all(term->label);
+  g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
+  gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), VTE_HBOX, term->label);
+#endif
+#if !TAB_CLOSE_BUTTON
+  gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(notebook), VTE_HBOX, vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+#endif
+}
+#endif
+
+#if MENU
+int menu_popup(GtkWidget *widget, GdkEventButton *event)
+{
+  GdkEventButton *event_button;
+  if (event->type == GDK_BUTTON_PRESS) {
+    event_button = (GdkEventButton*)event;
+    if (event_button->button == 3) {
+#ifdef MENU_MATCH_STRING_EXEC
+      int tag = -1;
+#if TAB
+      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+      matched_url = vte_terminal_match_check(VTE_TERMINAL(term->vte), event->x / vte_terminal_get_char_width(VTE_TERMINAL(term->vte)), event->y / vte_terminal_get_char_height(VTE_TERMINAL(term->vte)), &tag);
+      if (matched_url != NULL) {
+        gtk_widget_show_all(menu);
+#ifdef MENU_CUSTOM
+        if (menu_item_success == 100)
+          gtk_widget_hide(match_item);
+#endif
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
+      } else {
+        gtk_widget_hide(match_open);
+        gtk_widget_hide(match_copy);
+        gtk_widget_hide(match_item);
+#ifdef MENU_CUSTOM
+        if (menu_item_success > 100)
+#endif
+          gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
+      }
+#endif /* MENU_MATCH_STRING_EXEC */
+
+#ifndef MENU_MATCH_STRING_EXEC
+#ifdef MENU_CUSTOM
+      if (menu_item_success > 0)
+#endif
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
+#endif
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+#endif /* MENU */
+
+#if MOUSE_CTRL_SATURATION
+int scroll_event(GtkWidget *widget, GdkEventScroll *event)
+{
+  if (event->direction == GDK_SCROLL_RIGHT) {
+    saturation_level += 0.025;
+    if (saturation_level > 1)
+      saturation_level = 1;
+#if TAB
+    int i = 0;
+    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+      vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
+#if BACKGROUND_OPACITY
+      vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
+      if (!strncmp(background_order[background_status], "Opacity", 8))
+        vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if TAB
+    }
+#endif
+    return TRUE;
+  }
+
+  if (event->direction == GDK_SCROLL_LEFT) {
+    saturation_level -= 0.025;
+    if (saturation_level < 0)
+      saturation_level = 0;
+#if TAB
+    int i = 0;
+    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+      vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
+#if BACKGROUND_OPACITY
+      vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
+      if (!strncmp(background_order[background_status], "Opacity", 8))
+        vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if TAB
+    }
+#endif
+    return TRUE;
+  }
+  return FALSE;
+}
+#endif /* MOUSE_CTRL_SATURATION */
+
+void add_tab()
+{
+  term = g_malloc(sizeof(struct terminal));
+
+#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
+  int label_exist = 0;
+#endif
+
+#if defined(TAB_LABEL) || defined(TAB_LABEL_CUSTOM)
+  GtkWidget *label;
+#endif
+
+#ifdef TAB_LABEL
+  label = gtk_label_new(g_strdup_printf(gettext(TAB_LABEL), (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) + 1)));
+#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
+  label_exist = 1;
+#endif
+#endif
+
+#ifdef TAB_LABEL_CUSTOM
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size) {
+    label = gtk_label_new(g_strdup_printf("%s", label_style_custom[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
+#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
+    label_exist = 1;
+#endif
+  } else
+    label = NULL;
+#endif
+
+#if TAB_CLOSE_BUTTON
+  term->label = gtk_hbox_new(0, 0);
+  term->button = gtk_button_new();
+  GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+  GtkRcStyle *rcstyle = gtk_rc_style_new();
+  gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+  rcstyle->xthickness = 0;
+  rcstyle->ythickness = 0;
+  gtk_widget_modify_style(term->button, rcstyle);
+  g_object_unref(rcstyle);
+  term->label_edit = label;
+  gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
+  gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
+  gtk_widget_show_all(term->label);
+  g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
+#endif
+
+#ifdef SCROLLBAR
+  term->hbox = gtk_hbox_new(0, 0);
+#endif
+
+  term->vte = vte_terminal_new();
+
+#ifdef SCROLLBAR
+  term->scrollbar = gtk_vscrollbar_new(vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
+#endif
+
+#ifdef SCROLLBAR
+#if !SCROLLBAR
+  gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
+#endif
+  gtk_box_pack_start(GTK_BOX(term->hbox), term->vte, 1, 1, 0);
+#if SCROLLBAR
+  gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
+#endif
+#endif
+
+#if TAB_NEW_PATH_EQUAL_OLD
+  char *default_directory = (char*)DEFAULT_DIRECTORY;
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 0) {
+    struct terminal *oldterm;
+    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    oldterm = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+    default_directory = g_file_read_link(g_strdup_printf("/proc/%d/cwd", oldterm->pid), NULL);
+  }
+#endif
+
+#if COMMAND_LOGIN_SHELL
+  if (login_shell_flag & 1)
+    GET_VTE_CHILD_PID vte_terminal_fork_command(VTE_TERMINAL(term->vte), VTE_DEFAULT_COMMAND, login_shell, DEFAULT_ENVV, VTE_DEFAULT_DIRECTORY, RECORD_LASTLOG, RECORD_UTMP, RECORD_WTMP);
+  else
+#endif
+    GET_VTE_CHILD_PID vte_terminal_fork_command(VTE_TERMINAL(term->vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, VTE_DEFAULT_DIRECTORY, RECORD_LASTLOG, RECORD_UTMP, RECORD_WTMP);
+
+#ifdef MATCH_STRING
+#if !VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_STRING);
+#endif
+#if VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), regex, flags);
+#endif
+#endif
+
+#ifdef DEFAULT_EMULATION_TYPE
+  vte_terminal_set_emulation(VTE_TERMINAL(term->vte), DEFAULT_EMULATION_TYPE);
+#endif
+
+#ifdef FONT_ENABLE_BOLD_TEXT
+  vte_terminal_set_allow_bold(VTE_TERMINAL(term->vte), FONT_ENABLE_BOLD_TEXT);
+#endif
+
+#ifdef BELL_AUDIBLE
+  vte_terminal_set_audible_bell(VTE_TERMINAL(term->vte), BELL_AUDIBLE);
+#endif
+
+#ifdef BELL_VISIBLE
+  vte_terminal_set_visible_bell(VTE_TERMINAL(term->vte), BELL_VISIBLE);
+#endif
+
+#ifdef BACKGROUND_IMAGE
+  vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
+#endif
+
+#if BACKGROUND_OPACITY
+  vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+
+#if defined(BACKGROUND_TINT_COLOR) && BACKGROUND_EXIST
+  vte_terminal_set_background_tint_color(VTE_TERMINAL(term->vte), &color_tint);
+#endif
+
+#if defined(BACKGROUND_SATURATION) && BACKGROUND_EXIST
+  vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
+#endif
+
+#ifdef BACKGROUND_TRANSPARENT
+  vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), BACKGROUND_TRANSPARENT);
+#endif
+
+#ifdef BACKSPACE_KEY
+  vte_terminal_set_backspace_binding(VTE_TERMINAL(term->vte), BACKSPACE_KEY);
+#endif
+
+#ifdef DELETE_KEY
+  vte_terminal_set_delete_binding(VTE_TERMINAL(term->vte), DELETE_KEY);
+#endif
+
+#ifdef COLOR_STYLE
+  vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, COLOR_STYLE, 16);
+#endif
+
+#if SET_DEFAULT_COLORS
+  vte_terminal_set_default_colors(VTE_TERMINAL(term->vte));
+#endif
+
+#ifdef COLOR_BACKGROUND
+  GdkColor color_bg;
+  gdk_color_parse(COLOR_BACKGROUND, &color_bg);
+  vte_terminal_set_color_background(VTE_TERMINAL(term->vte), &color_bg);
+#endif
+
+#ifdef COLOR_TEXT_BOLD
+  GdkColor color_bold;
+  gdk_color_parse(COLOR_TEXT_BOLD, &color_bold);
+  vte_terminal_set_color_bold(VTE_TERMINAL(term->vte), &color_bold);
+#endif
+
+#ifdef CURSOR_COLOR
+  GdkColor color_cursor;
+  gdk_color_parse(CURSOR_COLOR, &color_cursor);
+  vte_terminal_set_color_cursor(VTE_TERMINAL(term->vte), &color_cursor);
+#endif
+
+#ifdef COLOR_TEXT_DIM
+  GdkColor color_dim;
+  gdk_color_parse(COLOR_TEXT_DIM, &color_dim);
+  vte_terminal_set_color_dim(VTE_TERMINAL(term->vte), &color_dim);
+#endif
+
+#ifdef COLOR_FOREGROUND
+  GdkColor color_fg;
+  gdk_color_parse(COLOR_FOREGROUND, &color_fg);
+  vte_terminal_set_color_foreground(VTE_TERMINAL(term->vte), &color_fg);
+#endif
+
+#ifdef COLOR_TEXT_HIGHLIGHTED
+  GdkColor color_highlight;
+  gdk_color_parse(COLOR_TEXT_HIGHLIGHTED, &color_highlight);
+  vte_terminal_set_color_highlight(VTE_TERMINAL(term->vte), &color_highlight);
+#endif
+
+#ifdef CURSOR_BLINKS
+#if !VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_set_cursor_blinks(VTE_TERMINAL(term->vte), CURSOR_BLINKS);
+#endif
+#if VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINKS);
+#endif
+#endif
+
+#ifdef DEFAULT_ENCODING
+  vte_terminal_set_encoding(VTE_TERMINAL(term->vte), DEFAULT_ENCODING);
+#endif
+
+#ifdef FONT
+#if !DISABLE_ANTI_ALIAS
+#if defined(HOTKEY_TOGGLE_ANTI_ALIAS) || MENU_TOGGLE_ANTI_ALIAS
+  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, antialias_status);
+#endif
+#if !defined(HOTKEY_TOGGLE_ANTI_ALIAS) && !MENU_TOGGLE_ANTI_ALIAS
+  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, VTE_ANTI_ALIAS);
+#endif
+#endif
+#if DISABLE_ANTI_ALIAS
+  vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
+#endif
+#endif
+
+#ifdef MOUSE_CURSOR_AUTOHIDE
+  vte_terminal_set_mouse_autohide(VTE_TERMINAL(term->vte), MOUSE_CURSOR_AUTOHIDE);
+#endif
+
+#ifdef BACKGROUND_SCROLLABLE
+  vte_terminal_set_scroll_background(VTE_TERMINAL(term->vte), BACKGROUND_SCROLLABLE);
+#endif
+
+#ifdef SCROLL_ON_KEYSTROKE
+  vte_terminal_set_scroll_on_keystroke(VTE_TERMINAL(term->vte), SCROLL_ON_KEYSTROKE);
+#endif
+
+#ifdef SCROLL_ON_OUTPUT
+  vte_terminal_set_scroll_on_output(VTE_TERMINAL(term->vte), SCROLL_ON_OUTPUT);
+#endif
+
+#ifdef SCROLL_LINES
+  vte_terminal_set_scrollback_lines(VTE_TERMINAL(term->vte), SCROLL_LINES);
+#endif
+
+#if DEFAULT_COLUMNS && DEFAULT_ROWS
+  vte_terminal_set_size(VTE_TERMINAL(term->vte), DEFAULT_COLUMNS, DEFAULT_ROWS);
+#endif
+
+#ifdef WORD_CHARS
+  vte_terminal_set_word_chars(VTE_TERMINAL(term->vte), WORD_CHARS);
+#endif
+
+  gtk_widget_show_all(VTE_HBOX);
+#if TAB
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
+#endif
+#if !TAB
+  gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
+#endif
+
+#if TAB
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
+  g_object_set_data(G_OBJECT(current_tab), "current_tab", term);
+#endif
+
+  g_signal_connect(term->vte, "child-exited", G_CALLBACK(del_tab), (int*)CLOSE_DIALOG);
+
+#if TAB_LABEL_DYNAMIC
+  g_signal_connect(term->vte, "window-title-changed", do_title_changed, NULL);
+#endif
+
+#if MENU
+  g_signal_connect(term->vte, "button-press-event", G_CALLBACK(menu_popup), NULL);
+#endif
+
+#if MOUSE_CTRL_SATURATION
+  g_signal_connect(term->vte, "scroll-event", G_CALLBACK(scroll_event), NULL);
+#endif
+
+#if TABBAR_AUTOHIDE
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) ? 0 : VTE_TABBAR);
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
+
+#if DO_TOGGLE_BACKGROUND
+#if TOGGLE_BG_TRANSPARENT
+  if (!strncmp(background_order[background_status], "Transparent", 12))
+    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 1);
+#endif
+#if TOGGLE_BG_IMAGE
+  if (!strncmp(background_order[background_status], "Image", 6)) {
+    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
+    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
+  }
+#endif
+#if TOGGLE_BG_NO_BACKGROUND
+  if (!strncmp(background_order[background_status], "No background", 14)) {
+    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
+    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+#if VTE_CHECK_VERSION(0,13,3)
+    vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
+#endif
+  }
+#endif
+#if TOGGLE_BG_OPACITY
+  if (!strncmp(background_order[background_status], "Opacity", 8)) {
+    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
+    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+    vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+  }
+#endif
+#endif
+
+  gtk_widget_show_all(notebook);
+
+#if DO_TOGGLE_SCROLLBAR
+  if (scrollbar_status) {
+#if TAB
+    int i = 0;
+    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+      gtk_widget_hide(term->scrollbar);
+#if TAB
+    }
+#endif
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
+
+#if TAB
+  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+#endif
+
+#if TAB_EXPANDED_WIDTH
+  gtk_container_child_set(GTK_CONTAINER(notebook), VTE_HBOX, "tab-expand", 1, NULL);
+#endif
+
+#if TAB_REORDERABLE
+  gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), VTE_HBOX, 1);
+#endif
+
+  gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
+
+#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
+  term->label_exist = label_exist;
+#endif
+}
+
+#if STATUS_BAR
+void change_statusbar_encoding()
+{
+#if TAB
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+  gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term->vte)));
+}
+#endif
+
+#if defined(HOTKEY_SATURATION_DIALOG) || MENU_CHANGE_SATURATION
+void do_change_saturation()
+{
+  saturation_level = gtk_range_get_value(GTK_RANGE(adjustment));
+#if TAB
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+  vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
+#if BACKGROUND_OPACITY
+  vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
+  if (!strncmp(background_order[background_status], "Opacity", 8))
+    vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
+#endif
+}
+#endif
+
+#if FONT_CHANGE_SIZE
+void font_size_changed()
+{
+  g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
+#if TAB
+  int i = 0;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
+#if TAB
+  }
+#endif
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+}
+#endif
+
+#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
+void recover_window_status()
+{
+#if DO_TOGGLE_SCROLLBAR
+  if (scrollbar_status) {
+#if TAB
+    int i = 0;
+    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+      gtk_widget_hide(term->scrollbar);
+#if TAB
+    }
+#endif
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
+
+#if DO_TOGGLE_STATUS_BAR
+  if (status_bar_status)
+    gtk_widget_hide(statusbar);
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
+}
+#endif
 
 #if HOTKEY
-int key_press_event(GtkWidget *widget __attribute__((unused)), GdkEventKey *event)
+int key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
 #if !CTRL_ALT
   if (event->state & GDK_CONTROL_MASK) {
@@ -1434,12 +2040,7 @@ int key_press_event(GtkWidget *widget __attribute__((unused)), GdkEventKey *even
 
 #ifdef HOTKEY_TAB_REMOVE
       if (HOTKEY_TAB_REMOVE) {
-#if CLOSE_DIALOG
-        del_tab(NULL, 1);
-#endif
-#if !CLOSE_DIALOG
-        del_tab();
-#endif
+        del_tab(NULL, CLOSE_DIALOG);
         return TRUE;
       }
 #endif
@@ -1453,117 +2054,12 @@ int key_press_event(GtkWidget *widget __attribute__((unused)), GdkEventKey *even
 }
 #endif /* HOTKEY */
 
-#if MENU
-int menu_popup(GtkWidget *widget __attribute__((unused)), GdkEventButton *event)
-{
-  GdkEventButton *event_button;
-  if (event->type == GDK_BUTTON_PRESS) {
-    event_button = (GdkEventButton*)event;
-    if (event_button->button == 3) {
-#ifdef MENU_MATCH_STRING_EXEC
-      int tag = -1;
-#if TAB
-      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-      matched_url = vte_terminal_match_check(VTE_TERMINAL(term->vte), event->x / vte_terminal_get_char_width(VTE_TERMINAL(term->vte)), event->y / vte_terminal_get_char_height(VTE_TERMINAL(term->vte)), &tag);
-      if (matched_url != NULL) {
-        gtk_widget_show_all(menu);
-#ifdef MENU_CUSTOM
-        if (menu_item_success == 100)
-          gtk_widget_hide(match_item);
-#endif
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
-      } else {
-        gtk_widget_hide(match_open);
-        gtk_widget_hide(match_copy);
-        gtk_widget_hide(match_item);
-#ifdef MENU_CUSTOM
-        if (menu_item_success > 100)
-#endif
-          gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
-      }
-#endif /* MENU_MATCH_STRING_EXEC */
-
-#ifndef MENU_MATCH_STRING_EXEC
-#ifdef MENU_CUSTOM
-      if (menu_item_success > 0)
-#endif
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
-#endif
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-#endif /* MENU */
-
-#if MOUSE_CTRL_SATURATION
-int scroll_event(GtkWidget *widget __attribute__((unused)), GdkEventScroll *event)
-{
-  if (event->direction == GDK_SCROLL_RIGHT) {
-    saturation_level += 0.025;
-    if (saturation_level > 1)
-      saturation_level = 1;
-#if TAB
-    int i = 0;
-    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-      vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
-#if BACKGROUND_OPACITY
-      vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-#endif
-#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
-      if (!strncmp(background_order[background_status], "Opacity", 8))
-        vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-#endif
-#if TAB
-    }
-#endif
-    return TRUE;
-  }
-
-  if (event->direction == GDK_SCROLL_LEFT) {
-    saturation_level -= 0.025;
-    if (saturation_level < 0)
-      saturation_level = 0;
-#if TAB
-    int i = 0;
-    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-      vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
-#if BACKGROUND_OPACITY
-      vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-#endif
-#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
-      if (!strncmp(background_order[background_status], "Opacity", 8))
-        vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-#endif
-#if TAB
-    }
-#endif
-    return TRUE;
-  }
-  return FALSE;
-}
-#endif /* MOUSE_CTRL_SATURATION */
-
-#if STATUS_BAR
-void change_statusbar_encoding()
-{
-#if TAB
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-  gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term->vte)));
-}
-#endif
-
+#if CLOSE_DIALOG
 gboolean delete_event()
+#endif
+#if !CLOSE_DIALOG
+void delete_event()
+#endif
 {
 #if CLOSE_DIALOG && TAB
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1) {
@@ -1592,7 +2088,12 @@ gboolean delete_event()
 #endif
     } else {
       gtk_widget_destroy(dialog);
+#if CLOSE_DIALOG
       return TRUE;
+#endif
+#if !CLOSE_DIALOG
+      return;
+#endif
     }
   }
 #endif
@@ -1600,23 +2101,15 @@ gboolean delete_event()
   int i = 0;
   for (i = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i > 0 ; i--) {
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i - 1);
-#if CLOSE_DIALOG
     del_tab(NULL, 0);
-#endif
-#if !CLOSE_DIALOG
-    del_tab();
-#endif
   }
 #endif
 #if !TAB
+  del_tab(NULL, CLOSE_DIALOG);
+#endif
 #if CLOSE_DIALOG
-  del_tab(NULL, 1);
-#endif
-#if !CLOSE_DIALOG
-  del_tab();
-#endif
-#endif
   return FALSE;
+#endif
 }
 
 #if MENU_TOGGLE_ON_TOP
@@ -1631,25 +2124,6 @@ void do_always_on_top()
     gtk_window_set_skip_taskbar_hint(GTK_WINDOW(main_window), 1);
     gtk_window_set_skip_pager_hint(GTK_WINDOW(main_window), 1);
   }
-#endif
-}
-#endif
-
-#if defined(HOTKEY_SATURATION_DIALOG) || MENU_CHANGE_SATURATION
-void do_change_saturation()
-{
-  saturation_level = gtk_range_get_value(GTK_RANGE(adjustment));
-#if TAB
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-  vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
-#if BACKGROUND_OPACITY
-  vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-#endif
-#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
-  if (!strncmp(background_order[background_status], "Opacity", 8))
-    vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
 #endif
 }
 #endif
@@ -1888,34 +2362,6 @@ void do_select_font()
 }
 #endif /* MENU_FONT_SELECT */
 
-#if TAB_LABEL_DYNAMIC
-void do_title_changed()
-{
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#if TAB_CLOSE_BUTTON
-  term->label = gtk_hbox_new(0, 0);
-  term->button = gtk_button_new();
-  GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
-  GtkRcStyle *rcstyle = gtk_rc_style_new();
-  gtk_button_set_image(GTK_BUTTON(term->button), img_button);
-  rcstyle->xthickness = 0;
-  rcstyle->ythickness = 0;
-  gtk_widget_modify_style(term->button, rcstyle);
-  g_object_unref(rcstyle);
-  term->label_edit = gtk_label_new(vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
-  gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
-  gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
-  gtk_widget_show_all(term->label);
-  g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
-  gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), VTE_HBOX, term->label);
-#endif
-#if !TAB_CLOSE_BUTTON
-  gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(notebook), VTE_HBOX, vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
-#endif
-}
-#endif
-
 #if MENU_TOGGLE_ANTI_ALIAS
 void do_toggle_antialias()
 {
@@ -2123,529 +2569,7 @@ void do_zoom_out()
 }
 #endif
 
-void add_tab()
-{
-  term = g_malloc(sizeof(struct terminal));
-
-#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
-  int label_exist = 0;
-#endif
-
-#if TAB_LABEL_INIT
-  GtkWidget *label;
-#endif
-
-#ifdef TAB_LABEL
-#if TAB_LABEL_NUMBER
-  label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) + 1)));
-#endif
-#if !TAB_LABEL_NUMBER
-  label = gtk_label_new(TAB_LABEL);
-#endif
-#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
-  label_exist = 1;
-#endif
-#endif
-
-#ifdef TAB_LABEL_CUSTOM
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size) {
-    label = gtk_label_new(g_strdup_printf("%s", label_style_custom[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
-#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
-    label_exist = 1;
-#endif
-  } else
-    label = NULL;
-#endif
-
-#if TAB_LABEL_POEM
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size) {
-    label = gtk_label_new(g_strdup_printf("%s", label_style_poem[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
-#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
-    label_exist = 1;
-#endif
-  } else
-    label = NULL;
-#endif
-
-#if TAB_CLOSE_BUTTON
-  term->label = gtk_hbox_new(0, 0);
-  term->button = gtk_button_new();
-  GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
-  GtkRcStyle *rcstyle = gtk_rc_style_new();
-  gtk_button_set_image(GTK_BUTTON(term->button), img_button);
-  rcstyle->xthickness = 0;
-  rcstyle->ythickness = 0;
-  gtk_widget_modify_style(term->button, rcstyle);
-  g_object_unref(rcstyle);
-  term->label_edit = label;
-  gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
-  gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
-  gtk_widget_show_all(term->label);
-  g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
-#endif
-
-#ifdef SCROLLBAR
-  term->hbox = gtk_hbox_new(0, 0);
-#endif
-
-  term->vte = vte_terminal_new();
-
-#ifdef SCROLLBAR
-  term->scrollbar = gtk_vscrollbar_new(vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
-#endif
-
-#ifdef SCROLLBAR
-#if !SCROLLBAR
-  gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
-#endif
-  gtk_box_pack_start(GTK_BOX(term->hbox), term->vte, 1, 1, 0);
-#if SCROLLBAR
-  gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
-#endif
-#endif
-
-#if TAB_NEW_PATH_EQUAL_OLD
-  char *default_directory = (char*)DEFAULT_DIRECTORY;
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 0) {
-    struct terminal *oldterm;
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-    oldterm = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-    default_directory = g_file_read_link(g_strdup_printf("/proc/%d/cwd", oldterm->pid), NULL);
-  }
-#endif
-
-#if GET_VTE_CHILD_PID
-  term->pid = vte_terminal_fork_command(VTE_TERMINAL(term->vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, VTE_DEFAULT_DIRECTORY, RECORD_LASTLOG, RECORD_UTMP, RECORD_WTMP);
-#endif
-#if !GET_VTE_CHILD_PID
-  vte_terminal_fork_command(VTE_TERMINAL(term->vte), VTE_DEFAULT_COMMAND, VTE_DEFAULT_ARGV, DEFAULT_ENVV, VTE_DEFAULT_DIRECTORY, RECORD_LASTLOG, RECORD_UTMP, RECORD_WTMP);
-#endif
-
-#ifdef MATCH_STRING
-#if !VTE_CHECK_VERSION(0,17,1)
-  vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_STRING);
-#endif
-#if VTE_CHECK_VERSION(0,17,1)
-  vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), regex, flags);
-#endif
-#endif
-
-#ifdef DEFAULT_EMULATION_TYPE
-  vte_terminal_set_emulation(VTE_TERMINAL(term->vte), DEFAULT_EMULATION_TYPE);
-#endif
-
-#ifdef FONT_ENABLE_BOLD_TEXT
-  vte_terminal_set_allow_bold(VTE_TERMINAL(term->vte), FONT_ENABLE_BOLD_TEXT);
-#endif
-
-#ifdef BELL_AUDIBLE
-  vte_terminal_set_audible_bell(VTE_TERMINAL(term->vte), BELL_AUDIBLE);
-#endif
-
-#ifdef BELL_VISIBLE
-  vte_terminal_set_visible_bell(VTE_TERMINAL(term->vte), BELL_VISIBLE);
-#endif
-
-#ifdef BACKGROUND_IMAGE
-  vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
-#endif
-
-#if BACKGROUND_OPACITY
-  vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-#endif
-
-#if defined(BACKGROUND_TINT_COLOR) && BACKGROUND_EXIST
-  vte_terminal_set_background_tint_color(VTE_TERMINAL(term->vte), &color_tint);
-#endif
-
-#if defined(BACKGROUND_SATURATION) && BACKGROUND_EXIST
-  vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
-#endif
-
-#ifdef BACKGROUND_TRANSPARENT
-  vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), BACKGROUND_TRANSPARENT);
-#endif
-
-#ifdef BACKSPACE_KEY
-  vte_terminal_set_backspace_binding(VTE_TERMINAL(term->vte), BACKSPACE_KEY);
-#endif
-
-#ifdef DELETE_KEY
-  vte_terminal_set_delete_binding(VTE_TERMINAL(term->vte), DELETE_KEY);
-#endif
-
-#ifdef COLOR_STYLE
-  vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, COLOR_STYLE, 16);
-#endif
-
-#if SET_DEFAULT_COLORS
-  vte_terminal_set_default_colors(VTE_TERMINAL(term->vte));
-#endif
-
-#ifdef COLOR_BACKGROUND
-  GdkColor color_bg;
-  gdk_color_parse(COLOR_BACKGROUND, &color_bg);
-  vte_terminal_set_color_background(VTE_TERMINAL(term->vte), &color_bg);
-#endif
-
-#ifdef COLOR_TEXT_BOLD
-  GdkColor color_bold;
-  gdk_color_parse(COLOR_TEXT_BOLD, &color_bold);
-  vte_terminal_set_color_bold(VTE_TERMINAL(term->vte), &color_bold);
-#endif
-
-#ifdef CURSOR_COLOR
-  GdkColor color_cursor;
-  gdk_color_parse(CURSOR_COLOR, &color_cursor);
-  vte_terminal_set_color_cursor(VTE_TERMINAL(term->vte), &color_cursor);
-#endif
-
-#ifdef COLOR_TEXT_DIM
-  GdkColor color_dim;
-  gdk_color_parse(COLOR_TEXT_DIM, &color_dim);
-  vte_terminal_set_color_dim(VTE_TERMINAL(term->vte), &color_dim);
-#endif
-
-#ifdef COLOR_FOREGROUND
-  GdkColor color_fg;
-  gdk_color_parse(COLOR_FOREGROUND, &color_fg);
-  vte_terminal_set_color_foreground(VTE_TERMINAL(term->vte), &color_fg);
-#endif
-
-#ifdef COLOR_TEXT_HIGHLIGHTED
-  GdkColor color_highlight;
-  gdk_color_parse(COLOR_TEXT_HIGHLIGHTED, &color_highlight);
-  vte_terminal_set_color_highlight(VTE_TERMINAL(term->vte), &color_highlight);
-#endif
-
-#ifdef CURSOR_BLINKS
-#if !VTE_CHECK_VERSION(0,17,1)
-  vte_terminal_set_cursor_blinks(VTE_TERMINAL(term->vte), CURSOR_BLINKS);
-#endif
-#if VTE_CHECK_VERSION(0,17,1)
-  vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINKS);
-#endif
-#endif
-
-#ifdef DEFAULT_ENCODING
-  vte_terminal_set_encoding(VTE_TERMINAL(term->vte), DEFAULT_ENCODING);
-#endif
-
-#ifdef FONT
-#if !DISABLE_ANTI_ALIAS
-#if defined(HOTKEY_TOGGLE_ANTI_ALIAS) || MENU_TOGGLE_ANTI_ALIAS
-  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, antialias_status);
-#endif
-#if !defined(HOTKEY_TOGGLE_ANTI_ALIAS) && !MENU_TOGGLE_ANTI_ALIAS
-  vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, VTE_ANTI_ALIAS);
-#endif
-#endif
-#if DISABLE_ANTI_ALIAS
-  vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#endif
-#endif
-
-#ifdef MOUSE_CURSOR_AUTOHIDE
-  vte_terminal_set_mouse_autohide(VTE_TERMINAL(term->vte), MOUSE_CURSOR_AUTOHIDE);
-#endif
-
-#ifdef BACKGROUND_SCROLLABLE
-  vte_terminal_set_scroll_background(VTE_TERMINAL(term->vte), BACKGROUND_SCROLLABLE);
-#endif
-
-#ifdef SCROLL_ON_KEYSTROKE
-  vte_terminal_set_scroll_on_keystroke(VTE_TERMINAL(term->vte), SCROLL_ON_KEYSTROKE);
-#endif
-
-#ifdef SCROLL_ON_OUTPUT
-  vte_terminal_set_scroll_on_output(VTE_TERMINAL(term->vte), SCROLL_ON_OUTPUT);
-#endif
-
-#ifdef SCROLL_LINES
-  vte_terminal_set_scrollback_lines(VTE_TERMINAL(term->vte), SCROLL_LINES);
-#endif
-
-#if DEFAULT_COLUMNS && DEFAULT_ROWS
-  vte_terminal_set_size(VTE_TERMINAL(term->vte), DEFAULT_COLUMNS, DEFAULT_ROWS);
-#endif
-
-#ifdef WORD_CHARS
-  vte_terminal_set_word_chars(VTE_TERMINAL(term->vte), WORD_CHARS);
-#endif
-
-  gtk_widget_show_all(VTE_HBOX);
-#if TAB
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
-#endif
-#if !TAB
-  gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
-#endif
-
-#if TAB
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
-  g_object_set_data(G_OBJECT(current_tab), "current_tab", term);
-#endif
-
-#if CLOSE_DIALOG
-  g_signal_connect(term->vte, "child-exited", G_CALLBACK(del_tab), (int*)1);
-#endif
-#if !CLOSE_DIALOG
-  g_signal_connect(term->vte, "child-exited", del_tab, NULL);
-#endif
-
-#if TAB_LABEL_DYNAMIC
-  g_signal_connect(term->vte, "window-title-changed", do_title_changed, NULL);
-#endif
-
-#if MENU
-  g_signal_connect(term->vte, "button-press-event", G_CALLBACK(menu_popup), NULL);
-#endif
-
-#if MOUSE_CTRL_SATURATION
-  g_signal_connect(term->vte, "scroll-event", G_CALLBACK(scroll_event), NULL);
-#endif
-
-#if TABBAR_AUTOHIDE
-  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) ? 0 : VTE_TABBAR);
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-#endif
-
-#if DO_TOGGLE_BACKGROUND
-#if TOGGLE_BG_TRANSPARENT
-  if (!strncmp(background_order[background_status], "Transparent", 12))
-    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 1);
-#endif
-#if TOGGLE_BG_IMAGE
-  if (!strncmp(background_order[background_status], "Image", 6)) {
-    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
-  }
-#endif
-#if TOGGLE_BG_NO_BACKGROUND
-  if (!strncmp(background_order[background_status], "No background", 14)) {
-    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-#if VTE_CHECK_VERSION(0,13,3)
-    vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
-#endif
-  }
-#endif
-#if TOGGLE_BG_OPACITY
-  if (!strncmp(background_order[background_status], "Opacity", 8)) {
-    vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-    vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
-  }
-#endif
-#endif
-
-  gtk_widget_show_all(notebook);
-
-#if DO_TOGGLE_SCROLLBAR
-  if (scrollbar_status) {
-#if TAB
-    int i = 0;
-    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-      gtk_widget_hide(term->scrollbar);
-#if TAB
-    }
-#endif
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-  }
-#endif
-
-#if TAB
-  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
-#endif
-
-#if TAB_EXPANDED_WIDTH
-  gtk_container_child_set(GTK_CONTAINER(notebook), VTE_HBOX, "tab-expand", 1, NULL);
-#endif
-
-#if TAB_REORDERABLE
-  gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), VTE_HBOX, 1);
-#endif
-
-  gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
-
-#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
-  term->label_exist = label_exist;
-#endif
-}
-
-#if TAB_CLOSE_BUTTON
-void button_clicked(GtkWidget *widget __attribute__((unused)), void *data)
-{
-  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-  int i = 0;
-  int killed = 0;
-  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-    if (data == term->button) {
-      gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i);
-#if CLOSE_DIALOG
-      del_tab(NULL, 1);
-#endif
-#if !CLOSE_DIALOG
-      del_tab();
-#endif
-      killed = i;
-    }
-  }
-  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), (killed < index) ? index - 1 : index);
-}
-#endif
-
-#if CLOSE_DIALOG
-void del_tab(GtkWidget *widget __attribute__((unused)), int do_close_dialog)
-#endif
-#if !CLOSE_DIALOG
-void del_tab()
-#endif
-{
-  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-
-#if CLOSE_DIALOG
-#if TAB
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
-  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-  int user_want_to_close = 0;
-  if (do_close_dialog) {
-#if 1 /* Maybe only work on GNU/Linux */
-    char *stat = NULL;
-    char **stats = NULL;
-    gsize length;
-    if (g_file_get_contents(g_strdup_printf("/proc/%d/stat", term->pid), &stat, &length, NULL)) {
-      stats = g_strsplit_set(stat, " ", 8);
-      if (atoi(stats[7]) != term->pid) {
-        GtkWidget *dialog;
-        GtkWidget *dialog_hbox;
-        GtkWidget *dialog_icon;
-        GtkWidget *dialog_string;
-#if BUTTON_ORDER_BY_RCFILE
-        if (button_order)
-          dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
-        else
-#endif
-          dialog = gtk_dialog_new_with_buttons(LABEL_DIALOG_CLOSE, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
-        gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
-        dialog_hbox = gtk_hbox_new (0, 0);
-        dialog_icon = gtk_image_new_from_stock (GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
-        dialog_string = gtk_label_new (LABEL_DIALOG_CLOSE);
-        gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), dialog_hbox);
-        gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_icon, 0, 0, 0);
-        gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_string, 1, 0, 0);
-        gtk_widget_show_all(dialog);
-        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_CLOSE) {
-          gtk_widget_destroy(dialog);
-          user_want_to_close = 1;
-        } else {
-          gtk_widget_destroy(dialog);
-          return;
-        }
-      }
-    }
-#endif /* Maybe only work on GNU/Linux */
-  }
-#endif /* CLOSE_DIALOG */
-
-#if CLOSE_SAFELY
-#if TAB
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
-  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-#if CLOSE_DIALOG
-  if (!user_want_to_close && do_close_dialog) {
-#endif
-#if 1 /* Maybe only work on GNU/Linux */
-    char *stat = NULL;
-    char **stats = NULL;
-    gsize length;
-    if (g_file_get_contents(g_strdup_printf("/proc/%d/stat", term->pid), &stat, &length, NULL)) {
-      stats = g_strsplit_set(stat, " ", 8);
-      if (atoi(stats[7]) != term->pid)
-        return;
-      else
-        kill(term->pid, 9);
-    }
-#endif
-#if CLOSE_DIALOG
-  } else
-    kill(term->pid, 9);
-#endif
-#endif /* CLOSE_SAFELY */
-
-#if TAB
-  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-  g_free(term);
-
-  (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2) ? gtk_main_quit() : gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
-
-#if TAB
-  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
-#endif
-
-#if TABBAR_AUTOHIDE
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-  }
-#endif
-}
-
-#if FONT_CHANGE_SIZE
-void font_size_changed()
-{
-  g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
-#if TAB
-  int i = 0;
-  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-  }
-#endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-}
-#endif
-
-#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
-void recover_window_status()
-{
-#if DO_TOGGLE_SCROLLBAR
-  if (scrollbar_status) {
-#if TAB
-    int i = 0;
-    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-      gtk_widget_hide(term->scrollbar);
-#if TAB
-    }
-#endif
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-  }
-#endif
-
-#if DO_TOGGLE_STATUS_BAR
-  if (status_bar_status)
-    gtk_widget_hide(statusbar);
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-#endif
-}
-#endif
-
-void set_encoding(GtkWidget *widget __attribute__((unused)), void *data)
+void set_encoding(GtkWidget *widget, void *data)
 {
 #if TAB
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
@@ -2676,6 +2600,10 @@ void switch_page()
 
 int main(int argc, char **argv)
 {
+#ifdef TAB_LABEL
+  textdomain("gtk20");
+#endif
+
 #if !EVILVTE_MINIMUM
   int i, j;
 #endif
@@ -2685,8 +2613,12 @@ int main(int argc, char **argv)
   if (argc > 2) {
     for (i = 0 ; i < argc ; i++) {
       if (!strncmp(argv[i], "-e", 3)) {
-        if (i < argc - 1)
+        if (i < argc - 1) {
           g_snprintf(default_command, sizeof(default_command), "%s", argv[i + 1]);
+#if COMMAND_LOGIN_SHELL
+          login_shell_flag = 2;
+#endif
+        }
         if (++i != argc)
           default_argv = &(argv[i]);
       }
@@ -2719,18 +2651,26 @@ int main(int argc, char **argv)
 
 #if COMMAND_SHOW_HELP
     if (!strncmp(argv[j], "-h", 3)) {
-      printf("%s, version %s\n\nUsage:\n\t%s [option%s]\n\nOption%s:\n\t-h                    \tshow this help\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME, COMMAND_SHOW_HELP_OPTION_S, COMMAND_SHOW_HELP_OPTION_S);
-#if COMMAND_AT_ROOT_WINDOW
-      printf("\t-r                    \tmake %s run in root window\n", PROGRAM_NAME);
-#endif
+      printf("%s, version %s\n\nUsage:\n\t%s [options]\n\nOptions:\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME);
 #if COMMAND_EXEC_PROGRAM
       printf("\t-e [program] [options]\tspecify the program to be run in %s\n", PROGRAM_NAME);
 #endif
 #if COMMAND_FULLSCREEN
       printf("\t-f                    \tstart %s in fullscreen mode\n", PROGRAM_NAME);
 #endif
+      printf("\t-h                    \tshow this help\n");
+#if COMMAND_LOGIN_SHELL
+      printf("\t-ls                   \tuse login shell\n");
+#endif
 #if COMMAND_SHOW_OPTIONS
       printf("\t-o                    \tshow build-time configuration\n");
+#endif
+#if COMMAND_AT_ROOT_WINDOW
+      printf("\t-r                    \tmake %s run in root window\n", PROGRAM_NAME);
+#endif
+#if COMMAND_SET_TITLE
+      printf("\t-T [string]           \tset program title\n");
+      printf("\t-title [string]       \tset program title\n");
 #endif
 #if COMMAND_SHOW_VERSION
       printf("\t-v                    \tshow version\n");
@@ -2738,15 +2678,18 @@ int main(int argc, char **argv)
 #if COMMAND_TAB_NUMBERS
       printf("\t-2 to -9              \tspecify the initial tab numbers\n");
 #endif
-#if COMMAND_SET_TITLE
-      printf("\t-T [string]           \tset program title\n");
-      printf("\t-title [string]       \tset program title\n");
-#endif
 #ifdef BACKGROUND_IMAGE
       printf("\nBackground image:\n\t$HOME/%s\n\n", BACKGROUND_IMAGE);
 #endif
       return 0;
     }
+#endif
+
+#if COMMAND_LOGIN_SHELL
+    if (!strncmp(argv[j], "-ls", 4) && !(login_shell_flag & 4))
+      login_shell_flag ^= 4;
+    if (login_shell_flag == 4)
+      login_shell_flag = 5;
 #endif
 
 #if COMMAND_AT_ROOT_WINDOW
@@ -2811,7 +2754,7 @@ int main(int argc, char **argv)
   font_size_default = font_size;
 #endif
 
-  gtk_init(NULL, NULL);
+  gtk_init(&argc, &argv);
 
 #if BUTTON_ORDER_BY_RCFILE
   g_object_get(gtk_settings_get_default(), "gtk-alternative-button-order", &button_order, NULL);
@@ -2895,6 +2838,10 @@ int main(int argc, char **argv)
 #if COMMAND_EXEC_PROGRAM && TAB
   g_snprintf(default_command, sizeof(default_command), "%s", DEFAULT_COMMAND);
   default_argv = DEFAULT_ARGV;
+#if COMMAND_LOGIN_SHELL
+  if (login_shell_flag & 4)
+    login_shell_flag = 5;
+#endif
 #endif
 
 #if COMMAND_TAB_NUMBERS
@@ -3023,14 +2970,12 @@ int main(int argc, char **argv)
       menu_item_success++;
     }
 
-#if 1 /* For compatibility only, will be removed in future release */
     if (!strncmp(menu_custom[j], "Select_all", 11)) {
       GtkWidget *menu_select_all = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_select_all);
       g_signal_connect(menu_select_all, "activate", do_select_all, NULL);
       menu_item_success++;
     }
-#endif
 #endif
 
 #if MENU_TAB_ADD
@@ -3046,12 +2991,7 @@ int main(int argc, char **argv)
     if (!strncmp(menu_custom[j], "Remove tab", 11)) {
       GtkWidget *menu_close_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_REMOVE, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_close_tab);
-#if CLOSE_DIALOG
-      g_signal_connect(menu_close_tab, "activate", del_tab, 1);
-#endif
-#if !CLOSE_DIALOG
-      g_signal_connect(menu_close_tab, "activate", del_tab, NULL);
-#endif
+      g_signal_connect(menu_close_tab, "activate", G_CALLBACK(del_tab), (int*)CLOSE_DIALOG);
       menu_item_success++;
     }
 #endif
