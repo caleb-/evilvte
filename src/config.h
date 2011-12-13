@@ -80,6 +80,7 @@
 // #define TAB_BORDER             0
 // #define TAB_BORDER_HORIZONTAL  0
 // #define TAB_BORDER_VERTICAL    0
+// #define TAB_CLOSE_BUTTON       TRUE
 // #define TAB_EXPANDED_WIDTH     TRUE
 // #define TAB_LABEL              "Page"
 // #define TAB_LABEL_NUMBER       TRUE

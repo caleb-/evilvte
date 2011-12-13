@@ -649,6 +649,17 @@ GtkWidget *notebook;
 #endif
 #endif
 
+#if TAB_CLOSE_BUTTON
+#ifndef TAB_LABEL
+#define TAB_LABEL "Page"
+#endif
+#define VTE_LABEL term->label
+#endif
+
+#if !TAB_CLOSE_BUTTON
+#define VTE_LABEL label
+#endif
+
 #ifdef TAB_LABEL_CUSTOM
 #undef TAB_LABEL
 #undef TAB_LABEL_POEM
@@ -911,6 +922,11 @@ struct terminal {
 #if GET_VTE_CHILD_PID
   int pid;
 #endif
+#if TAB_CLOSE_BUTTON
+  GtkWidget *button;
+  GtkWidget *label;
+  GtkWidget *label_edit;
+#endif
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   GtkWidget *hbox;
   GtkWidget *scrollbar;
@@ -928,7 +944,8 @@ static int menu_popup(GtkWidget *widget, GdkEventButton *event);
 static int scroll_event(GtkWidget *widget, GdkEventScroll *event);
 static void change_statusbar_encoding();
 static void add_tab();
-static void del_tab(int do_close_dialog);
+static void button_clicked(GtkWidget *widget, void *data);
+static void del_tab(GtkWidget *widget, int do_close_dialog);
 static void delete_event();
 static void do_always_on_top();
 static void do_change_saturation();
@@ -1206,7 +1223,14 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TAB_EDIT_LABEL
       if CTRL_TAB_EDIT_LABEL {
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+#if TAB_CLOSE_BUTTON
+        current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
+        term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+        char *label_name = (char*)gtk_label_get_text(GTK_LABEL(term->label_edit));
+#endif
+#if !TAB_CLOSE_BUTTON
         char *label_name = (char*)gtk_label_get_text(GTK_LABEL(gtk_notebook_get_tab_label(GTK_NOTEBOOK(notebook), gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index))));
+#endif
         if (label_name == NULL)
           label_name = "";
         GtkWidget *entry = gtk_entry_new();
@@ -1227,12 +1251,38 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
         term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
         if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+#if TAB_CLOSE_BUTTON
+          term->label = gtk_hbox_new(0, 0);
+          term->button = gtk_button_new();
+          GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+          GtkRcStyle *rcstyle = gtk_rc_style_new();
+          gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+          rcstyle->xthickness = 0;
+          rcstyle->ythickness = 0;
+          gtk_widget_modify_style(term->button, rcstyle);
+          gtk_rc_style_unref(rcstyle);
+          gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
+          term->label_edit = gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry)));
+          gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
+          gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
+          gtk_widget_show_all(term->label);
+          g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+          gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->hbox, term->label);
+#endif
+#if !SCROLLBAR_LEFT && !SCROLLBAR_RIGHT
+          gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->vte, term->label);
+#endif
+#endif /* TAB_CLOSE_BUTTON */
+
+#if !TAB_CLOSE_BUTTON
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
           gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->hbox, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
 #endif
 #if !SCROLLBAR_LEFT && !SCROLLBAR_RIGHT
           gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->vte, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
 #endif
+#endif /* !TAB_CLOSE_BUTTON */
         gtk_widget_destroy(dialog);
         return TRUE;
       }
@@ -1582,7 +1632,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef CTRL_TAB_REMOVE
       if CTRL_TAB_REMOVE {
-        del_tab(DO_CLOSE_DIALOG);
+        del_tab(NULL, DO_CLOSE_DIALOG);
         return TRUE;
       }
 #endif
@@ -1760,11 +1810,11 @@ static void delete_event()
   int i = 0;
   for (i = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i > 0 ; i--) {
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i - 1);
-    del_tab(0);
+    del_tab(NULL, 0);
   }
 #endif
 #if !TAB
-  del_tab(DO_CLOSE_DIALOG);
+  del_tab(NULL, DO_CLOSE_DIALOG);
 #endif
 }
 
@@ -1829,7 +1879,14 @@ static void do_copy()
 static void do_edit_label()
 {
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+#if TAB_CLOSE_BUTTON
+  current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
+  term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+  char *label_name = (char*)gtk_label_get_text(GTK_LABEL(term->label_edit));
+#endif
+#if !TAB_CLOSE_BUTTON
   char *label_name = (char*)gtk_label_get_text(GTK_LABEL(gtk_notebook_get_tab_label(GTK_NOTEBOOK(notebook), gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index))));
+#endif
   if (label_name == NULL)
     label_name = "";
   GtkWidget *entry = gtk_entry_new();
@@ -1850,12 +1907,38 @@ static void do_edit_label()
   term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
   if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+#if TAB_CLOSE_BUTTON
+    term->label = gtk_hbox_new(0, 0);
+    term->button = gtk_button_new();
+    GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+    GtkRcStyle *rcstyle = gtk_rc_style_new();
+    gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+    rcstyle->xthickness = 0;
+    rcstyle->ythickness = 0;
+    gtk_widget_modify_style(term->button, rcstyle);
+    gtk_rc_style_unref(rcstyle);
+    gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
+    term->label_edit = gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry)));
+    gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
+    gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
+    gtk_widget_show_all(term->label);
+    g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->hbox, term->label);
+#endif
+#if !SCROLLBAR_LEFT && !SCROLLBAR_RIGHT
+    gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->vte, term->label);
+#endif
+#endif /* TAB_CLOSE_BUTTON */
+
+#if !TAB_CLOSE_BUTTON
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
     gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->hbox, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
 #endif
 #if !SCROLLBAR_LEFT && !SCROLLBAR_RIGHT
     gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term->vte, gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry))));
 #endif
+#endif /* !TAB_CLOSE_BUTTON */
   gtk_widget_destroy(dialog);
 }
 #endif /* MENU_TAB_EDIT_LABEL */
@@ -2290,6 +2373,24 @@ static void add_tab()
     label = NULL;
 #endif
 
+#if TAB_CLOSE_BUTTON
+  term->label = gtk_hbox_new(0, 0);
+  term->button = gtk_button_new();
+  GtkWidget *img_button = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+  GtkRcStyle *rcstyle = gtk_rc_style_new();
+  gtk_button_set_image(GTK_BUTTON(term->button), img_button);
+  rcstyle->xthickness = 0;
+  rcstyle->ythickness = 0;
+  gtk_widget_modify_style(term->button, rcstyle);
+  gtk_rc_style_unref(rcstyle);
+  gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
+  term->label_edit = label;
+  gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
+  gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
+  gtk_widget_show_all(term->label);
+  g_signal_connect(term->button, "clicked", G_CALLBACK(button_clicked), term->button);
+#endif
+
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   term->hbox = gtk_hbox_new(0, 0);
 #endif
@@ -2472,10 +2573,10 @@ static void add_tab()
 
 #if TAB_LABEL_INIT
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term->hbox, label);
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term->hbox, VTE_LABEL);
 #endif
 #if !SCROLLBAR_LEFT && !SCROLLBAR_RIGHT
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term->vte, label);
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), term->vte, VTE_LABEL);
 #endif
 #endif
 
@@ -2583,7 +2684,29 @@ static void add_tab()
   gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
 }
 
-static void del_tab(int do_close_dialog)
+#if TAB_CLOSE_BUTTON
+static void button_clicked(GtkWidget *widget, void *data)
+{
+  int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
+  int i = 0;
+  int killed = 0;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+    if (data == term->button) {
+      gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i);
+      del_tab(NULL, DO_CLOSE_DIALOG);
+      killed = i;
+    }
+  }
+  if (killed < index)
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index - 1);
+  else
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+}
+#endif
+
+static void del_tab(GtkWidget *widget, int do_close_dialog)
 {
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 

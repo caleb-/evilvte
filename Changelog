@@ -1,11 +1,16 @@
+0.4.4~pre3
+ * Support TAB_CLOSE_BUTTON
+
 0.4.4~pre2
  * Support TAB_REORDERABLE
- * Support command line -r option to run in root window
- * Support command line -h option to show help messages
- * Support command line -2 to -9 options to set initial tab numbers
  * Fix a switch-page bug
  * Always handle delete_event, aka program closing event
  * Disable tab label auto-resorting
+
+0.4.4~pre1
+ * Support command line -r option to run in root window
+ * Support command line -h option to show help messages
+ * Support command line -2 to -9 options to set initial tab numbers
  * Remove TAB_INITIAL_NUMBER
  * Make icons smaller, and update their copyright to year 2008 with permission
    from the author, Tetralet <tetralet AT gmail DOT com>
@@ -13,10 +18,12 @@
  * Simplify Makefile and configure
 
 0.4.3
- * Fix Segmentation fault when closing program
-   Please enable CLOSE_SAFELY or CLOSE_DIALOG
  * Support PROGRAM_ALWAYS_ON_TOP
  * Support CTRL_TOGGLE_ON_TOP and "Toggle always on top" item in menu
+
+0.4.3~pre1
+ * Fix Segmentation fault when closing program
+   Please enable CLOSE_SAFELY or CLOSE_DIALOG
 
 0.4.2
  * Clarify licenses
@@ -176,14 +183,12 @@
 0.2.3
  * New option TABBAR
  * Support TAB_SHOW_INFO_AT_TITLE
- * Remove TAB_REORDERABLE
  * Fix a CLOSE_SAFELY bug for i386 architecture
  * Fix a statusbar size bug
  * Add a .desktop file
  * New icon with BSD License, misc/evilvte.xpm
 
 0.2.2
- * Support TAB_REORDERABLE
  * Support TABBAR_MENU_SELECT_TAB
  * Support TABBAR_SCROLLABLE
  * Support tabbar at bottom, left, right, and top
