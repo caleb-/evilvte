@@ -49,10 +49,15 @@ if [ "$COMMAND_TAB_NUMBERS" != "" ]; then
   COMMAND_ENABLED=1
 fi
 
+COMMAND_SET_TITLE=`grep COMMAND_SET_TITLE src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+if [ "$COMMAND_SET_TITLE" != "" ]; then
+  COMMAND_SET_TITLE=1
+fi
+
 if [ "$COMMAND_ENABLED" = "0" ]; then
-  head -n 10 misc/manpage.1 | grep -v options > misc/evilvte.1
+  head -n 9 misc/manpage.1 | grep -v options > misc/evilvte.1
 else
-  head -n 11 misc/manpage.1 > misc/evilvte.1
+  head -n 10 misc/manpage.1 > misc/evilvte.1
 fi
 
 if [ "$COMMAND_AT_ROOT_WINDOW" != "" ]; then
@@ -77,6 +82,10 @@ fi
 
 if [ "$COMMAND_TAB_NUMBERS" != "" ]; then
   grep '^.\\" 2 ' misc/manpage.1 | sed 's/^.\\" 2 //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_SET_TITLE" != "" ]; then
+  grep '^.\\" T ' misc/manpage.1 | sed 's/^.\\" T //' >> misc/evilvte.1
 fi
 
 tail -n 4 misc/manpage.1 >> misc/evilvte.1

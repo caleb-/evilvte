@@ -1,3 +1,8 @@
+0.4.4~pre4
+ * Support command line -title option to assign program title
+ * Use g_get_current_dir() instead of g_getenv("PWD") to decide current path
+   Thanks to Bruno Vieira <mail AT bmpvieira DOT com> for reporting this issue.
+
 0.4.4~pre3
  * Support TAB_CLOSE_BUTTON
 

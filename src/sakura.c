@@ -59,7 +59,7 @@
 #endif
 
 #ifndef DEFAULT_DIRECTORY
-#define DEFAULT_DIRECTORY g_getenv("PWD")
+#define DEFAULT_DIRECTORY g_get_current_dir()
 #endif
 
 #ifndef RECORD_LASTLOG
@@ -604,6 +604,18 @@ int tabbar_status = 0;
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "evilvte"
 #endif
+#endif
+
+#if COMMAND_SET_TITLE
+#ifndef PROGRAM_NAME
+#define PROGRAM_NAME "evilvte"
+#endif
+#define VTE_PROGRAM_NAME program_name
+char program_name[64];
+#endif
+
+#if !COMMAND_SET_TITLE
+#define VTE_PROGRAM_NAME PROGRAM_NAME
 #endif
 
 #ifdef COLOR_BACKGROUND
@@ -1261,7 +1273,6 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
           rcstyle->ythickness = 0;
           gtk_widget_modify_style(term->button, rcstyle);
           gtk_rc_style_unref(rcstyle);
-          gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
           term->label_edit = gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry)));
           gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
           gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
@@ -1917,7 +1928,6 @@ static void do_edit_label()
     rcstyle->ythickness = 0;
     gtk_widget_modify_style(term->button, rcstyle);
     gtk_rc_style_unref(rcstyle);
-    gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
     term->label_edit = gtk_label_new(gtk_entry_get_text(GTK_ENTRY(entry)));
     gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
     gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
@@ -2383,7 +2393,6 @@ static void add_tab()
   rcstyle->ythickness = 0;
   gtk_widget_modify_style(term->button, rcstyle);
   gtk_rc_style_unref(rcstyle);
-  gtk_button_set_relief(GTK_BUTTON(term->button), GTK_RELIEF_NONE);
   term->label_edit = label;
   gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
   gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
@@ -2824,10 +2833,10 @@ static void switch_page()
 #if TAB_SHOW_INFO_AT_TITLE
   int index = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook));
   if (index == 1)
-    gtk_window_set_title(GTK_WINDOW(main_window), PROGRAM_NAME);
+    gtk_window_set_title(GTK_WINDOW(main_window), VTE_PROGRAM_NAME);
   else {
     char tabtitle[64];
-    sprintf(tabtitle, "%s - tab %d of %d", PROGRAM_NAME, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)) + 1, index);
+    sprintf(tabtitle, "%s - tab %d of %d", VTE_PROGRAM_NAME, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)) + 1, index);
     gtk_window_set_title(GTK_WINDOW(main_window), tabtitle);
   }
 #endif
@@ -2848,6 +2857,12 @@ int main(int argc, char **argv)
       }
     }
   }
+#endif
+
+#if COMMAND_SET_TITLE
+  sprintf(program_name, "%s", PROGRAM_NAME);
+  if (argc > 2 && !strcmp(argv[1], "-title"))
+    sprintf(program_name, "%s", argv[2]);
 #endif
 
 #if COMMAND_SHOW_VERSION
@@ -2881,6 +2896,9 @@ int main(int argc, char **argv)
 #endif
 #if COMMAND_TAB_NUMBERS
     printf("\t-2 to -9              \tspecifies the initial tab numbers\n");
+#endif
+#if COMMAND_SET_TITLE
+    printf("\t-title [string]       \tset program title\n");
 #endif
 #ifdef BACKGROUND_IMAGE
     printf("\nBackground image:\n\t$HOME/%s\n", BACKGROUND_IMAGE);
@@ -2917,7 +2935,7 @@ int main(int argc, char **argv)
 #endif
 
 #if SHOW_WINDOW_TITLE
-  gtk_window_set_title(GTK_WINDOW(main_window), PROGRAM_NAME);
+  gtk_window_set_title(GTK_WINDOW(main_window), VTE_PROGRAM_NAME);
 #endif
 
 #if SHOW_WINDOW_ICON

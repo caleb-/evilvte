@@ -1,4 +1,4 @@
-/* Use // to comment out options                                              */
+/* Use // to disable options                                                  */
 
 #define    BACKGROUND_IMAGE       ".config/evilvte/background.png"
 // #define BACKGROUND_SATURATION  0.4
@@ -21,6 +21,7 @@
 // #define COLOR_TEXT_HIGHLIGHTED "green"
 // #define COMMAND_AT_ROOT_WINDOW TRUE  /* -r option, run in root window      */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
+// #define COMMAND_SET_TITLE      TRUE  /* -title option, set program title   */
 // #define COMMAND_SHOW_HELP      TRUE  /* -h option, show help               */
 #define    COMMAND_SHOW_OPTIONS   TRUE  /* -o option, show build-time options */
 #define    COMMAND_SHOW_VERSION   TRUE  /* -v option, show program version    */
