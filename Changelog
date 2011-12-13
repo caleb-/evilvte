@@ -1,21 +1,18 @@
-0.4.4.2
- * Fix an CLOSE_DIALOG bug which could destroy the program by accident.
-   Thanks to an anonymous guest.
-   (http://hyperrate.com/thread.php?tid=11916#11916)
- * Do not remove src/config.o in "make clean"
- * Support "make distclean"
-
-0.4.4.1
+0.4.5~pre1
  * Support command line -T option to assign program title.
    You may use -title as before.
+ * Detect VTE version and disable unsupported options automatically.
+ * Support VTE_DISABLE_DEPRECATED
+   You may use deprecated VTE functions that were disabled in evilvte 0.4.4.
+ * Support environment variable EVILVTE=min to build a minimal usable terminal.
+ * Disable deprecated GLib, GDK and GTK+ functions.
 
 0.4.4
  * Disable deprecated VTE functions if VTE version >= 0.19.4
-   Latest VTE no longer supports ANTI_ALIAS associated options.
 
 0.4.4~pre10
  * Support CTRL_ALT
-   If you enable it, all hotkeys will become Ctrl + Alt + hotkey(s). 
+   If you enable it, all hotkeys will become Ctrl + Alt + hotkey(s).
  * Cosmetic minor changes
 
 0.4.4~pre9

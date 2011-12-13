@@ -50,12 +50,16 @@ if [ $? != 0 ]; then
   exit
 else
   echo Prefix: [1m[33m$prefix[m
-  echo System is SUSE: $SUSE_DETECTED | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
-  echo Configuration:
-  sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
-  echo
-  echo Please edit [1m[33msrc/config.h[m to customize your options.
-  echo
+  if [ "$EVILVTE" != "" ]; then
+    echo Configuration:[1m[31m $EVILVTE [m| sed -e 's/ min / minimum /' -e 's/ max / maximum /'
+  else
+    echo System is SUSE: $SUSE_DETECTED | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
+    echo Configuration:
+    sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
+    echo
+    echo Please edit [1m[33msrc/config.h[m to customize your options.
+    echo
+  fi
 fi
 
 bindir=$prefix/bin
@@ -78,7 +82,7 @@ echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
 echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
 echo "ICON_DIR=$ICON_DIR" >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
-echo "LDLIBS=-L/usr/local/lib -lvte -lgtk-x11-2.0" >> src/config.o
+echo "LDLIBS=-L/usr/local/lib -lvte" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> src/config.o
 echo "SUSE_DETECTED=$SUSE_DETECTED" >> src/config.o

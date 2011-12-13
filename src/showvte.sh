@@ -12,7 +12,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
+# Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
 
 SHOWVTE_PROG_NAME=`grep PROGRAM_NAME src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | sed 's/"//g'`
 if [ "$SHOWVTE_PROG_NAME" = "" ]; then
@@ -27,6 +27,11 @@ else
 fi
 
 echo echo Configuration of $SHOWVTE_PROG_NAME $SHOWVTE_VERSION:
+
+if [ "$EVILVTE" = "min" ]; then
+  echo echo [1m[31mDisable everything.[m
+  echo exit
+fi
 
 exit
 

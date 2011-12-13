@@ -12,7 +12,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
+# Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
 
 COMMAND_ENABLED=0
 
@@ -95,3 +95,8 @@ if [ "$COMMAND_SET_TITLE" != "" ]; then
 fi
 
 tail -n 4 misc/manpage.1 >> misc/evilvte.1
+
+if [ "$EVILVTE" = "min" ]; then
+  head -n 9 misc/manpage.1 | grep -v options > misc/evilvte.1
+  tail -n 4 misc/manpage.1 >> misc/evilvte.1
+fi

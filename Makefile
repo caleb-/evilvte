@@ -6,6 +6,14 @@ OBJ=src/sakura.o
 
 CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\" -DEVILVTE_VERSION=\"$(EVILVTE_VERSION)\"
 
+ifneq (,$(findstring min,$(EVILVTE)))
+	CFLAGS += -DEVILVTE_MINIMUM=1
+endif
+
+ifneq (,$(findstring max,$(EVILVTE)))
+        CFLAGS += -DEVILVTE_MAXIMUM=1
+endif
+
 ifeq ($(SUSE_DETECTED),TRUE)
 CFLAGS += -DSUSE_DETECTED=1
 endif
@@ -53,12 +61,9 @@ installstrip: strip
 	install -m 644 misc/evilvte.desktop $(deskdir)
 
 clean: src/config.o
-	rm -f $(PROG) src/showvte src/sakura.o src/evilvte.h misc/evilvte.1
-
-distclean: clean
-	rm -f src/*.o
+	rm -f $(PROG) src/showvte src/*.o src/evilvte.h misc/evilvte.1 src/max.h
 
 src/config.o:
 	./configure
 
-.PHONY: all evilvte strip showvte install installstrip clean distclean
+.PHONY: all evilvte strip showvte install installstrip clean

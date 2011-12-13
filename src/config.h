@@ -157,3 +157,5 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "Character Encoding"
 // #define LABEL_SUBMENU_IME            "Input Methods"
+
+// #define VTE_DISABLE_DEPRECATED       TRUE

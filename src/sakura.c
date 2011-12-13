@@ -24,6 +24,10 @@
  * Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  */
 
+#define G_DISABLE_DEPRECATED   TRUE
+#define GDK_DISABLE_DEPRECATED TRUE
+#define GTK_DISABLE_DEPRECATED TRUE
+
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
 #include <vte/vte.h>
@@ -44,29 +48,59 @@
 #define TOP    2
 #define BOTTOM 3
 
+#if !EVILVTE_MINIMUM && !EVILVTE_MAXIMUM
 #include "config.h"
 #include "evilvte.h"
-
-#if VTE_MINOR_VERSION >= 19 && VTE_MICRO_VERSION >= 4
-#define VTE_VERSION_NEW 1
 #endif
 
-#if VTE_MAJOR_VERSION >= 1
-#undef VTE_VERSION_NEW
-#define VTE_VERSION_NEW 1
+#if EVILVTE_MAXIMUM
+#include "maximum.h"
+#include "max.h"
 #endif
 
-#if VTE_VERSION_NEW
+#ifndef VTE_CHECK_VERSION
+#define VTE_CHECK_VERSION(major,minor,micro) \
+  (VTE_MAJOR_VERSION > (major) || \
+  (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION > (minor)) || \
+  (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION == (minor) && VTE_MICRO_VERSION >= (micro)))
+#endif
+
+#if !VTE_CHECK_VERSION(0,11,0)
+#undef BACKGROUND_SCROLLABLE
+#undef BACKGROUND_TINT_COLOR
+#undef CTRL_COLOR_BACKGROUND
+#undef MENU_COLOR_BACKGROUND
+#endif
+
+#if !VTE_CHECK_VERSION(0,11,11)
+#undef COLOR_TEXT_HIGHLIGHTED
+#undef CURSOR_COLOR
+#define DISABLE_ANTI_ALIAS 1
+#endif
+
+#if !VTE_CHECK_VERSION(0,16,0)
+#undef CTRL_SELECT_ALL
+#undef MENU_SELECT_ALL
+#endif
+
+#if VTE_DISABLE_DEPRECATED
+#if VTE_CHECK_VERSION(0,19,1)
+#define DISABLE_ANTI_ALIAS 1
+#endif
+#endif
+
+#if DISABLE_ANTI_ALIAS
 #undef FONT_ANTI_ALIAS
 #undef CTRL_TOGGLE_ANTI_ALIAS
 #undef MENU_TOGGLE_ANTI_ALIAS
+#endif
+
 #ifdef CURSOR_BLINKS
 #if CURSOR_BLINKS
 #define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_ON
 #endif
 #if !CURSOR_BLINKS
 #define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
-#endif
 #endif
 #endif
 
@@ -748,7 +782,7 @@ static int label_style_size = sizeof(label_style_custom) / sizeof(label_style_cu
 #if TAB_LABEL_POEM
 #undef TAB_LABEL
 #define TAB_LABEL_INIT 1
-/* Taken from http://zh.wikipedia.org/wiki/%E5%8D%83%E5%AD%97%E6%96%87 */
+/* Taken from http://zh.wikipedia.org/wiki/千字文 */
 static char *label_style_poem[] = {
 "天", "地", "玄", "黃", "宇", "宙", "洪", "荒",
 "日", "月", "盈", "昃", "辰", "宿", "列", "張",
@@ -1023,7 +1057,7 @@ char *matched_url = (char*)NULL;
 #endif
 
 #ifdef MATCH_STRING
-#if VTE_VERSION_NEW
+#if VTE_CHECK_VERSION(0,17,1)
 GRegex *regex;
 GRegexMatchFlags flags = 0;
 #endif
@@ -1066,7 +1100,7 @@ static void change_statusbar_encoding();
 static void add_tab();
 static void button_clicked(GtkWidget *widget, void *data);
 static void del_tab(GtkWidget *widget, int do_close_dialog);
-static gboolean delete_event();
+static void delete_event();
 static void do_always_on_top();
 static void do_change_saturation();
 static void do_clear();
@@ -1899,7 +1933,7 @@ static void change_statusbar_encoding()
 }
 #endif
 
-static gboolean delete_event()
+static void delete_event()
 {
 #if CLOSE_DIALOG && TAB
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1) {
@@ -1928,7 +1962,7 @@ static gboolean delete_event()
 #endif
     } else {
       gtk_widget_destroy(dialog);
-      return TRUE;
+      return;
     }
   }
 #endif
@@ -1942,7 +1976,6 @@ static gboolean delete_event()
 #if !TAB
   del_tab(NULL, DO_CLOSE_DIALOG);
 #endif
-  return FALSE;
 }
 
 #if MENU_TOGGLE_ON_TOP
@@ -2570,10 +2603,10 @@ static void add_tab()
 #endif
 
 #ifdef MATCH_STRING
-#if !VTE_VERSION_NEW
+#if !VTE_CHECK_VERSION(0,17,1)
   vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_STRING);
 #endif
-#if VTE_VERSION_NEW
+#if VTE_CHECK_VERSION(0,17,1)
   vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), regex, flags);
 #endif
 #endif
@@ -2671,10 +2704,10 @@ static void add_tab()
 #endif
 
 #ifdef CURSOR_BLINKS
-#if !VTE_VERSION_NEW
+#if !VTE_CHECK_VERSION(0,17,1)
   vte_terminal_set_cursor_blinks(VTE_TERMINAL(term->vte), CURSOR_BLINKS);
 #endif
-#if VTE_VERSION_NEW
+#if VTE_CHECK_VERSION(0,17,1)
   vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINKS);
 #endif
 #endif
@@ -2684,7 +2717,7 @@ static void add_tab()
 #endif
 
 #ifdef FONT
-#if !VTE_VERSION_NEW
+#if !DISABLE_ANTI_ALIAS
 #if INT_ANTI_ALIAS_STATUS
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, antialias_status);
 #endif
@@ -2692,7 +2725,7 @@ static void add_tab()
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, VTE_ANTI_ALIAS);
 #endif
 #endif
-#if VTE_VERSION_NEW
+#if DISABLE_ANTI_ALIAS
   vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
 #endif
 #endif
@@ -3061,7 +3094,7 @@ int main(int argc, char **argv)
   main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 #ifdef MATCH_STRING
-#if VTE_VERSION_NEW
+#if VTE_CHECK_VERSION(0,17,1)
   regex = g_regex_new(MATCH_STRING, 0, 0, NULL);
 #endif
 #endif
@@ -3261,13 +3294,13 @@ int main(int argc, char **argv)
   menu = gtk_menu_new();
 #ifdef MENU_MATCH_STRING_EXEC
   match_open = gtk_image_menu_item_new_from_stock(GTK_STOCK_OPEN, NULL);
-  gtk_menu_append(menu, match_open);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), match_open);
   g_signal_connect(match_open, "activate", do_match_open, NULL);
   match_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
-  gtk_menu_append(menu, match_copy);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), match_copy);
   g_signal_connect(match_copy, "activate", do_match_copy, NULL);
   match_item = gtk_separator_menu_item_new();
-  gtk_menu_append(menu, match_item);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), match_item);
 #ifdef MENU_CUSTOM
   menu_item_success += 100;
 #endif
@@ -3284,7 +3317,7 @@ int main(int argc, char **argv)
 #if MENU_COPY
     if (menu_custom[m] == "Copy") {
       GtkWidget *menu_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
-      gtk_menu_append(menu, menu_copy);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_copy);
       g_signal_connect(menu_copy, "activate", do_copy, NULL);
       menu_item_success++;
     }
@@ -3293,7 +3326,7 @@ int main(int argc, char **argv)
 #if MENU_PASTE
     if (menu_custom[m] == "Paste") {
       GtkWidget *menu_paste = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, NULL);
-      gtk_menu_append(menu, menu_paste);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_paste);
       g_signal_connect(menu_paste, "activate", do_paste, NULL);
       menu_item_success++;
     }
@@ -3302,7 +3335,7 @@ int main(int argc, char **argv)
 #if MENU_SELECT_ALL
     if (menu_custom[m] == "Select_all") {
       GtkWidget *menu_select_all = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_ALL, NULL);
-      gtk_menu_append(menu, menu_select_all);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_select_all);
       g_signal_connect(menu_select_all, "activate", do_select_all, NULL);
       menu_item_success++;
     }
@@ -3311,7 +3344,7 @@ int main(int argc, char **argv)
 #if MENU_TAB_ADD
     if (menu_custom[m] == "Add tab") {
       GtkWidget *menu_add_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_ADD, NULL);
-      gtk_menu_append(menu, menu_add_tab);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_add_tab);
       g_signal_connect(menu_add_tab, "activate", add_tab, NULL);
       menu_item_success++;
     }
@@ -3320,7 +3353,7 @@ int main(int argc, char **argv)
 #if MENU_TAB_REMOVE
     if (menu_custom[m] == "Remove tab") {
       GtkWidget *menu_close_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_REMOVE, NULL);
-      gtk_menu_append(menu, menu_close_tab);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_close_tab);
       g_signal_connect(menu_close_tab, "activate", G_CALLBACK(del_tab), (int*)DO_CLOSE_DIALOG);
       menu_item_success++;
     }
@@ -3329,7 +3362,7 @@ int main(int argc, char **argv)
 #if MENU_TAB_EDIT_LABEL
     if (menu_custom[m] == "Edit label") {
       GtkWidget *menu_edit_label = gtk_image_menu_item_new_from_stock(GTK_STOCK_EDIT, NULL);
-      gtk_menu_append(menu, menu_edit_label);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_edit_label);
       g_signal_connect(menu_edit_label, "activate", do_edit_label, NULL);
       menu_item_success++;
     }
@@ -3338,7 +3371,7 @@ int main(int argc, char **argv)
 #if MENU_OPEN_NEW_WINDOW
     if (menu_custom[m] == "New window") {
       GtkWidget *menu_new_window = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
-      gtk_menu_append(menu, menu_new_window);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_new_window);
       g_signal_connect(menu_new_window, "activate", do_new_window, NULL);
       menu_item_success++;
     }
@@ -3347,7 +3380,7 @@ int main(int argc, char **argv)
 #if MENU_QUIT
     if (menu_custom[m] == "Quit") {
       GtkWidget *menu_quit = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL);
-      gtk_menu_append(menu, menu_quit);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_quit);
 #if CLOSE_SAFELY || CLOSE_DIALOG
       g_signal_connect(menu_quit, "activate", delete_event, NULL);
 #endif
@@ -3361,7 +3394,7 @@ int main(int argc, char **argv)
 #if MENU_FONT_BIGGER
     if (menu_custom[m] == "Zoom in") {
       GtkWidget *menu_zoom_in = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
-      gtk_menu_append(menu, menu_zoom_in);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_zoom_in);
       g_signal_connect(menu_zoom_in, "activate", do_zoom_in, NULL);
       menu_item_success++;
     }
@@ -3370,7 +3403,7 @@ int main(int argc, char **argv)
 #if MENU_FONT_SMALLER
     if (menu_custom[m] == "Zoom out") {
       GtkWidget *menu_zoom_out = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
-      gtk_menu_append(menu, menu_zoom_out);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_zoom_out);
       g_signal_connect(menu_zoom_out, "activate", do_zoom_out, NULL);
       menu_item_success++;
     }
@@ -3379,7 +3412,7 @@ int main(int argc, char **argv)
 #if MENU_FONT_DEFAULT_SIZE
     if (menu_custom[m] == "Zoom default") {
       GtkWidget *menu_zoom_100 = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
-      gtk_menu_append(menu, menu_zoom_100);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_zoom_100);
       g_signal_connect(menu_zoom_100, "activate", do_zoom_100, NULL);
       menu_item_success++;
     }
@@ -3388,7 +3421,7 @@ int main(int argc, char **argv)
 #if MENU_RESET_TERMINAL
     if (menu_custom[m] == "Reset terminal") {
       GtkWidget *menu_reset = gtk_image_menu_item_new_from_stock(GTK_STOCK_REFRESH, NULL);
-      gtk_menu_append(menu, menu_reset);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_reset);
       g_signal_connect(menu_reset, "activate", do_reset, NULL);
       menu_item_success++;
     }
@@ -3397,7 +3430,7 @@ int main(int argc, char **argv)
 #if MENU_RESET_AND_CLEAR
     if (menu_custom[m] == "Reset and clear") {
       GtkWidget *menu_clear = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLEAR, NULL);
-      gtk_menu_append(menu, menu_clear);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_clear);
       g_signal_connect(menu_clear, "activate", do_clear, NULL);
       menu_item_success++;
     }
@@ -3406,7 +3439,7 @@ int main(int argc, char **argv)
 #if MENU_FONT_SELECT
     if (menu_custom[m] == "Select font") {
       GtkWidget *menu_font = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT, NULL);
-      gtk_menu_append(menu, menu_font);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_font);
       g_signal_connect(menu_font, "activate", do_select_font, NULL);
       menu_item_success++;
     }
@@ -3417,7 +3450,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_on_top = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_ON_TOP);
       GtkWidget *image_toggle_on_top = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_on_top), image_toggle_on_top);
-      gtk_menu_append(menu, menu_toggle_on_top);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_on_top);
       g_signal_connect(menu_toggle_on_top, "activate", do_always_on_top, NULL);
       menu_item_success++;
     }
@@ -3428,7 +3461,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_bg = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_BG);
       GtkWidget *image_toggle_bg = gtk_image_new_from_stock(GTK_STOCK_DND_MULTIPLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_bg), image_toggle_bg);
-      gtk_menu_append(menu, menu_toggle_bg);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_bg);
       g_signal_connect(menu_toggle_bg, "activate", do_toggle_bg, NULL);
       menu_item_success++;
     }
@@ -3439,7 +3472,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_hotkeys = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_HOTKEYS);
       GtkWidget *image_toggle_hotkeys = gtk_image_new_from_stock(GTK_STOCK_DIALOG_AUTHENTICATION, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_hotkeys), image_toggle_hotkeys);
-      gtk_menu_append(menu, menu_toggle_hotkeys);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_hotkeys);
       g_signal_connect(menu_toggle_hotkeys, "activate", do_toggle_hotkeys, NULL);
       menu_item_success++;
     }
@@ -3451,7 +3484,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_scrollbar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_SCROLLBAR);
       GtkWidget *image_toggle_scrollbar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_scrollbar), image_toggle_scrollbar);
-      gtk_menu_append(menu, menu_toggle_scrollbar);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_scrollbar);
       g_signal_connect(menu_toggle_scrollbar, "activate", do_toggle_scrollbar, NULL);
       menu_item_success++;
     }
@@ -3463,7 +3496,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_status_bar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_STATUS_BAR);
       GtkWidget *image_toggle_status_bar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_status_bar), image_toggle_status_bar);
-      gtk_menu_append(menu, menu_toggle_status_bar);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_status_bar);
       g_signal_connect(menu_toggle_status_bar, "activate", do_toggle_status_bar, NULL);
       menu_item_success++;
     }
@@ -3474,7 +3507,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_tabbar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_TABBAR);
       GtkWidget *image_toggle_tabbar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_tabbar), image_toggle_tabbar);
-      gtk_menu_append(menu, menu_toggle_tabbar);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_tabbar);
       g_signal_connect(menu_toggle_tabbar, "activate", do_toggle_tabbar, NULL);
       menu_item_success++;
     }
@@ -3485,7 +3518,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_decorated = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_DECORATED);
       GtkWidget *image_toggle_decorated = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_decorated), image_toggle_decorated);
-      gtk_menu_append(menu, menu_toggle_decorated);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_decorated);
       g_signal_connect(menu_toggle_decorated, "activate", do_toggle_decorated, NULL);
       menu_item_success++;
     }
@@ -3496,7 +3529,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_fullscreen = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_FULLSCREEN);
       GtkWidget *image_toggle_fullscreen = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_fullscreen), image_toggle_fullscreen);
-      gtk_menu_append(menu, menu_toggle_fullscreen);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_fullscreen);
       g_signal_connect(menu_toggle_fullscreen, "activate", do_toggle_fullscreen, NULL);
       menu_item_success++;
     }
@@ -3507,7 +3540,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_toggle_antialias = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_ANTI_ALIAS);
       GtkWidget *image_toggle_antialias = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_antialias), image_toggle_antialias);
-      gtk_menu_append(menu, menu_toggle_antialias);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_antialias);
       g_signal_connect(menu_toggle_antialias, "activate", do_toggle_antialias, NULL);
       menu_item_success++;
     }
@@ -3518,7 +3551,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_change_saturation = gtk_image_menu_item_new_with_label(LABEL_MENU_SATURATION);
       GtkWidget *image_change_saturation = gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_change_saturation), image_change_saturation);
-      gtk_menu_append(menu, menu_change_saturation);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_change_saturation);
       g_signal_connect(menu_change_saturation, "activate", do_menu_saturation, NULL);
       menu_item_success++;
     }
@@ -3529,7 +3562,7 @@ int main(int argc, char **argv)
       GtkWidget *menu_change_tint = gtk_image_menu_item_new_with_label(LABEL_DIALOG_BACKGROUND_TINT);
       GtkWidget *image_change_tint = gtk_image_new_from_stock(GTK_STOCK_SELECT_COLOR, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_change_tint), image_change_tint);
-      gtk_menu_append(menu, menu_change_tint);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_change_tint);
       g_signal_connect(menu_change_tint, "activate", do_menu_tint_color, NULL);
       menu_item_success++;
     }
@@ -3538,7 +3571,7 @@ int main(int argc, char **argv)
 #if MENU_SEPARATOR
     if (menu_custom[m] == "Separator") {
       menu_item = gtk_separator_menu_item_new();
-      gtk_menu_append(menu, menu_item);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     }
 #endif
 
@@ -3578,7 +3611,7 @@ int main(int argc, char **argv)
 #if MENU_DEFAULT_ENCODING
         }
 #endif
-        gtk_menu_append(menu, encoding_item[i]);
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), encoding_item[i]);
         g_signal_connect(encoding_item[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
 #ifdef MENU_CUSTOM
         menu_item_success++;
@@ -3596,7 +3629,7 @@ int main(int argc, char **argv)
 #ifndef MENU_CUSTOM
       encoding_item = gtk_menu_item_new_with_label("UTF-8");
 #endif
-      gtk_menu_append(menu, encoding_item);
+      gtk_menu_shell_append(GTK_MENU_SHELL(menu), encoding_item);
       g_signal_connect(encoding_item, "activate", G_CALLBACK(set_encoding), "UTF-8");
 #ifdef MENU_CUSTOM
       menu_item_success++;
@@ -3637,7 +3670,7 @@ int main(int argc, char **argv)
         } else
 #endif
           encoding_sub[i] = gtk_menu_item_new_with_label(encoding[i]);
-        gtk_menu_append(submenu_enc, encoding_sub[i]);
+        gtk_menu_shell_append(GTK_MENU_SHELL(submenu_enc), encoding_sub[i]);
         g_signal_connect(encoding_sub[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
         menu_item_success++;
       }
@@ -3652,7 +3685,7 @@ int main(int argc, char **argv)
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(subitem_enc), image_submenu_enc);
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(subitem_enc), submenu_enc);
       encoding_item = gtk_menu_item_new_with_label("UTF-8");
-      gtk_menu_append(submenu_enc, encoding_item);
+      gtk_menu_shell_append(GTK_MENU_SHELL(submenu_enc), encoding_item);
       g_signal_connect(encoding_item, "activate", G_CALLBACK(set_encoding), "UTF-8");
       menu_item_success++;
     }
