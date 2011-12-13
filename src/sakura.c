@@ -259,6 +259,13 @@ ENCODING_LIST
 };
 #endif /* ENCODING_LIST */
 
+#if EXECUTE_COMMAND
+#define VTE_DEFAULT_COMMAND default_command
+char default_command[32];
+#else
+#define VTE_DEFAULT_COMMAND DEFAULT_COMMAND
+#endif
+
 #if MENU_INPUT_METHOD
 #undef SHOW_MENU /* undefine it here to prevent duplicated definition warning */
 #define SHOW_MENU TRUE
@@ -551,10 +558,21 @@ void sakura_add_tab()
   gtk_box_pack_start(GTK_BOX(term.hbox), term.scrollbar, FALSE, FALSE, 0);
 #endif
 
+#if EXECUTE_COMMAND
+#if TAB
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 0)
+    sprintf(default_command, "%s", DEFAULT_COMMAND);
+#endif
+#endif
+
 #if CLOSE_SAFE
-  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+  term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 #else
-  vte_terminal_fork_command(VTE_TERMINAL(term.vte), DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+  vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
+#endif
+
+#ifdef EMULATION_TYPE
+  vte_terminal_set_emulation(VTE_TERMINAL(term.vte), EMULATION_TYPE);
 #endif
 
 #ifdef ALLOW_BOLD
@@ -812,6 +830,13 @@ int main(int argc, char **argv)
     printf("%s, version %s\n", SHOW_WINDOW_TITLE, EVILVTE_VERSION);
     return 0;
   }
+#endif
+
+#if EXECUTE_COMMAND
+  if (argc > 2 && !strcmp(argv[1], "-e"))
+    sprintf(default_command, "%s", argv[2]);
+  else
+    sprintf(default_command, "%s", DEFAULT_COMMAND);
 #endif
 
 #ifdef DEFAULT_FONT

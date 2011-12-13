@@ -1,3 +1,8 @@
+0.2.1
+ * Support EMULATION_TYPE
+ * Support a very simple EXECUTE_COMMAND function
+   You can use command line -e option to run applications
+
 0.2.0
  * Support hotkey for copy to clipboard and paste from clipboard
 

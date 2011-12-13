@@ -36,12 +36,14 @@
 // #define ANTI_ALIAS             VTE_ANTI_ALIAS_USE_DEFAULT
 // #define ANTI_ALIAS             VTE_ANTI_ALIAS_FORCE_ENABLE
 // #define ANTI_ALIAS             VTE_ANTI_ALIAS_FORCE_DISABLE
+// #define EMULATION_TYPE         "xterm"
 // #define ENABLE_LASTLOG         TRUE
 // #define ENABLE_UTMP            TRUE
 // #define ENABLE_WTMP            TRUE
 // #define ENCODING_LIST_DEFAULT  TRUE /* Support "Default" in ENCODING_LIST */
 // #define ENCODING_LIST          "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
 #define    ENCODING_LIST          "UTF-8" /* Right click to switch encoding */
+// #define EXECUTE_COMMAND        TRUE /* Command line -e option */
 // #define FONT_CHANGE_SIZE       TRUE /* Change font size with hotkey */
 // #define MENU_INPUT_METHOD      TRUE
 // #define MOUSE_AUTOHIDE         TRUE
