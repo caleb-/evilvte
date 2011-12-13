@@ -1,3 +1,9 @@
+0.4.9
+ * Fix makefile parallelization
+   Thanks to Thomas Weißschuh <thomas_weissschuh AT lavabit DOT com>
+ * Use GTK_FONT_CHOOSER_DIALOG for GTK+ version >= 3.1.12
+ * Expand VTE widget in GtkGrid
+
 0.4.9~pre5
  * Support GtkGrid
  * Fix an SCROLLBAR minor bug with option OFF_L and OFF_R

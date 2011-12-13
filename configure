@@ -146,6 +146,7 @@ GNOME_DEF_APP=$prefix/share/gnome-control-center/default-apps
 EVILVTE_VERSION=`head -n 1 ChangeLog`
 
 echo "VTEINC=$VTEINC" >> src/config.o
+# sed -i 's/-pthread//' src/config.o
 echo "LIBS_VTE=$LIBS_VTE" >> src/config.o
 echo "LIBS_VTE_L=$LIBS_VTE_L" >> src/config.o
 echo "prefix=$prefix" >> src/config.o

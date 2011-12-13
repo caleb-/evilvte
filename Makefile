@@ -10,8 +10,10 @@ endif
 
 CFLAGS += $(OPTFLAGS) $(VTEINC)
 
-evilvte: src/evilvte.h src/evilvte.o
+evilvte: src/evilvte.o
 	$(CC) $(LDFLAGS) src/evilvte.o $(LDLIBS) -o src/$(PROG)
+
+src/evilvte.o: src/evilvte.h
 
 prepare:
 	rm -f src/custom.h src/evilvte.h src/evilvte.o
