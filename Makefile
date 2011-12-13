@@ -1,9 +1,6 @@
-all: evilvte evilvtab
+all: evilvte
 
 evilvte:
-	$(MAKE) -C src $@
-
-evilvtab:
 	$(MAKE) -C src $@
 
 install:

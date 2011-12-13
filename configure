@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PROGS="evilvte evilvtab"
+PROGS=evilvte
 
 if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
   echo
@@ -60,8 +60,6 @@ fi
 
 bindir=$prefix/bin
 
-EVILVTE_VERSION=`head -n 1 Changelog`
-
 if [ $prefix = /usr ]; then
   echo OPTFLAGS=-O >> config.mak
 fi
@@ -74,5 +72,4 @@ echo "bindir=\$(DESTDIR)$bindir" >> config.mak
 # echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> config.mak
 echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgobject-2.0 -lglib-2.0 >> config.mak
 echo "SO_FLAGS=$SO_FLAGS" >> config.mak
-echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> config.mak
 echo "PROGS=$PROGS" >> config.mak

@@ -1,3 +1,7 @@
+0.0.9
+ * Remove switch_page_routine()
+ * Set notebook borders only once
+
 0.0.8
  * Fix WINDOW_BORDER -> SHOW_WINDOW_BORDER
 
@@ -24,5 +28,6 @@
  * Initial release
 
 0.0.1
- * src/evilvtab.c is derived from termit 1.1.3, http://code.google.com/p/termit/
-   Thanks to <ratnikov.ev@gmail.com>
+ * src/evilvte.c is derived from sakura 2.0.1,
+   http://www.pleyades.net/david/sakura.php
+   Thanks to David Gómez <david@pleyades.net>
