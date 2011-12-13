@@ -9,7 +9,7 @@
 // #define DELETE_KEY    /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
-// #define BUTTON_ORDER           GTK_RCFILE /* Options: GTK_RCFILE, QT_STYLE */
+// #define BUTTON_ORDER_BY_RCFILE TRUE
 // #define CLOSE_SAFELY           TRUE /* Do not kill background applications */
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
@@ -56,10 +56,12 @@
 // #define MENU_MATCH_STRING_EXEC "firefox"
 // #define      MATCH_STRING      "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
 // #define MENU_CUSTOM            "Copy", "Separator", "Paste", "Separator"
-           /* Options: "Copy", "Paste", "Add tab", "Remove tab", "Edit label",
-            *          "New window", "Zoom in", "Zoom out", "Zoom default",
-            *          "Reset", "Reset and clear", "Select font", "Quit",
-            *          "Separator", "Encoding list", "Input method"           */
+           /* Options: "Copy", "Paste", "Select_all", "Add tab", "Remove tab",
+            *          "Edit label", "New window", "Zoom in", "Zoom out",
+            *          "Zoom default", "Reset", "Reset and clear",
+            *          "Select font", "Separator", "Encoding list",
+            *          "Input method", "Submenu encoding list",
+            *          "Submenu input method", "Toggle background"            */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -87,6 +89,7 @@
 #define    CTRL                   TRUE
 // #define CTRL_COPY              (event->keyval == GDK_C)
 // #define CTRL_PASTE             (event->keyval == GDK_V)
+// #define CTRL_SELECT_ALL        (event->keyval == GDK_S)
 // #define CTRL_EDIT_ENCODING     (event->keyval == GDK_U)
 // #define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
 // #define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
@@ -107,3 +110,8 @@
 // #define CTRL_TAB_EDIT_LABEL    (event->keyval == GDK_E)
 // #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
 // #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background"
+
+// #define LABEL_DEFAULT_ENCODING "Default Encoding"
+// #define LABEL_MENU_TOGGLE_BG   "Toggle background"
+// #define LABEL_SUBMENU_ENCODING "Character Encoding"
+// #define LABEL_SUBMENU_IME      "Input Methods"
