@@ -3,7 +3,7 @@
 #define    BACKGROUND_IMAGE       ".config/evilvte/background.png"
 // #define BACKGROUND_SATURATION  0.4
 // #define BACKGROUND_SCROLLABLE  TRUE
-// #define BACKGROUND_TINT_COLOR  "brown"
+// #define BACKGROUND_TINT_COLOR  "black"
 // #define BACKGROUND_TRANSPARENT TRUE  /* Pseudo transparent background      */
 // #define BACKGROUND_OPACITY     TRUE  /* True transparent background        */
 // #define BACKSPACE_KEY /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
@@ -68,7 +68,8 @@
             *          "Submenu input method", "Toggle background",
             *          "Toggle scrollbar", "Toggle status bar",
             *          "Toggle tabbar", "Toggle window decorated",
-            *          "Toggle anti-alias", "Toggle hotkeys locking"          */
+            *          "Toggle anti-alias", "Toggle hotkeys locking",
+            *          "Adjust saturation", "Background tint"                 */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -97,6 +98,7 @@
 // #define CTRL_COPY              (event->keyval == GDK_C)
 // #define CTRL_PASTE             (event->keyval == GDK_V)
 // #define CTRL_SELECT_ALL        (event->keyval == GDK_S)
+// #define CTRL_COLOR_BACKGROUND  (event->keyval == GDK_B)
 // #define CTRL_EDIT_ENCODING     (event->keyval == GDK_U)
 // #define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
 // #define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
@@ -105,6 +107,7 @@
 // #define CTRL_OPEN_NEW_WINDOW   (event->keyval == GDK_N)
 // #define CTRL_RESET_TERMINAL    (event->keyval == GDK_R)
 // #define CTRL_RESET_AND_CLEAR   (event->keyval == GDK_A)
+// #define CTRL_SATURATION_DIALOG (event->keyval == GDK_X)
 // #define CTRL_SATURATION_MORE   (event->keyval == GDK_KP_Multiply)
 // #define CTRL_SATURATION_LESS   (event->keyval == GDK_KP_Divide)
 #define    CTRL_TAB_ADD           (event->keyval == GDK_T)
@@ -125,7 +128,10 @@
 // #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background", "Opacity"
 
 // #define LABEL_DEFAULT_ENCODING       "Default Encoding"
+// #define LABEL_DIALOG_BACKGROUND_TINT "Background tint color"
 // #define LABEL_DIALOG_CLOSE           "Do you really want to close it?"
+// #define LABEL_DIALOG_SATURATION      "Saturation level"
+// #define LABEL_MENU_SATURATION        "Adjust saturation"
 // #define LABEL_MENU_TOGGLE_ANTI_ALIAS "Toggle anti-alias"
 // #define LABEL_MENU_TOGGLE_BG         "Toggle background"
 // #define LABEL_MENU_TOGGLE_DECORATED  "Toggle window decorated"

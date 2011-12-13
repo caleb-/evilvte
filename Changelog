@@ -1,3 +1,9 @@
+0.4.1
+ * Support CTRL_SATURATION_DIALOG and "Adjust saturation" item in menu
+ * Support CTRL_COLOR_BACKGROUND and "Background tint" item in menu
+ * Parse TOGGLE_BG_ORDER and COLOR_STYLE
+ * Support command line -v option in showvte
+
 0.4.0
  * Support CTRL_TOGGLE_HOTKEYS and "Toggle hotkeys locking" item in menu
    When hotkeys are locked, all evilvte hotkeys will be disabled, execpt

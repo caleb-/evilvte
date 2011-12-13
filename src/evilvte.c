@@ -1,5 +1,8 @@
 #!/bin/sh
 # This is not an C program text
+#
+# Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
+#
 
 cat /dev/null > src/evilvte.h
 rm -f src/evilvte src/sakura.o
@@ -7,6 +10,60 @@ rm -f src/evilvte src/sakura.o
 MENU_DEFAULT_ENCODING=`grep MENU_ENCODING_LIST src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
 if [ "$MENU_DEFAULT_ENCODING" != "" ]; then
   echo \#define MENU_DEFAULT_ENCODING 1 >> src/evilvte.h
+fi
+
+COLOR_STYLE_DEFINE=`grep COLOR_STYLE src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | awk '{print $3}'`
+if [ "$COLOR_STYLE_DEFINE" = "LINUX" ]; then
+  echo \#define COLOR_LINUX 1 >> src/evilvte.h
+fi
+if [ "$COLOR_STYLE_DEFINE" = "RXVT" ]; then
+  echo \#define COLOR_RXVT 1 >> src/evilvte.h
+fi
+if [ "$COLOR_STYLE_DEFINE" = "TANGO" ]; then
+  echo \#define COLOR_TANGO 1 >> src/evilvte.h
+fi
+if [ "$COLOR_STYLE_DEFINE" = "XTERM" ]; then
+  echo \#define COLOR_XTERM 1 >> src/evilvte.h
+fi
+
+TOGGLE_BG_ORDER_DEFINE=`grep TOGGLE_BG_ORDER src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
+  echo \#define TOGGLE_BG_IMAGE 1 >> src/evilvte.h
+  echo \#define TOGGLE_BG_TRANSPARENT 1 >> src/evilvte.h
+  echo \#define TOGGLE_BG_NO_BACKGROUND 1 >> src/evilvte.h
+  echo \#define TOGGLE_BG_OPACITY 1 >> src/evilvte.h
+fi
+
+TOGGLE_BG_IMAGE=`echo $TOGGLE_BG_ORDER_DEFINE | grep Image`
+if [ "$TOGGLE_BG_IMAGE" != "" ]; then
+  echo \#define TOGGLE_BG_IMAGE 1 >> src/evilvte.h
+fi
+
+TOGGLE_BG_TRANSPARENT=`echo $TOGGLE_BG_ORDER_DEFINE | grep Transparent`
+if [ "$TOGGLE_BG_TRANSPARENT" != "" ]; then
+  echo \#define TOGGLE_BG_TRANSPARENT 1 >> src/evilvte.h
+fi
+
+TOGGLE_BG_NO_BACKGROUND=`echo $TOGGLE_BG_ORDER_DEFINE | grep 'No background'`
+if [ "$TOGGLE_BG_NO_BACKGROUND" != "" ]; then
+  echo \#define TOGGLE_BG_NO_BACKGROUND 1 >> src/evilvte.h
+fi
+
+TOGGLE_BG_OPACITY=`echo $TOGGLE_BG_ORDER_DEFINE | grep Opacity`
+if [ "$TOGGLE_BG_OPACITY" != "" ]; then
+  echo \#define TOGGLE_BG_OPACITY 1 >> src/evilvte.h
+fi
+
+CTRL_TOGGLE_BACKGROUND_DEFINE=`grep CTRL_TOGGLE_BACKGROUND src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
+if [ "$CTRL_TOGGLE_BACKGROUND_DEFINE" != "" ]; then
+  if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
+    echo \#undef INIT_OPACITY >> src/evilvte.h
+    echo \#define INIT_OPACITY 1 >> src/evilvte.h
+  fi
+  if [ "$TOGGLE_BG_OPACITY" != "" ]; then
+    echo \#undef INIT_OPACITY >> src/evilvte.h
+    echo \#define INIT_OPACITY 1 >> src/evilvte.h
+  fi
 fi
 
 MENU_CUSTOM_DEFINE=`grep MENU_CUSTOM src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
@@ -24,6 +81,11 @@ fi
 MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep 'Select_all'`
 if [ "$MENU_SELECT_ALL" != "" ]; then
   echo \#define MENU_SELECT_ALL 1 >> src/evilvte.h
+fi
+
+MENU_COLOR_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Background tint'`
+if [ "$MENU_COLOR_BACKGROUND" != "" ]; then
+  echo \#define MENU_COLOR_BACKGROUND 1 >> src/evilvte.h
 fi
 
 MENU_TAB_ADD=`echo $MENU_CUSTOM_DEFINE | grep 'Add tab'`
@@ -99,6 +161,14 @@ fi
 MENU_TOGGLE_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle background'`
 if [ "$MENU_TOGGLE_BACKGROUND" != "" ]; then
   echo \#define MENU_TOGGLE_BACKGROUND 1 >> src/evilvte.h
+  if [ "$TOGGLE_BG_ORDER_DEFINE" = "" ]; then
+    echo \#undef INIT_OPACITY >> src/evilvte.h
+    echo \#define INIT_OPACITY 1 >> src/evilvte.h
+  fi
+  if [ "$TOGGLE_BG_OPACITY" != "" ]; then
+    echo \#undef INIT_OPACITY >> src/evilvte.h
+    echo \#define INIT_OPACITY 1 >> src/evilvte.h
+  fi
 fi
 
 MENU_TOGGLE_HOTKEYS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle hotkeys locking'`
@@ -129,4 +199,9 @@ fi
 MENU_TOGGLE_ANTI_ALIAS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle anti-alias'`
 if [ "$MENU_TOGGLE_ANTI_ALIAS" != "" ]; then
   echo \#define MENU_TOGGLE_ANTI_ALIAS 1 >> src/evilvte.h
+fi
+
+MENU_CHANGE_SATURATION=`echo $MENU_CUSTOM_DEFINE | grep 'Adjust saturation'`
+if [ "$MENU_CHANGE_SATURATION" != "" ]; then
+  echo \#define MENU_CHANGE_SATURATION 1 >> src/evilvte.h
 fi

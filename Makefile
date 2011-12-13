@@ -22,7 +22,8 @@ strip: all
 	strip --remove-section=.comment --remove-section=.note $(PROG)
 
 showvte:
-	head -n 1 src/showvte.c > src/showvte
+	head -n 6 src/showvte.c | grep -v 'This is not an C program text' > src/showvte
+	tail -n 7 src/showvte.c | head -n 6 >> src/showvte
 	sh src/showvte.c >> src/showvte
 	tail -n 1 src/showvte.c >> src/showvte
 	sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ >> src/showvte
