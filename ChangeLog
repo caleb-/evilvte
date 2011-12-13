@@ -1,3 +1,10 @@
+0.4.8~pre3
+ * Fix a bug for multiple -e options in command line
+ * Fix an i18n bug when linked to GTK+ version >= 2.90.0
+ * Make everything GTK+ 2.99.2 compatible
+   To build with older versions of GTK+ 2.9x, please
+   export LDLIBS=`pkg-config --libs vte-2.90`
+
 0.4.8~pre2
  * Initial support for vte_terminal_search_*
    The feature of VTE is still quite buggy.
@@ -17,7 +24,6 @@
  * Initial support for new VTE resizing behavior
    If you are using GTK+ version >= 2.91.1 and VTE version >= 0.27.1,
    the window size of evilvte is not always correct currently.
- * Make everything GTK+ 2.91.4 compatible
 
 0.4.7.1
  * Fix a segfault bug of HOTKEY_MIMIC_SCROLL_UP and HOTKEY_MIMIC_SCROLL_DOWN
@@ -119,7 +125,6 @@
 
 0.4.5~pre7
  * Fix an HOTKEY_TOGGLE_BACKGROUND bug which was in 0.4.5~pre3 to 0.4.5~pre6
- * Fix gcc -Wall -Wextra warnings
 
 0.4.5~pre6
  * Support TAB_LABEL_DYNAMIC for xterm escape sequences, thanks to Pavel Plesov
@@ -142,13 +147,10 @@
 0.4.5~pre2
  * Detect GTK+ version and disable unsupported options automatically.
  * Fix a displaying bug about toggling scrollbar or status bar.
- * Avoid an GTK+ warning message when TAB_LABEL is customized.
- * Update license to latest format published by the Free Software Foundation.
 
 0.4.5~pre1
  * Detect VTE version and disable unsupported options automatically.
  * Enable deprecated VTE functions that were disabled in evilvte 0.4.4.
- * Disable deprecated GLib, GDK and GTK+ functions.
 
 0.4.4.2
  * Fix an CLOSE_DIALOG bug which could destroy the program by accident.
@@ -194,7 +196,6 @@
  * Fix a do-no-harm message when trying to rename a null tab label
    Thanks to Bernhard R. Link <brlink AT debian DOT org>
  * Fix number_char redefinition error if built with gcc 4.3.1
- * Rename shell scripts to the .sh scheme, and update the LICENSE file
 
 0.4.4~pre4
  * Support command line -title option to assign program title
@@ -214,8 +215,6 @@
  * Support command line -r option to run in root window
  * Support command line -h option to show help messages
  * Support command line -2 to -9 options to set initial tab numbers
- * Make icons smaller, and update their copyright to year 2008 with permission
-   from the author, Tetralet <tetralet AT gmail DOT com>
  * Make manpage of evilvte according to options in src/config.h
  * Simplify Makefile and configure
 
@@ -362,7 +361,6 @@
  * Fix an CLOSE_SAFELY bug for i386 architecture
  * Fix a status bar size bug
  * Add a .desktop file
- * New icon with BSD License, misc/evilvte.xpm
 
 0.2.2
  * Support TABBAR_MENU_SELECT_TAB
@@ -409,7 +407,6 @@
 
 0.1.1
  * Remove an useless g_signal_connect
- * New icon with BSD License, misc/evilvte.png
 
 0.1.0
  * Support window title

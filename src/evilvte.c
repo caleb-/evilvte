@@ -1,6 +1,6 @@
 /* Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  * Copyright (C) 2006-2008  David Gómez <david@pleyades.net>
- * Copyright (C) 2008-2010  Wen-Yen Chuang <caleb AT calno DOT com>
+ * Copyright (C) 2008-2011  Wen-Yen Chuang <caleb AT calno DOT com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@
 #define BACKSPACE       VTE_ERASE_ASCII_BACKSPACE
 #define DELETE          VTE_ERASE_ASCII_DELETE
 #define DELETE_SEQUENCE VTE_ERASE_DELETE_SEQUENCE
-#define ERASE_TTY       VTE_ERASE_AUTO
-#if VTE_CHECK_VERSION(0,20,4)
-#undef ERASE_TTY
 #define ERASE_TTY       VTE_ERASE_TTY
+#if !VTE_CHECK_VERSION(0,20,4)
+#undef ERASE_TTY
+#define ERASE_TTY       VTE_ERASE_AUTO
 #endif
 
 #define BLOCK     VTE_CURSOR_SHAPE_BLOCK
@@ -64,10 +64,6 @@
 #include "custom.h"
 #include "evilvte.h"
 
-#if !GTK_CHECK_VERSION(2,9,0)
-#undef TAB_REORDERABLE
-#endif
-
 #if !GTK_CHECK_VERSION(2,13,0)
 #undef HOTKEY_MIMIC_SCROLL_UP
 #undef HOTKEY_MIMIC_SCROLL_DOWN
@@ -78,10 +74,8 @@
 #define gtk_dialog_get_content_area(x) (x)->vbox
 #endif
 
-#if GTK_CHECK_VERSION(2,90,0)
-#undef TAB_BORDER
-#undef TAB_BORDER_HORIZONTAL
-#undef TAB_BORDER_VERTICAL
+#if !GTK_CHECK_VERSION(2,17,5)
+#define gtk_widget_set_can_focus(x,y)
 #endif
 
 #if GTK_CHECK_VERSION(2,90,7)
@@ -95,6 +89,12 @@
 
 #if !GTK_CHECK_VERSION(2,91,1)
 #define gtk_window_set_has_resize_grip(x,y)
+#endif
+
+#if !VTE_CHECK_VERSION(0,25,1)
+#undef HOTKEY_SEARCH_STRING
+#undef HOTKEY_SEARCH_PREVIOUS
+#undef HOTKEY_SEARCH_NEXT
 #endif
 
 #define INNER_BORDER_H (inner_border ? (inner_border->top + inner_border->bottom) : 0)
@@ -144,13 +144,11 @@ GtkBorder *inner_border;
 #define CURRENT_TAB(x) (struct terminal*)g_object_get_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), (x))), "current_tab")
 #define GET_CURRENT_TAB(x) term = CURRENT_TAB(x)
 
-#ifdef CURSOR_BLINKS
 #if CURSOR_BLINKS
 #define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_ON
 #endif
 #if !CURSOR_BLINKS
 #define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
-#endif
 #endif
 
 #ifndef DEFAULT_COMMAND
@@ -189,8 +187,6 @@ GtkBorder *inner_border;
 #undef EVILVTE_PTY_NO_HELPER
 #define EVILVTE_PTY_NO_HELPER VTE_PTY_NO_HELPER
 #endif
-
-#define EVILVTE_PTY_NO_FALLBACK 0
 
 #ifndef LABEL_DEFAULT_ENCODING
 #define LABEL_DEFAULT_ENCODING "_Default Encoding"
@@ -256,18 +252,16 @@ GtkBorder *inner_border;
 #define LABEL_SUBMENU_IME "_Input Methods"
 #endif
 
-#ifdef CLOSE_DIALOG
 #if CLOSE_DIALOG
-#define DEL_TAB(major,minor) del_tab(major,minor)
-#endif
-#if !CLOSE_DIALOG
-#undef CLOSE_DIALOG
-#endif
+#define DEL_TAB del_tab
 #endif
 
 #ifndef CLOSE_DIALOG
 #define CLOSE_DIALOG 0
-#define DEL_TAB(major,minor) del_tab()
+#endif
+
+#ifndef DEL_TAB
+#define DEL_TAB(x,y) del_tab()
 #endif
 
 #if DEF_TAB_LABEL && !defined(TAB_LABEL)
@@ -275,55 +269,31 @@ GtkBorder *inner_border;
 #endif
 
 #if !TAB
-#undef HOTKEY_TAB_ADD
-#undef HOTKEY_TAB_REMOVE
-#undef HOTKEY_TAB_PREVIOUS
-#undef HOTKEY_TAB_NEXT
-#undef HOTKEY_TAB_FIRST
-#undef HOTKEY_TAB_LAST
-#undef HOTKEY_TAB_GO_TO_NUMBER
-#undef HOTKEY_TAB_EDIT_LABEL
-#undef HOTKEY_TOGGLE_TABBAR
-#undef MENU_TAB_ADD
-#undef MENU_TAB_REMOVE
-#undef MENU_TAB_EDIT_LABEL
-#undef MENU_TOGGLE_TABBAR
 #undef SHOW_WINDOW_BORDER
-#undef TAB_BORDER
-#undef TAB_BORDER_HORIZONTAL
-#undef TAB_BORDER_VERTICAL
 #undef TAB_CLOSE_BUTTON
-#undef TAB_EXPANDED_WIDTH
 #undef COMMAND_TAB_NUMBERS
 #undef TAB_LABEL
 #undef TAB_LABEL_DYNAMIC
 #undef TAB_LABEL_CUSTOM
 #undef TAB_NEW_PATH_EQUAL_OLD
-#undef TAB_REORDERABLE
-#undef TAB_SHOW_INFO_AT_TITLE
 #undef TABBAR
-#undef TABBAR_PLACE
 #undef TABBAR_AUTOHIDE
-#undef TABBAR_SCROLLABLE
-#undef TABBAR_MENU_SELECT_TAB
 #define SHOW_WINDOW_BORDER 0
 #undef GET_CURRENT_TAB
 #define GET_CURRENT_TAB(x)
 #endif
 
-#if !VTE_FORK_CMD_OLD
 #define GET_VTE_CHILD_PID NULL
-#endif
 #if VTE_FORK_CMD_OLD
+#undef GET_VTE_CHILD_PID
 #define GET_VTE_CHILD_PID
 #endif
 
 #if TAB_NEW_PATH_EQUAL_OLD || CLOSE_DIALOG || CLOSE_SAFELY
 #undef GET_VTE_CHILD_PID
-#if !VTE_FORK_CMD_OLD
 #define GET_VTE_CHILD_PID &(term->pid)
-#endif
 #if VTE_FORK_CMD_OLD
+#undef GET_VTE_CHILD_PID
 #define GET_VTE_CHILD_PID term->pid =
 #endif
 #endif
@@ -348,35 +318,20 @@ GtkBorder *inner_border;
 #undef HOTKEY
 #define HOTKEY TRUE
 #undef KEY_MOD_MASK
-#define KEY_MOD_MASK (GDK_CONTROL_MASK|GDK_MOD1_MASK)
+#define KEY_MOD_MASK (GDK_CONTROL_MASK | GDK_MOD1_MASK)
 #endif
 
 #if !HOTKEY
-#undef HOTKEY_COPY
-#undef HOTKEY_PASTE
-#undef HOTKEY_SELECT_ALL
 #undef HOTKEY_COLOR_BACKGROUND
-#undef HOTKEY_EDIT_ENCODING
 #undef HOTKEY_FONT_BIGGER
 #undef HOTKEY_FONT_SMALLER
 #undef HOTKEY_FONT_DEFAULT_SIZE
 #undef HOTKEY_FONT_SELECT
 #undef HOTKEY_MIMIC_SCROLL_UP
 #undef HOTKEY_MIMIC_SCROLL_DOWN
-#undef HOTKEY_OPEN_NEW_WINDOW
-#undef HOTKEY_RESET_TERMINAL
-#undef HOTKEY_RESET_AND_CLEAR
 #undef HOTKEY_SATURATION_DIALOG
 #undef HOTKEY_SATURATION_MORE
 #undef HOTKEY_SATURATION_LESS
-#undef HOTKEY_TAB_ADD
-#undef HOTKEY_TAB_REMOVE
-#undef HOTKEY_TAB_PREVIOUS
-#undef HOTKEY_TAB_NEXT
-#undef HOTKEY_TAB_FIRST
-#undef HOTKEY_TAB_LAST
-#undef HOTKEY_TAB_GO_TO_NUMBER
-#undef HOTKEY_TAB_EDIT_LABEL
 #undef HOTKEY_TOGGLE_ANTI_ALIAS
 #undef HOTKEY_TOGGLE_DECORATED
 #undef HOTKEY_TOGGLE_FULLSCREEN
@@ -384,8 +339,12 @@ GtkBorder *inner_border;
 #undef HOTKEY_TOGGLE_ON_TOP
 #undef HOTKEY_TOGGLE_SCROLLBAR
 #undef HOTKEY_TOGGLE_STATUS_BAR
-#undef HOTKEY_TOGGLE_TABBAR
 #undef HOTKEY_TOGGLE_BACKGROUND
+#endif
+
+#if !TAB || !HOTKEY
+#undef HOTKEY_TAB_EDIT_LABEL
+#undef HOTKEY_TOGGLE_TABBAR
 #endif
 
 #if BUTTON_ORDER_BY_RCFILE
@@ -419,9 +378,6 @@ int button_order = 0;
 #undef MENU_PASTE
 #undef MENU_SELECT_ALL
 #undef MENU_COLOR_BACKGROUND
-#undef MENU_TAB_ADD
-#undef MENU_TAB_REMOVE
-#undef MENU_TAB_EDIT_LABEL
 #undef MENU_OPEN_NEW_WINDOW
 #undef MENU_QUIT
 #undef MENU_FONT_BIGGER
@@ -438,11 +394,17 @@ int button_order = 0;
 #undef MENU_TOGGLE_ON_TOP
 #undef MENU_TOGGLE_SCROLLBAR
 #undef MENU_TOGGLE_STATUS_BAR
-#undef MENU_TOGGLE_TABBAR
 #undef MENU_TOGGLE_DECORATED
 #undef MENU_TOGGLE_FULLSCREEN
 #undef MENU_TOGGLE_ANTI_ALIAS
 #undef MENU_CHANGE_SATURATION
+#endif
+
+#if !TAB || !defined(MENU_CUSTOM)
+#undef MENU_TAB_ADD
+#undef MENU_TAB_REMOVE
+#undef MENU_TAB_EDIT_LABEL
+#undef MENU_TOGGLE_TABBAR
 #endif
 
 #if defined(HOTKEY_TOGGLE_ON_TOP) || MENU_TOGGLE_ON_TOP
@@ -586,17 +548,16 @@ int tabbar_status = 1;
 #define VTE_TABBAR TABBAR
 #endif
 
-#if !defined(MATCH_STRING)
+#ifndef MATCH_STRING
 #if defined(MENU_MATCH_STRING_EXEC) || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
 #define MATCH_STRING "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
 #endif
 #endif
 
 #ifdef FONT_ANTI_ALIAS
-#if FONT_ANTI_ALIAS
 #define VTE_ANTI_ALIAS VTE_ANTI_ALIAS_FORCE_ENABLE
-#endif
 #if !FONT_ANTI_ALIAS
+#undef VTE_ANTI_ALIAS
 #define VTE_ANTI_ALIAS VTE_ANTI_ALIAS_FORCE_DISABLE
 #endif
 #endif
@@ -605,17 +566,15 @@ int tabbar_status = 1;
 #define VTE_ANTI_ALIAS VTE_ANTI_ALIAS_USE_DEFAULT
 #endif
 
-#define EVILVTE_SET_FONT(major,minor,micro) vte_terminal_set_font_from_string(major,minor)
+#define EVILVTE_SET_FONT(x,y,z) vte_terminal_set_font_from_string(x,y)
 #if defined(FONT_ANTI_ALIAS) || MENU_TOGGLE_ANTI_ALIAS || defined(HOTKEY_TOGGLE_ANTI_ALIAS)
 #undef EVILVTE_SET_FONT
-#define EVILVTE_SET_FONT(major,minor,micro) vte_terminal_set_font_from_string_full(major,minor,micro)
+#define EVILVTE_SET_FONT vte_terminal_set_font_from_string_full
 #endif
 
-#if PROGRAM_WM_CLASS || MENU_OPEN_NEW_WINDOW || COMMAND_SHOW_VERSION || COMMAND_SHOW_HELP || defined(HOTKEY_OPEN_NEW_WINDOW) || COMMAND_SET_TITLE || TAB_SHOW_INFO_AT_TITLE
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "evilvte"
 #define UPPER_PROGRAM_NAME "Evilvte"
-#endif
 #endif
 
 #ifndef PROGRAM_VERSION
@@ -627,7 +586,9 @@ char *wm_class_name = PROGRAM_NAME;
 char *wm_class_class = UPPER_PROGRAM_NAME;
 #endif
 
+#define VTE_PROGRAM_NAME PROGRAM_NAME
 #if COMMAND_SET_TITLE
+#undef VTE_PROGRAM_NAME
 #define VTE_PROGRAM_NAME program_name
 char *program_name = PROGRAM_NAME;
 #endif
@@ -638,19 +599,6 @@ char *command_font = NULL;
 
 #if COMMAND_GEOMETRY
 char *command_geometry = NULL;
-#endif
-
-#if !COMMAND_SET_TITLE
-#define VTE_PROGRAM_NAME PROGRAM_NAME
-#endif
-
-#if defined(COLOR_BACKGROUND) || defined(COLOR_TEXT_BOLD) || defined(CURSOR_COLOR) || defined(COLOR_TEXT_DIM) || defined(COLOR_FOREGROUND) || defined(COLOR_TEXT_HIGHLIGHTED)
-#define SET_DEFAULT_COLORS 1
-#endif
-
-#ifdef COLOR_STYLE
-#undef SET_DEFAULT_COLORS
-#define SET_DEFAULT_COLORS 0
 #endif
 
 GtkWidget *main_window;
@@ -787,7 +735,9 @@ const GdkColor color_style[16] = {
 char font_name[125];
 char font_str[128];
 int font_size;
+#if defined(HOTKEY_FONT_DEFAULT_SIZE) || MENU_FONT_DEFAULT_SIZE
 int font_size_default;
+#endif
 #endif
 
 #if COMMAND_EXEC_PROGRAM
@@ -1104,7 +1054,7 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #endif
           gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
       }
-#endif /* MENU_MATCH_STRING_EXEC */
+#endif
 
 #ifndef MENU_MATCH_STRING_EXEC
 #ifdef MENU_CUSTOM
@@ -1281,7 +1231,7 @@ void add_tab()
   if (login_shell_flag == 1)
     evilvte_argv[1] = "-";
 #endif
-  vte_terminal_fork_command_full(VTE_TERMINAL(term->vte), EVILVTE_PTY_NO_LASTLOG | EVILVTE_PTY_NO_UTMP | EVILVTE_PTY_NO_WTMP | EVILVTE_PTY_NO_HELPER | EVILVTE_PTY_NO_FALLBACK, VTE_DEFAULT_DIRECTORY, evilvte_argv, NULL, G_SPAWN_CHILD_INHERITS_STDIN | G_SPAWN_SEARCH_PATH | G_SPAWN_FILE_AND_ARGV_ZERO, NULL, NULL, GET_VTE_CHILD_PID, NULL);
+  vte_terminal_fork_command_full(VTE_TERMINAL(term->vte), EVILVTE_PTY_NO_LASTLOG | EVILVTE_PTY_NO_UTMP | EVILVTE_PTY_NO_WTMP | EVILVTE_PTY_NO_HELPER, VTE_DEFAULT_DIRECTORY, evilvte_argv, NULL, G_SPAWN_CHILD_INHERITS_STDIN | G_SPAWN_SEARCH_PATH | G_SPAWN_FILE_AND_ARGV_ZERO, NULL, NULL, GET_VTE_CHILD_PID, NULL);
 #endif
 
 #if VTE_FORK_CMD_OLD
@@ -1350,8 +1300,10 @@ void add_tab()
   vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, color_style, 16);
 #endif
 
-#if SET_DEFAULT_COLORS
+#if defined(COLOR_BACKGROUND) || defined(COLOR_TEXT_BOLD) || defined(CURSOR_COLOR) || defined(COLOR_TEXT_DIM) || defined(COLOR_FOREGROUND) || defined(COLOR_TEXT_HIGHLIGHTED)
+#ifndef COLOR_STYLE
   vte_terminal_set_default_colors(VTE_TERMINAL(term->vte));
+#endif
 #endif
 
 #ifdef COLOR_BACKGROUND
@@ -1479,9 +1431,7 @@ void add_tab()
 #ifndef VTE_FUNNY
   VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
 #endif
-#if GTK_CHECK_VERSION(2,17,5)
   gtk_widget_set_can_focus(notebook, 0);
-#endif
 #endif
 
 #if DO_TOGGLE_BACKGROUND
@@ -1530,14 +1480,12 @@ void add_tab()
 
 #if TAB
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
-#endif
-
 #if TAB_EXPANDED_WIDTH
   gtk_container_child_set(GTK_CONTAINER(notebook), VTE_HBOX, "tab-expand", 1, NULL);
 #endif
-
-#if TAB_REORDERABLE
+#if TAB_REORDERABLE && GTK_CHECK_VERSION(2,9,0)
   gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), VTE_HBOX, 1);
+#endif
 #endif
 
   gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
@@ -1860,13 +1808,11 @@ void do_toggle_decorated()
     hide_scrollbar();
 #endif
 #if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
-  if (!status_bar_status) {
-    gtk_widget_hide(statusbar);
-#if GTK_CHECK_VERSION(2,91,1)
-    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
-  } else {
+  if (status_bar_status)
     gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
-#endif
+  else {
+    gtk_widget_hide(statusbar);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
   }
 #endif
 #ifndef VTE_FUNNY
@@ -1901,6 +1847,23 @@ void do_toggle_scrollbar()
 }
 #endif
 
+#if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
+void do_toggle_status_bar()
+{
+  status_bar_status ^= 1;
+  if (status_bar_status) {
+    gtk_widget_show(statusbar);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
+  } else {
+    gtk_widget_hide(statusbar);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
+  }
+#ifndef VTE_FUNNY
+  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
+#endif
+}
+#endif
+
 #if defined(HOTKEY_TOGGLE_TABBAR) || MENU_TOGGLE_TABBAR
 void do_toggle_tabbar()
 {
@@ -1912,9 +1875,7 @@ void do_toggle_tabbar()
 #ifndef VTE_FUNNY
   VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
 #endif
-#if GTK_CHECK_VERSION(2,17,5)
   gtk_widget_set_can_focus(notebook, 0);
-#endif
 }
 #endif
 
@@ -2009,17 +1970,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TOGGLE_STATUS_BAR
       if (HOTKEY_TOGGLE_STATUS_BAR) {
-        status_bar_status ^= 1;
-        if (status_bar_status) {
-          gtk_widget_show(statusbar);
-          gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
-        } else {
-          gtk_widget_hide(statusbar);
-          gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
-        }
-#ifndef VTE_FUNNY
-        VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
-#endif
+        do_toggle_status_bar();
         return TRUE;
       }
 #endif
@@ -2139,7 +2090,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
 
-#if HOTKEY_TAB_GO_TO_NUMBER
+#if TAB && HOTKEY_TAB_GO_TO_NUMBER
       if (event->keyval == GDK_1) {
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
         return TRUE;
@@ -2269,14 +2220,14 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
 
-#ifdef HOTKEY_TAB_FIRST
+#if TAB && defined(HOTKEY_TAB_FIRST)
       if (HOTKEY_TAB_FIRST) {
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
         return TRUE;
       }
 #endif
 
-#ifdef HOTKEY_TAB_LAST
+#if TAB && defined(HOTKEY_TAB_LAST)
       if (HOTKEY_TAB_LAST) {
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
         return TRUE;
@@ -2299,7 +2250,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
 
-#ifdef HOTKEY_TAB_PREVIOUS
+#if TAB && defined(HOTKEY_TAB_PREVIOUS)
       if (HOTKEY_TAB_PREVIOUS) {
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index ? index - 1 : gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
@@ -2307,7 +2258,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
 
-#ifdef HOTKEY_TAB_NEXT
+#if TAB && defined(HOTKEY_TAB_NEXT)
       if (HOTKEY_TAB_NEXT) {
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), (index == (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1)) ? 0 : index + 1);
@@ -2315,14 +2266,14 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
 
-#ifdef HOTKEY_TAB_ADD
+#if TAB && defined(HOTKEY_TAB_ADD)
       if (HOTKEY_TAB_ADD) {
         add_tab();
         return TRUE;
       }
 #endif
 
-#ifdef HOTKEY_TAB_REMOVE
+#if TAB && defined(HOTKEY_TAB_REMOVE)
       if (HOTKEY_TAB_REMOVE) {
         DEL_TAB(NULL, CLOSE_DIALOG);
         return TRUE;
@@ -2461,23 +2412,6 @@ void do_toggle_hotkeys()
 }
 #endif
 
-#if MENU_TOGGLE_STATUS_BAR
-void do_toggle_status_bar()
-{
-  status_bar_status ^= 1;
-  if (status_bar_status) {
-    gtk_widget_show(statusbar);
-    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
-  } else {
-    gtk_widget_hide(statusbar);
-    gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), 0);
-  }
-#ifndef VTE_FUNNY
-  VTE_WINDOW_RESIZE(GTK_WINDOW(main_window), 1, 1);
-#endif
-}
-#endif
-
 #if MENU
 void set_encoding(GtkWidget *widget, void *data)
 {
@@ -2530,10 +2464,6 @@ int main(int argc, char **argv)
 int at_dock_mode = 0;
 #endif
 
-#ifdef TAB_LABEL
-  textdomain("gtk20");
-#endif
-
 #if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
   int i = 0;
 #endif
@@ -2560,6 +2490,7 @@ int at_dock_mode = 0;
           default_argv = &(argv[i - 1]);
         default_argv[0] = default_command;
 #endif
+        break;
       }
     }
   }
@@ -2719,10 +2650,27 @@ int at_dock_mode = 0;
   if (font_size < 1)
     font_size = 10;
   g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
+#if defined(HOTKEY_FONT_DEFAULT_SIZE) || MENU_FONT_DEFAULT_SIZE
   font_size_default = font_size;
+#endif
+#endif
+
+#if GTK_CHECK_VERSION(2,91,7)
+#if defined(HOTKEY_MIMIC_SCROLL_UP) || defined(HOTKEY_MIMIC_SCROLL_DOWN)
+  gdk_disable_multidevice();
+#endif
 #endif
 
   gtk_init(&argc, &argv);
+
+#ifdef TAB_LABEL
+#if GTK_CHECK_VERSION(2,90,0)
+  textdomain("gtk30");
+#endif
+#if !GTK_CHECK_VERSION(2,90,0)
+  textdomain("gtk20");
+#endif
+#endif
 
 #if defined(HOTKEY_SEARCH_STRING) || defined(HOTKEY_SEARCH_PREVIOUS) || defined(HOTKEY_SEARCH_NEXT)
 #if TAB
@@ -2783,39 +2731,39 @@ int at_dock_mode = 0;
   gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), SHOW_WINDOW_BORDER);
 #endif
 
+#if TAB && !GTK_CHECK_VERSION(2,90,0)
 #ifdef TAB_BORDER
   gtk_notebook_set_tab_border(GTK_NOTEBOOK(notebook), TAB_BORDER);
 #endif
-
 #ifdef TAB_BORDER_VERTICAL
   gtk_notebook_set_tab_hborder(GTK_NOTEBOOK(notebook), TAB_BORDER_VERTICAL);
 #endif
-
 #ifdef TAB_BORDER_HORIZONTAL
   gtk_notebook_set_tab_vborder(GTK_NOTEBOOK(notebook), TAB_BORDER_HORIZONTAL);
+#endif
 #endif
 
 #ifdef TABBAR
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), VTE_TABBAR);
 #endif
 
+#if TAB
 #if TABBAR_SCROLLABLE
   gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TABBAR_SCROLLABLE);
 #endif
-
 #if TABBAR_MENU_SELECT_TAB
   gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
 #endif
-
 #ifdef TABBAR_PLACE
   gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), TABBAR_PLACE);
+#endif
 #endif
 
 #if !TAB
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
 #endif
 
-#if TAB && GTK_CHECK_VERSION(2,17,5)
+#if TAB
   gtk_widget_set_can_focus(notebook, 0);
 #endif
 
@@ -2870,10 +2818,9 @@ int at_dock_mode = 0;
 
 #if TAB
   g_signal_connect_after(notebook, "switch-page", switch_page, NULL);
-#endif
-
-#if TAB_REORDERABLE
+#if TAB_REORDERABLE && GTK_CHECK_VERSION(2,9,0)
   g_signal_connect(notebook, "page-reordered", switch_page, NULL);
+#endif
 #endif
 
 #if COMMAND_AT_ROOT_WINDOW
