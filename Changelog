@@ -1,3 +1,9 @@
+0.2.7
+ * Support SHOW_BUILDTIME_OPTION
+ * Add a script "showvte" to show buildtime configuration
+ * Show configuration status in configure script
+ * Simplify src/config.h
+
 0.2.6
  * Support CTRL_MORE_SATURATION and CTRL_LESS_SATURATION
  * Support ENCODING_LIST_LABEL

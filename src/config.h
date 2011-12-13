@@ -27,6 +27,10 @@
 // #define COLOR_DIM              "yellow"
 // #define COLOR_HIGHLIGHT        "green"
 // #define CURSOR_BLINKS          TRUE
+// #define DEFAULT_COMMAND        g_getenv("SHELL")
+// #define DEFAULT_ARGV           NULL
+// #define DEFAULT_ENVV           NULL
+// #define DEFAULT_DIRECTORY      g_getenv("PWD")
 // #define DEFAULT_COLUMNS        80
 // #define DEFAULT_ROWS           24
 // #define DEFAULT_ENCODING       "UTF-8"
@@ -53,10 +57,11 @@
 // #define SCROLL_ON_OUTPUT       TRUE
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
+#define    SHOW_BUILDTIME_OPTION  TRUE      /* Command line -o option */
+#define    SHOW_VERSION           TRUE      /* Command line -v option */
 // #define SHOW_WINDOW_BORDER     TRUE 
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      "evilvte"
-#define    SHOW_WINDOW_VERSION    TRUE      /* Command line -v option */
 #define    STATUS_BAR             TRUE
 #define    WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 #define    TAB                    TRUE
@@ -107,13 +112,6 @@
 // #define DOUBLE_PRESS_HOTKEY    TRUE
 // #define DOUBLE_PRESS_TIME      300000 /* 0.3 second = 300000 microseconds */
 
-/* Do not edit options below unless you know what you are doing */
-
-#define DEFAULT_COMMAND           g_getenv("SHELL")
-#define DEFAULT_ARGV              NULL
-#define DEFAULT_ENVV              NULL
-#define DEFAULT_DIRECTORY         g_getenv("PWD")
-
 /* uncomment options below to reduce binary size
  * WARNING: may cause compatibility problems
  */
@@ -122,6 +120,7 @@
 // #undef GTK_BOX
 // #undef GTK_CONTAINER
 // #undef GTK_MENU
+// #undef GTK_MENU_SHELL
 // #undef GTK_NOTEBOOK
 // #undef GTK_STATUSBAR
 // #undef GTK_WINDOW
@@ -130,6 +129,7 @@
 // #define GTK_BOX
 // #define GTK_CONTAINER
 // #define GTK_MENU
+// #define GTK_MENU_SHELL
 // #define GTK_NOTEBOOK
 // #define GTK_STATUSBAR
 // #define GTK_WINDOW

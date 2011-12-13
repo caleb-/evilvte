@@ -28,6 +28,22 @@
 #include <vte/vte.h>
 #include "config.h"
 
+#ifndef DEFAULT_COMMAND
+#define DEFAULT_COMMAND g_getenv("SHELL")
+#endif
+
+#ifndef DEFAULT_ARGV
+#define DEFAULT_ARGV NULL
+#endif
+
+#ifndef DEFAULT_ENVV
+#define DEFAULT_ENVV NULL
+#endif
+
+#ifndef DEFAULT_DIRECTORY
+#define DEFAULT_DIRECTORY g_getenv("PWD")
+#endif
+
 #ifndef ENABLE_LASTLOG
 #define ENABLE_LASTLOG TRUE
 #endif
@@ -102,7 +118,7 @@
 #endif
 #endif
 
-#if SHOW_WINDOW_VERSION
+#if SHOW_VERSION
 #ifndef SHOW_WINDOW_TITLE
 #define SHOW_WINDOW_TITLE "evilvte"
 #endif
@@ -971,9 +987,16 @@ void set_encoding(GtkWidget *widget, void *data)
 
 int main(int argc, char **argv)
 {
-#if SHOW_WINDOW_VERSION
+#if SHOW_VERSION
   if (argc == 2 && !strcmp(argv[1], "-v")) {
     printf("%s, version %s\n", SHOW_WINDOW_TITLE, EVILVTE_VERSION);
+    return 0;
+  }
+#endif
+
+#if SHOW_BUILDTIME_OPTION
+  if (argc == 2 && !strcmp(argv[1], "-o")) {
+    system("showvte");
     return 0;
   }
 #endif
