@@ -1,6 +1,13 @@
+0.2.2
+ * Support TAB_REORDERABLE
+ * Support TAB_MENU_SELECT_TAB
+ * Support TAB_MOUSE_SCROLLABLE
+ * Support tab at bottom, left, right, and top
+ * Add a manpage
+
 0.2.1
  * Support EMULATION_TYPE
- * Support a very simple EXECUTE_COMMAND function
+ * Support a simple EXECUTE_COMMAND function
    You can use command line -e option to run applications
 
 0.2.0

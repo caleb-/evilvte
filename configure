@@ -57,10 +57,11 @@ else
 fi
 
 bindir=$prefix/bin
+mandir=$prefix/share/man/man1
 ICON_DIR=$prefix/share/pixmaps
 
 if [ $prefix = /usr ]; then
-  echo OPTFLAGS=-O >> src/config.o
+  echo OPTFLAGS=-Os >> src/config.o
 fi
 
 EVILVTE_VERSION=`head -n 1 Changelog`
@@ -70,9 +71,10 @@ echo "MAKE=$MAKE" >> src/config.o
 echo "VTEINC=$VTEINC" >> src/config.o
 echo "prefix=$prefix" >> src/config.o
 echo "bindir=\$(DESTDIR)$bindir" >> src/config.o
+echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
 echo "ICON_DIR=$ICON_DIR" >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
 # echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> src/config.o
-echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgobject-2.0 -lglib-2.0 >> src/config.o
+echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> src/config.o

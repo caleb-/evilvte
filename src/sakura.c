@@ -59,12 +59,19 @@
 
 #if !TAB
 #undef SHOW_WINDOW_BORDER
+#undef TAB_AT_BOTTOM
+#undef TAB_AT_LEFT
+#undef TAB_AT_RIGHT
+#undef TAB_AT_TOP
 #undef TAB_AUTOHIDE
 #undef TAB_BORDER
 #undef TAB_BORDER_H
 #undef TAB_BORDER_V
 #undef TAB_INITIAL_NUMBER
 #undef TAB_LABEL
+#undef TAB_MENU_SELECT_TAB
+#undef TAB_MOUSE_SCROLLABLE
+#undef TAB_REORDERABLE
 #define SHOW_WINDOW_BORDER FALSE
 #endif
 
@@ -558,13 +565,6 @@ void sakura_add_tab()
   gtk_box_pack_start(GTK_BOX(term.hbox), term.scrollbar, FALSE, FALSE, 0);
 #endif
 
-#if EXECUTE_COMMAND
-#if TAB
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 0)
-    sprintf(default_command, "%s", DEFAULT_COMMAND);
-#endif
-#endif
-
 #if CLOSE_SAFE
   term.pid = vte_terminal_fork_command(VTE_TERMINAL(term.vte), VTE_DEFAULT_COMMAND, DEFAULT_ARGV, DEFAULT_ENVV, DEFAULT_DIRECTORY, ENABLE_LASTLOG, ENABLE_UTMP, ENABLE_WTMP);
 #else
@@ -760,6 +760,38 @@ void sakura_add_tab()
   gtk_window_resize(GTK_WINDOW(main_window), width, height);
 #endif
 
+#ifdef TAB_MOUSE_SCROLLABLE
+  gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TAB_MOUSE_SCROLLABLE);
+#endif
+
+#if TAB_MENU_SELECT_TAB
+  gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
+#endif
+
+#if TAB_REORDERABLE
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+  gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), term.hbox, TRUE);
+#else
+  gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), term.vte, TRUE);
+#endif
+#endif /* TAB_REORDERABLE */
+
+#if TAB_AT_BOTTOM
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 3);
+#endif
+
+#if TAB_AT_LEFT
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 0);
+#endif
+
+#if TAB_AT_RIGHT
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 1);
+#endif
+
+#if TAB_AT_TOP
+  gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 2);
+#endif
+
   gtk_widget_show_all(notebook);
 
 #if TAB
@@ -882,11 +914,16 @@ int main(int argc, char **argv)
   gtk_notebook_set_tab_vborder(GTK_NOTEBOOK(notebook), TAB_BORDER_H);
 #endif
 
-#if TAB_INITIAL_NUMBER
-  for (i = 0 ; i < TAB_INITIAL_NUMBER ; i++)
-    sakura_add_tab();
-#else
   sakura_add_tab();
+
+#if EXECUTE_COMMAND && TAB
+  sprintf(default_command, "%s", DEFAULT_COMMAND);
+#endif
+
+#if TAB_INITIAL_NUMBER
+  int j;
+  for (j = 1 ; j < TAB_INITIAL_NUMBER ; j++)
+    sakura_add_tab();
 #endif
 
 #if STATUS_BAR
@@ -926,7 +963,7 @@ int main(int argc, char **argv)
 #if ENCODING_LIST_DEFAULT
     if (encoding[i] == "Default") {
       encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term.vte));
-      encoding_item[i] = gtk_menu_item_new_with_label("Default");
+      encoding_item[i] = gtk_menu_item_new_with_label("Default Encoding");
     } else
 #endif
       encoding_item[i] = gtk_menu_item_new_with_label(encoding[i]);

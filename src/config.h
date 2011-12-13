@@ -1,7 +1,7 @@
 /* comment out options to reduce binary size and RAM consumption */
 
 // #define ALLOW_BOLD             TRUE
-// #define BACKGROUND_IMAGE       ".config/evilvte/background.png"
+#define    BACKGROUND_IMAGE       ".config/evilvte/background.png"
 // #define BACKGROUND_SATURATION  0.5     /* Between 0 and 1 */
 // #define BACKGROUND_TINT_COLOR  "brown"
 // #define BACKGROUND_TRANSPARENT TRUE
@@ -15,7 +15,7 @@
 // #define BINDING_DELETE_KEY     VTE_ERASE_ASCII_BACKSPACE
 // #define BINDING_DELETE_KEY     VTE_ERASE_ASCII_DELETE
 // #define BINDING_DELETE_KEY     VTE_ERASE_DELETE_SEQUENCE
-// #define CLOSE_SAFE             TRUE /* Do not kill background applications */
+#define    CLOSE_SAFE             TRUE /* Do not kill background applications */
 // #define COLOR_STYLE_LINUX      TRUE
 // #define COLOR_STYLE_RXVT       TRUE
 // #define COLOR_STYLE_TANGO      TRUE
@@ -43,23 +43,27 @@
 // #define ENCODING_LIST_DEFAULT  TRUE /* Support "Default" in ENCODING_LIST */
 // #define ENCODING_LIST          "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
 #define    ENCODING_LIST          "UTF-8" /* Right click to switch encoding */
-// #define EXECUTE_COMMAND        TRUE /* Command line -e option */
+#define    EXECUTE_COMMAND        TRUE /* Command line -e option */
 // #define FONT_CHANGE_SIZE       TRUE /* Change font size with hotkey */
-// #define MENU_INPUT_METHOD      TRUE
+#define    MENU_INPUT_METHOD      TRUE
 // #define MOUSE_AUTOHIDE         TRUE
 // #define SCROLL_BACKGROUND      TRUE
-// #define SCROLL_LINES           60
+#define    SCROLL_LINES           1024
 // #define SCROLL_ON_KEYSTROKE    TRUE
 // #define SCROLL_ON_OUTPUT       TRUE
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
 // #define SHOW_WINDOW_BORDER     TRUE
-// #define SHOW_WINDOW_ICON       TRUE
-// #define SHOW_WINDOW_TITLE      "evilvte"
-// #define SHOW_WINDOW_VERSION    TRUE      /* Command line -v option */
+#define    SHOW_WINDOW_ICON       TRUE
+#define    SHOW_WINDOW_TITLE      "evilvte"
+#define    SHOW_WINDOW_VERSION    TRUE      /* Command line -v option */
 #define    STATUS_BAR             TRUE
-// #define WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
+#define    WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 #define    TAB                    TRUE
+// #define TAB_AT_BOTTOM          TRUE
+// #define TAB_AT_LEFT            TRUE
+// #define TAB_AT_RIGHT           TRUE
+// #define TAB_AT_TOP             TRUE
 // #define TAB_AUTOHIDE           TRUE
 // #define TAB_BORDER             0
 // #define TAB_BORDER_H           0
@@ -67,6 +71,9 @@
 // #define TAB_INITIAL_NUMBER     1
 // #define TAB_LABEL              "Page"
 // #define TAB_LABEL_NUMBER       TRUE   /* Depends on TAB_LABEL */
+// #define TAB_MENU_SELECT_TAB    TRUE
+// #define TAB_MOUSE_SCROLLABLE   TRUE
+// #define TAB_REORDERABLE        TRUE
 
 /* Hotkey definitions
  *
@@ -106,13 +113,19 @@
  * WARNING: may cause compatibility problems
  */
 
+// #undef G_CALLBACK
 // #undef GTK_BOX
 // #undef GTK_CONTAINER
+// #undef GTK_MENU
 // #undef GTK_NOTEBOOK
+// #undef GTK_STATUSBAR
 // #undef GTK_WINDOW
 // #undef VTE_TERMINAL
+// #define G_CALLBACK
 // #define GTK_BOX
 // #define GTK_CONTAINER
+// #define GTK_MENU
 // #define GTK_NOTEBOOK
+// #define GTK_STATUSBAR
 // #define GTK_WINDOW
 // #define VTE_TERMINAL

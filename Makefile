@@ -16,6 +16,8 @@ install:
 	install -m 755 $(PROG) $(bindir)
 	install -d $(ICON_DIR_INSTALL)
 	install -m 644 src/evilvte.png $(ICON_DIR_INSTALL)
+	install -d $(mandir)
+	install -m 644 src/evilvte.1 $(mandir)
 
 clean: src/config.o
 	rm -f $(PROG) src/*.o
