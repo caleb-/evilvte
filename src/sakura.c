@@ -264,6 +264,16 @@ ENCODING_LIST
 #define SHOW_MENU TRUE
 #endif
 
+#ifdef CTRL_COPY_TO_CLIPBOARD
+#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#define ENABLE_KEY_PRESS TRUE
+#endif
+
+#ifdef CTRL_PASTE_FROM_CLIPBD
+#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#define ENABLE_KEY_PRESS TRUE
+#endif
+
 #if TAB
 GArray *terminals;
 #endif
@@ -321,6 +331,20 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 {
   if (event->state & GDK_CONTROL_MASK) {
 
+#ifdef CTRL_COPY_TO_CLIPBOARD
+    if CTRL_COPY_TO_CLIPBOARD {
+      vte_terminal_copy_clipboard(VTE_TERMINAL(term.vte));
+      return TRUE;
+    }
+#endif
+
+#ifdef CTRL_PASTE_FROM_CLIPBD
+    if CTRL_PASTE_FROM_CLIPBD {
+      vte_terminal_paste_clipboard(VTE_TERMINAL(term.vte));
+      return TRUE;
+    }
+#endif
+
 #if FONT_CHANGE_SIZE
 #ifdef CTRL_FONT_BIGGER
     if CTRL_FONT_BIGGER {
@@ -356,8 +380,9 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       change_statusbar_encoding();
 #endif
       return TRUE;
-#endif /* CTRL_PREVIOUS_TAB */
     }
+#endif /* CTRL_PREVIOUS_TAB */
+
 #ifdef CTRL_NEXT_TAB
     if CTRL_NEXT_TAB {
       int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
@@ -369,8 +394,9 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       change_statusbar_encoding();
 #endif
       return TRUE;
-#endif /* CTRL_NEXT_TAB */
     }
+#endif /* CTRL_NEXT_TAB */
+
 #ifdef CTRL_NEW_TAB
     if CTRL_NEW_TAB {
 #if DOUBLE_PRESS_HOTKEY
@@ -379,6 +405,7 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
         if (now_time_1 - last_time_1 < DOUBLE_PRESS_TIME) {
 #endif
           sakura_add_tab();
+
 #if STATUS_BAR
           change_statusbar_encoding();
 #endif
@@ -386,6 +413,7 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #if DOUBLE_PRESS_HOTKEY
           last_time_1 = 0;
 #endif
+
           return TRUE;
 
 #if DOUBLE_PRESS_HOTKEY
@@ -395,16 +423,20 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #endif
 
       return FALSE;
-#endif /* CTRL_NEW_TAB */
     }
+#endif /* CTRL_NEW_TAB */
+
 #ifdef CTRL_REMOVE_TAB
     if CTRL_REMOVE_TAB {
+
 #if DOUBLE_PRESS_HOTKEY
       if (last_time_2 != 0) {
         now_time_2 = current_time();
         if (now_time_2 - last_time_2 < DOUBLE_PRESS_TIME) {
 #endif
+
           sakura_del_tab();
+
 #if STATUS_BAR
           change_statusbar_encoding();
 #endif
@@ -412,6 +444,7 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #if DOUBLE_PRESS_HOTKEY
           last_time_2 = 0;
 #endif
+
           return TRUE;
 
 #if DOUBLE_PRESS_HOTKEY
@@ -421,12 +454,12 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #endif
 
       return FALSE;
-#endif /* CTRL_REMOVE_TAB */
     }
+#endif /* CTRL_REMOVE_TAB */
 #endif /* TAB */
 
   }
-  return FALSE;
+  return FALSE; /* (event->state & GDK_CONTROL_MASK) */
 
 #if FONT_CHANGE_SIZE
 font_size_changed:

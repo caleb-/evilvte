@@ -1,3 +1,6 @@
+0.2.0
+ * Support hotkey for copy to clipboard and paste from clipboard
+
 0.1.9
  * Support transparent background
  * Support MENU_INPUT_METHOD
