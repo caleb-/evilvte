@@ -14,9 +14,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-NEWCONFFILE=src/evilvte.h
+NEWCONFFILE=src/install.sh
 
-cat /dev/null > $NEWCONFFILE
+grep ^#define src/config.o > $NEWCONFFILE
 rm -f $1 src/evilvte.o
 
 MENU_DEFAULT_ENCODING=`grep MENU_ENCODING_LIST src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
@@ -198,3 +198,117 @@ MENU_CHANGE_SATURATION=`echo $MENU_CUSTOM_DEFINE | grep 'Adjust saturation'`
 if [ "$MENU_CHANGE_SATURATION" != "" ]; then
   echo \#define MENU_CHANGE_SATURATION 1 >> $NEWCONFFILE
 fi
+
+mv $NEWCONFFILE src/evilvte.h
+
+head -n 1 $0 > src/install.sh
+make -n install | grep 'install ' >> src/install.sh
+
+  head -n 1 $0 > src/showvte
+  tail -n 6 $0 | grep -v ^grep >> src/showvte
+  sed 's/\t/ /g' src/custom.h | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define >> src/showvte
+
+SHOWVTE_PROG_NAME=`grep PROGRAM_NAME src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | awk '{print $3}' | sed 's/"//g'`
+if [ "$SHOWVTE_PROG_NAME" = "" ]; then
+  SHOWVTE_PROG_NAME="evilvte"
+fi
+
+SHOWVTE_VERSION=`grep PROGRAM_VERSION src/custom.h | grep -v ^\/\/ | awk '{print $3}'`
+if [ "$SHOWVTE_VERSION" = "" ]; then
+  SHOWVTE_VERSION=`head -n 1 ChangeLog`
+fi
+
+echo echo Configuration of $SHOWVTE_PROG_NAME $SHOWVTE_VERSION: >> src/showvte
+
+DEFINE_LINES=`grep ^\#define src/showvte | wc | awk '{print $1}'`
+
+if [ "$DEFINE_LINES" = "0" ]; then
+  echo echo [1m[31mDisable everything.[m >> src/showvte
+  echo exit >> src/showvte
+fi
+
+  tail -n 6 $0 | grep ^grep >> src/showvte
+
+COMMAND_ENABLED=`grep COMMAND_ src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | grep -v FALSE | grep -v 0 | tail -n 1`
+if [ "$COMMAND_ENABLED" = "" ]; then
+  grep -v -i option misc/manpage.1 > misc/evilvte.1
+  exit
+fi
+
+COMMAND_TAB_NUMBERS=`grep    COMMAND_TAB_NUMBERS    src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+TAB_ENABLE=`grep             ' TAB '                src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+if [ "$TAB_ENABLE" = "" ]; then
+  COMMAND_TAB_NUMBERS=
+fi
+
+COMMAND_AT_ROOT_WINDOW=`grep COMMAND_AT_ROOT_WINDOW src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_DOCK_MODE=`grep      COMMAND_DOCK_MODE      src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_EXEC_PROGRAM=`grep   COMMAND_EXEC_PROGRAM   src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_FULLSCREEN=`grep     COMMAND_FULLSCREEN     src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_LOGIN_SHELL=`grep    COMMAND_LOGIN_SHELL    src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SET_TITLE=`grep      COMMAND_SET_TITLE      src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SHOW_HELP=`grep      COMMAND_SHOW_HELP      src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SHOW_OPTIONS=`grep   COMMAND_SHOW_OPTIONS   src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_SHOW_VERSION=`grep   COMMAND_SHOW_VERSION   src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+
+head -n 10 misc/manpage.1 > misc/evilvte.1
+
+if [ "$COMMAND_DOCK_MODE" != "" ]; then
+  grep '^.\\" D ' misc/manpage.1 | sed 's/^.\\" D //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_EXEC_PROGRAM" != "" ]; then
+  grep '^.\\" E ' misc/manpage.1 | sed 's/^.\\" E //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_FULLSCREEN" != "" ]; then
+  grep '^.\\" F ' misc/manpage.1 | sed 's/^.\\" F //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_SHOW_HELP" != "" ]; then
+  grep '^.\\" H ' misc/manpage.1 | sed 's/^.\\" H //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_LOGIN_SHELL" != "" ]; then
+  grep '^.\\" L ' misc/manpage.1 | sed 's/^.\\" L //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_SHOW_OPTIONS" != "" ]; then
+  grep '^.\\" O ' misc/manpage.1 | sed 's/^.\\" O //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_AT_ROOT_WINDOW" != "" ]; then
+  grep '^.\\" R ' misc/manpage.1 | sed 's/^.\\" R //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_SET_TITLE" != "" ]; then
+  grep '^.\\" T ' misc/manpage.1 | sed 's/^.\\" T //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_SHOW_VERSION" != "" ]; then
+  grep '^.\\" V ' misc/manpage.1 | sed 's/^.\\" V //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_TAB_NUMBERS" != "" ]; then
+  grep '^.\\" 2 ' misc/manpage.1 | sed 's/^.\\" 2 //' >> misc/evilvte.1
+fi
+
+tail -n 4 misc/manpage.1 >> misc/evilvte.1
+
+COMMAND_NUMBERS=`grep '^.B..-' misc/evilvte.1 | wc | awk '{print $1}'`
+if [ "$COMMAND_NUMBERS" = "0" ]; then
+  grep -v -i option misc/manpage.1 > misc/evilvte.1
+  exit
+fi
+if [ "$COMMAND_NUMBERS" != "1" ]; then
+  sed -e 's/option/options/' -e 's/OPTION/OPTIONS/' misc/evilvte.1 > misc/evilvte.2
+  mv misc/evilvte.2 misc/evilvte.1
+fi
+exit
+
+if [ "$1" = "-v" ]; then
+  SHOWVTE_VERSION=`grep ^echo $0 | cut -d : -f 1 | cut -d ' ' -f 5`
+  echo showvte, version $SHOWVTE_VERSION
+  exit
+fi
+grep ^#define $0 | sed -e 's/$/[m/' -e 's/"/[1m[32m"/' -e 's/ 0/[1m[32m 0/' -e 's/ 1/[1m[32m 1/' -e 's/ 2/[1m[32m 2/' -e 's/ 3/[1m[32m 3/' -e 's/ 4/[1m[32m 4/' -e 's/ 5/[1m[32m 5/' -e 's/ 6/[1m[32m 6/' -e 's/ 7/[1m[32m 7/' -e 's/ 8/[1m[32m 8/' -e 's/ 9/[1m[32m 9/' -e 's/TRUE/[1m[32mTRUE/' -e 's/FALSE/[1m[31mFALSE/' -e 's/ AUTO/[1m[32m AUTO/' -e 's/ ERASE_TTY/[1m[32m ERASE_TTY/' -e 's/ BLOCK/[1m[32m BLOCK/' -e 's/ IBEAM/[1m[32m IBEAM/' -e 's/ UNDERLINE/[1m[32m UNDERLINE/' -e 's/ BACKSPACE/[1m[32m BACKSPACE/g' -e 's/BACKSPACE_KEY/[mBACKSPACE_KEY/' -e 's/ DELETE/[1m[32m DELETE/g' -e 's/DELETE_KEY/[mDELETE_KEY/' -e 's/ VTE_FIXED/[1m[32m VTE_FIXED/' -e 's/ LINUX/[1m[32m LINUX/' -e 's/ RXVT/[1m[32m RXVT/' -e 's/ TANGO/[1m[32m TANGO/' -e 's/ XTERM/[1m[32m XTERM/' -e 's/ g_/[1m[32m g_/' -e 's/ RIGHT/[1m[32m RIGHT/' -e 's/ LEFT/[1m[32m LEFT/' -e 's/ TOP/[1m[32m TOP/' -e 's/ BOTTOM/[1m[32m BOTTOM/' -e 's/ CTRL /[1m[32m CTRL /'

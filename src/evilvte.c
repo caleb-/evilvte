@@ -20,14 +20,31 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <libintl.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vte/vte.h>
+
+#ifndef VTE_CHECK_VERSION
+#define VTE_CHECK_VERSION(major,minor,micro) \
+  (VTE_MAJOR_VERSION > (major) || \
+  (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION > (minor)) || \
+  (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION == (minor) && VTE_MICRO_VERSION >= (micro)))
+#endif
 
 #define AUTO            VTE_ERASE_AUTO
 #define BACKSPACE       VTE_ERASE_ASCII_BACKSPACE
 #define DELETE          VTE_ERASE_ASCII_DELETE
 #define DELETE_SEQUENCE VTE_ERASE_DELETE_SEQUENCE
+#define ERASE_TTY       VTE_ERASE_AUTO
+#if VTE_CHECK_VERSION(0,20,4)
+#undef ERASE_TTY
+#define ERASE_TTY       VTE_ERASE_TTY
+#endif
+
+#define BLOCK     VTE_CURSOR_SHAPE_BLOCK
+#define IBEAM     VTE_CURSOR_SHAPE_IBEAM
+#define UNDERLINE VTE_CURSOR_SHAPE_UNDERLINE
 
 #define LINUX     1
 #define RXVT      2
@@ -45,13 +62,6 @@
 #include "custom.h"
 #include "evilvte.h"
 
-#ifndef VTE_CHECK_VERSION
-#define VTE_CHECK_VERSION(major,minor,micro) \
-  (VTE_MAJOR_VERSION > (major) || \
-  (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION > (minor)) || \
-  (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION == (minor) && VTE_MICRO_VERSION >= (micro)))
-#endif
-
 #if !GTK_CHECK_VERSION(2,7,1)
 #define VTE_STOCK_SUBMENU_IME GTK_STOCK_BOLD
 #define VTE_STOCK_TOGGLE GTK_STOCK_YES
@@ -64,6 +74,15 @@
 
 #if !GTK_CHECK_VERSION(2,10,0)
 #undef TAB_REORDERABLE
+#endif
+
+#if GTK_CHECK_VERSION(2,14,0)
+#define VTE_DIALOG_GET_COLOR(major) gtk_color_selection_dialog_get_color_selection(major)
+#define VTE_DIALOG_GET_CONTENT(major) gtk_dialog_get_content_area(major)
+#endif
+#if !GTK_CHECK_VERSION(2,14,0)
+#define VTE_DIALOG_GET_COLOR(major) (major)->colorsel
+#define VTE_DIALOG_GET_CONTENT(major) (major)->vbox
 #endif
 
 #if !VTE_CHECK_VERSION(0,11,0)
@@ -91,15 +110,17 @@
 #undef MENU_SELECT_ALL
 #endif
 
-#if VTE_CHECK_VERSION(0,17,1) && COLOR_VTE_FIXED
-#undef COLOR_VTE_FIXED
+#if VTE_CHECK_VERSION(0,17,1) && (COLOR_STYLE == VTE_FIXED)
 #undef COLOR_STYLE
 #endif
 
-#define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
-#if defined(CURSOR_BLINKS) && CURSOR_BLINKS
-#undef VTE_CURSOR_BLINKS
+#ifdef CURSOR_BLINKS
+#if CURSOR_BLINKS
 #define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_ON
+#endif
+#if !CURSOR_BLINKS
+#define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
+#endif
 #endif
 
 #ifndef DEFAULT_COMMAND
@@ -413,7 +434,6 @@ int scrollbar_status = 0;
 #ifdef SCROLLBAR
 #define VTE_HBOX term->hbox
 #endif
-
 #ifndef SCROLLBAR
 #define VTE_HBOX term->vte
 #endif
@@ -504,12 +524,8 @@ int tabbar_status = 0;
 #endif
 #endif
 
-#ifdef PROGRAM_VERSION
-#define EVILVTE_PROGRAM_VERSION PROGRAM_VERSION
-#endif
-
 #ifndef PROGRAM_VERSION
-#define EVILVTE_PROGRAM_VERSION EVILVTE_VERSION
+#define PROGRAM_VERSION EVILVTE_VERSION
 #endif
 
 #if COMMAND_SET_TITLE
@@ -786,7 +802,7 @@ void del_tab(GtkWidget *widget, int do_close_dialog)
         dialog_hbox = gtk_hbox_new(0, 0);
         dialog_icon = gtk_image_new_from_stock(GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
         dialog_string = gtk_label_new(LABEL_DIALOG_CLOSE);
-        gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), dialog_hbox);
+        gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(dialog))), dialog_hbox);
         gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_icon, 0, 0, 0);
         gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_string, 1, 0, 0);
         gtk_widget_show_all(dialog);
@@ -1264,6 +1280,10 @@ void add_tab()
 #endif
 #endif
 
+#if defined(CURSOR_SHAPE) && VTE_CHECK_VERSION(0,19,1)
+  vte_terminal_set_cursor_shape(VTE_TERMINAL(term->vte), CURSOR_SHAPE);
+#endif
+
 #ifdef DEFAULT_ENCODING
   vte_terminal_set_encoding(VTE_TERMINAL(term->vte), DEFAULT_ENCODING);
 #endif
@@ -1509,9 +1529,9 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef HOTKEY_COLOR_BACKGROUND
       if (HOTKEY_COLOR_BACKGROUND) {
         GtkColorSelectionDialog *color_tint_dialog = (GtkColorSelectionDialog*)gtk_color_selection_dialog_new(LABEL_DIALOG_BACKGROUND_TINT);
-        gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color_tint_dialog->colorsel), &color_tint);
+        gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(VTE_DIALOG_GET_COLOR(color_tint_dialog)), &color_tint);
         if (GTK_RESPONSE_OK == gtk_dialog_run(GTK_DIALOG(color_tint_dialog))) {
-          gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_tint_dialog->colorsel), &color_tint);
+          gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(VTE_DIALOG_GET_COLOR(color_tint_dialog)), &color_tint);
 #if TAB
           int i = 0;
           for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
@@ -1541,7 +1561,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         adjustment = gtk_hscale_new_with_range(0, 1, 0.01);
         gtk_range_set_value(GTK_RANGE(adjustment), saturation_level_old);
         g_signal_connect_after(adjustment, "change-value", do_change_saturation, NULL);
-        gtk_container_add(GTK_CONTAINER(GTK_DIALOG(saturation_dialog)->vbox), adjustment);
+        gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(saturation_dialog))), adjustment);
         gtk_dialog_set_default_response(GTK_DIALOG(saturation_dialog), GTK_RESPONSE_OK);
         gtk_widget_show_all(saturation_dialog);
         saturation_level = (gtk_dialog_run(GTK_DIALOG(saturation_dialog)) == GTK_RESPONSE_OK) ? gtk_range_get_value(GTK_RANGE(adjustment)) : saturation_level_old;
@@ -1722,7 +1742,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         gtk_dialog_set_default_response(GTK_DIALOG(encoding_dialog), GTK_RESPONSE_OK);
         gtk_entry_set_text(GTK_ENTRY(encoding_entry), encoding_name);
         gtk_entry_set_activates_default(GTK_ENTRY(encoding_entry), 1);
-        gtk_container_add(GTK_CONTAINER(GTK_DIALOG(encoding_dialog)->vbox), encoding_entry);
+        gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(encoding_dialog))), encoding_entry);
         gtk_widget_show_all(encoding_dialog);
         if (gtk_dialog_run(GTK_DIALOG(encoding_dialog)) == GTK_RESPONSE_OK) {
           vte_terminal_set_encoding(VTE_TERMINAL(term->vte), gtk_entry_get_text(GTK_ENTRY(encoding_entry)));
@@ -1760,7 +1780,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
         gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
         gtk_entry_set_text(GTK_ENTRY(entry), label_name);
         gtk_entry_set_activates_default(GTK_ENTRY(entry), 1);
-        gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), entry);
+        gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(dialog))), entry);
         gtk_widget_show_all(dialog);
         if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
 #if TAB_CLOSE_BUTTON
@@ -2141,7 +2161,7 @@ void delete_event()
     dialog_hbox = gtk_hbox_new(0, 0);
     dialog_icon = gtk_image_new_from_stock(GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
     dialog_string = gtk_label_new(LABEL_DIALOG_CLOSE);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), dialog_hbox);
+    gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(dialog))), dialog_hbox);
     gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_icon, 0, 0, 0);
     gtk_box_pack_start(GTK_BOX(dialog_hbox), dialog_string, 1, 0, 0);
     gtk_widget_show_all(dialog);
@@ -2240,7 +2260,7 @@ void do_edit_label()
   gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
   gtk_entry_set_text(GTK_ENTRY(entry), label_name);
   gtk_entry_set_activates_default(GTK_ENTRY(entry), 1);
-  gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), entry);
+  gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(dialog))), entry);
   gtk_widget_show_all(dialog);
   if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
 #if TAB_CLOSE_BUTTON
@@ -2302,7 +2322,7 @@ void do_menu_saturation()
   adjustment = gtk_hscale_new_with_range(0, 1, 0.001);
   gtk_range_set_value(GTK_RANGE(adjustment), saturation_level_old);
   g_signal_connect_after(adjustment, "change-value", do_change_saturation, NULL);
-  gtk_container_add(GTK_CONTAINER(GTK_DIALOG(saturation_dialog)->vbox), adjustment);
+  gtk_container_add(GTK_CONTAINER(VTE_DIALOG_GET_CONTENT(GTK_DIALOG(saturation_dialog))), adjustment);
   gtk_dialog_set_default_response(GTK_DIALOG(saturation_dialog), GTK_RESPONSE_OK);
   gtk_widget_show_all(saturation_dialog);
   saturation_level = (gtk_dialog_run(GTK_DIALOG(saturation_dialog)) == GTK_RESPONSE_OK) ? gtk_range_get_value(GTK_RANGE(adjustment)) : saturation_level_old;
@@ -2331,9 +2351,9 @@ void do_menu_saturation()
 void do_menu_tint_color()
 {
   GtkColorSelectionDialog *color_tint_dialog = (GtkColorSelectionDialog*)gtk_color_selection_dialog_new(LABEL_DIALOG_BACKGROUND_TINT);
-  gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color_tint_dialog->colorsel), &color_tint);
+  gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(VTE_DIALOG_GET_COLOR(color_tint_dialog)), &color_tint);
   if (GTK_RESPONSE_OK == gtk_dialog_run(GTK_DIALOG(color_tint_dialog))) {
-    gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(color_tint_dialog->colorsel), &color_tint);
+    gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(VTE_DIALOG_GET_COLOR(color_tint_dialog)), &color_tint);
 #if TAB
     int i = 0;
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
@@ -2713,7 +2733,7 @@ int at_dock_mode = 0;
 
 #if COMMAND_SHOW_VERSION
     if (!strncmp(argv[j], "-v", 3)) {
-      printf("%s, version %s\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION);
+      printf("%s, version %s\n", PROGRAM_NAME, PROGRAM_VERSION);
       return 0;
     }
 #endif
@@ -2727,7 +2747,7 @@ int at_dock_mode = 0;
 
 #if COMMAND_SHOW_HELP
     if (!strncmp(argv[j], "-h", 3)) {
-      printf("%s, version %s\n\nUsage:\n\t%s [option%s]\n\nOption%s:\n", PROGRAM_NAME, EVILVTE_PROGRAM_VERSION, PROGRAM_NAME,
+      printf("%s, version %s\n\nUsage:\n\t%s [option%s]\n\nOption%s:\n", PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_NAME,
 #if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
              "s", "s");
 #endif

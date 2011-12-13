@@ -6,8 +6,10 @@
 // #define BACKGROUND_TINT_COLOR  "black"
 // #define BACKGROUND_TRANSPARENT TRUE  /* Pseudo transparent background      */
 // #define BACKGROUND_OPACITY     TRUE  /* True transparent background        */
-// #define BACKSPACE_KEY /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
-// #define DELETE_KEY    /* Options: AUTO, BACKSPACE, DELETE, DELETE_SEQUENCE */
+// #define BACKSPACE_KEY /* Options: AUTO, BACKSPACE, DELETE, ERASE_TTY,      */
+                         /*          DELETE_SEQUENCE                          */
+// #define DELETE_KEY    /* Options: AUTO, BACKSPACE, DELETE, ERASE_TTY,      */
+                         /*          DELETE_SEQUENCE                          */
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
 // #define BUTTON_ORDER_BY_RCFILE TRUE
@@ -31,6 +33,7 @@
 // #define COMMAND_TAB_NUMBERS    TRUE  /* -[2-9] options, to set tab numbers */
 // #define CURSOR_BLINKS          TRUE
 // #define CURSOR_COLOR           "blue"
+// #define CURSOR_SHAPE  /* Options: BLOCK, IBEAM, UNDERLINE                  */
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
 // #define DEFAULT_DIRECTORY      g_get_current_dir()
 // #define DEFAULT_EMULATION_TYPE "xterm"
@@ -49,7 +52,7 @@
 // #define RECORD_LASTLOG         TRUE
 // #define RECORD_UTMP            TRUE
 // #define RECORD_WTMP            TRUE
-// #define SCROLL_LINES           1000
+// #define SCROLL_LINES           1000  /* Negative value means unlimited     */
 // #define SCROLL_ON_KEYSTROKE    TRUE
 // #define SCROLL_ON_OUTPUT       TRUE
 #define    SCROLLBAR              RIGHT /* Options: LEFT, RIGHT               */
