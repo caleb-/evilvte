@@ -1,3 +1,12 @@
+0.4.9~pre5
+ * Support GtkGrid
+ * Fix an SCROLLBAR minor bug with option OFF_L and OFF_R
+ * New icon set under the license:
+   GNU General Public License version 2 or any later version
+   Thanks to Alexander Inglessi <inglessi AT gmail DOT com>
+ * Use vte_terminal_fork_command() by default. Please see:
+   http://evilvte.blogspot.com/2011/03/issue-evilvte-048-makes-zsh-segfault.html
+
 0.4.9~pre4
  * Support SEARCH_CASE_SENSITIVE
    I will make it toggleable at runtime in the future.
@@ -152,8 +161,6 @@
 
 0.4.5~pre6
  * Support TAB_LABEL_DYNAMIC for xterm escape sequences, thanks to Pavel Plesov
- * Relicense icons to GNU General Public License version 2 with permission
-   from the author, Tetralet <tetralet AT gmail DOT com>
 
 0.4.5~pre5
  * Merge changes from 0.4.4.2

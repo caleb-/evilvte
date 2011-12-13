@@ -141,6 +141,7 @@ ONLY_ONE_MENU_ITEM=`echo $MENU_CUSTOM_DEFINE | grep '"Auto-click"'`
 mv $CONFFILE src/evilvte.h
 
 head -n 1 $0 > src/install.sh
+echo "set -x" >> src/install.sh
 make -n install | grep 'install ' >> src/install.sh
 
 head -n 1 $0 > src/showvte

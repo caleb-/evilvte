@@ -84,6 +84,11 @@
 #define gtk_widget_set_can_focus(x,y)
 #endif
 
+#if !GTK_CHECK_VERSION(2,90,0)
+#define gtk_scrollbar_new(x,y) gtk_vscrollbar_new(y)
+#define gtk_scale_new_with_range(w,x,y,z) gtk_hscale_new_with_range(x,y,z)
+#endif
+
 #if GTK_CHECK_VERSION(2,90,7)
 #define GTK_DIALOG_NO_SEPARATOR 0
 #endif
@@ -95,6 +100,19 @@
 
 #if !GTK_CHECK_VERSION(2,91,1)
 #define gtk_window_set_has_resize_grip(x,y)
+#endif
+
+#if GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID)
+#undef GTK_BOX
+#define GTK_BOX GTK_GRID
+#define gtk_hbox_new(x,y) gtk_grid_new()
+#define gtk_vbox_new(x,y) gtk_grid_new()
+#define gtk_box_pack_start(v,w,x,y,z) gtk_container_add(GTK_CONTAINER(v),w)
+#endif
+
+#if !GTK_CHECK_VERSION(2,99,0)
+#define gdk_device_warp(w,x,y,z) gdk_display_warp_pointer(display,x,y,z)
+#define gdk_device_get_position(w,x,y,z) gdk_display_get_pointer(display,x,y,z,NULL)
 #endif
 
 #if !VTE_CHECK_VERSION(0,25,1)
@@ -128,10 +146,6 @@
 
 #ifndef VTE_FORK_CMD_OLD
 #define VTE_FORK_CMD_OLD 1
-#if VTE_CHECK_VERSION(0,25,1)
-#undef VTE_FORK_CMD_OLD
-#define VTE_FORK_CMD_OLD 0
-#endif
 #endif
 
 #define VTE_WINDOW_RESIZE(x,y,z) gtk_window_resize(x,y,z)
@@ -508,12 +522,11 @@ GdkColor color_tint;
 #ifndef SCROLLBAR
 #define SCROLLBAR RIGHT
 #endif
-#if (SCROLLBAR == LEFT) || (SCROLLBAR == RIGHT)
-int scrollbar_status = 1 ;
+int scrollbar_status = (SCROLLBAR < 3);
 #endif
-#if (SCROLLBAR == OFF_L) || (SCROLLBAR == OFF_R)
-int scrollbar_status = 0 ;
-#endif
+
+#if !defined(HOTKEY_TOGGLE_SCROLLBAR) && !MENU_TOGGLE_SCROLLBAR && (SCROLLBAR > 3)
+#undef SCROLLBAR
 #endif
 
 #ifdef SCROLLBAR
@@ -1024,6 +1037,9 @@ void tab_close_button(GtkWidget *tab_label)
   g_object_unref(rcstyle);
 #endif
   term->label_edit = tab_label;
+#if GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID) && TAB_EXPANDED_WIDTH
+  gtk_widget_set_hexpand(term->label_edit, TRUE);
+#endif
   gtk_box_pack_start(GTK_BOX(term->label), term->label_edit, 1, 1, 0);
   gtk_box_pack_start(GTK_BOX(term->label), term->button, 0, 0, 0);
   gtk_widget_show_all(term->label);
@@ -1063,6 +1079,9 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #ifdef ONLY_ONE_MENU_ITEM
   int x = 0;
   int y = 0;
+#endif
+#if defined(ONLY_ONE_MENU_ITEM) && GTK_CHECK_VERSION(2,99,0)
+  GdkDevice *device = gtk_get_current_event_device();
 #endif
 #if defined(ONLY_ONE_MENU_ITEM) || MENU_PASTE
   GdkDisplay *display = gdk_display_get_default();
@@ -1140,10 +1159,10 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
           gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
 #ifdef ONLY_ONE_MENU_ITEM
         if (menu_item_success == 1) {
-          gdk_display_get_pointer(display, NULL, &x, &y, NULL);
+          gdk_device_get_position(device, NULL, &x, &y);
           gtk_test_widget_send_key(menu, GDK_Down, 0);
           gtk_test_widget_send_key(menu, GDK_Return, 0);
-          gdk_display_warp_pointer(display, gdk_display_get_default_screen(display), x, y);
+          gdk_device_warp(device, gdk_display_get_default_screen(display), x, y);
         }
 #endif
 #ifdef MENU_MATCH_STRING_EXEC
@@ -1268,22 +1287,16 @@ void add_tab()
   tab_close_button(label);
 #endif
 
-#ifdef SCROLLBAR
-  term->hbox = (GtkWidget*)gtk_hbox_new(0, 0);
-#endif
-
   term->vte = vte_terminal_new();
 
 #ifdef SCROLLBAR
-  term->scrollbar = (GtkWidget*)gtk_vscrollbar_new(vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
-#endif
-
-#ifdef SCROLLBAR
-#if (SCROLLBAR == LEFT) || (SCROLLBAR == OFF_L)
+  term->hbox = (GtkWidget*)gtk_hbox_new(0, 0);
+  term->scrollbar = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, vte_terminal_get_adjustment(VTE_TERMINAL(term->vte)));
+#if !(SCROLLBAR & 1)
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
 #endif
   gtk_box_pack_start(GTK_BOX(term->hbox), term->vte, 1, 1, 0);
-#if (SCROLLBAR == RIGHT) || (SCROLLBAR == OFF_R)
+#if (SCROLLBAR & 1)
   gtk_box_pack_start(GTK_BOX(term->hbox), term->scrollbar, 0, 0, 0);
 #endif
 #endif
@@ -1709,7 +1722,7 @@ void do_menu_saturation()
   else
 #endif
     dialog = gtk_dialog_new_with_buttons(LABEL_MENU_SATURATION, GTK_WINDOW(main_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-  adjustment = (GtkWidget*)gtk_hscale_new_with_range(0, 1, 0.01);
+  adjustment = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 1, 0.01);
   gtk_range_set_value(GTK_RANGE(adjustment), saturation_level_old);
   g_signal_connect_after(adjustment, "change-value", do_change_saturation, NULL);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), adjustment);
@@ -2495,7 +2508,7 @@ int main(int argc, char **argv)
 int at_dock_mode = 0;
 #endif
 
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
+#if COMMAND_EXEC_PROGRAM || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
   int i = 0;
 #endif
 #if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_CUSTOM)
@@ -2533,7 +2546,6 @@ int at_dock_mode = 0;
 #endif
 
 #if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
-  i = 1;
   j = 1;
   while ((j < argc) && strncmp(argv[j], "-e", 3)) {
 #if PROGRAM_WM_CLASS
@@ -2640,6 +2652,7 @@ int at_dock_mode = 0;
 #endif
 
 #if COMMAND_TAB_NUMBERS
+    i = 1;
     if (!strncmp(argv[j], "-2", 3))
       i = 2;
     if (!strncmp(argv[j], "-3", 3))
@@ -2758,6 +2771,9 @@ int at_dock_mode = 0;
 
 #if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
   vbox = (GtkWidget*)gtk_vbox_new(0, 0);
+#if GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID)
+  gtk_orientable_set_orientation(GTK_ORIENTABLE(vbox), GTK_ORIENTATION_VERTICAL);
+#endif
   gtk_container_add(GTK_CONTAINER(main_window), vbox);
 #endif
 
@@ -2880,7 +2896,7 @@ int at_dock_mode = 0;
 #endif
 
 #if VTE_CHECK_VERSION(0,27,1) && GTK_CHECK_VERSION(2,91,1)
-  gtk_widget_style_get (term->vte, "inner-border", &inner_border, NULL);
+  gtk_widget_style_get(term->vte, "inner-border", &inner_border, NULL);
 #ifndef VTE_FUNNY
   gtk_window_set_default_geometry(GTK_WINDOW(main_window), VTE_COLUMNS * vte_terminal_get_char_width(VTE_TERMINAL(term->vte)) + INNER_BORDER_W, VTE_ROWS * vte_terminal_get_char_height(VTE_TERMINAL(term->vte)) + INNER_BORDER_H);
 #endif

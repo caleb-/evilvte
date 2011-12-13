@@ -141,6 +141,7 @@ bindir=$prefix/bin
 mandir=$prefix/share/man/man1
 deskdir=$prefix/share/applications
 ICON_DIR=$prefix/share/pixmaps
+THEME_DIR=$prefix/share/icons
 GNOME_DEF_APP=$prefix/share/gnome-control-center/default-apps
 EVILVTE_VERSION=`head -n 1 ChangeLog`
 
@@ -153,41 +154,65 @@ echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
 echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
 echo \#define ICON_DIR '"'$ICON_DIR'"' >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
+echo "THEME_DIR=\$(DESTDIR)$THEME_DIR" >> src/config.o
 echo "GNOME_DEF_APP=\$(DESTDIR)$GNOME_DEF_APP" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo \#define EVILVTE_VERSION '"'$EVILVTE_VERSION'"' >> src/config.o
 echo "CONF_FILE=$CONF_FILE" >> src/config.o
 head -n 1 $0 > src/uninstall.sh
-echo "echo rm -f $bindir/$PROG" >> src/uninstall.sh
+echo "set -x" >> src/uninstall.sh
 echo "rm -f $bindir/$PROG" >> src/uninstall.sh
-echo "echo rm -f $bindir/showvte" >> src/uninstall.sh
 echo "rm -f $bindir/showvte" >> src/uninstall.sh
-echo "echo rm -f $deskdir/evilvte.desktop" >> src/uninstall.sh
+echo "rmdir $bindir 2> /dev/null" >> src/uninstall.sh
 echo "rm -f $deskdir/evilvte.desktop" >> src/uninstall.sh
-echo "echo rm -f $GNOME_DEF_APP/evilvte.xml" >> src/uninstall.sh
+echo "rmdir $deskdir 2> /dev/null" >> src/uninstall.sh
 echo "rm -f $GNOME_DEF_APP/evilvte.xml" >> src/uninstall.sh
-echo "echo rm -f $mandir/evilvte.1" >> src/uninstall.sh
+echo "rmdir $GNOME_DEF_APP 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $prefix/share/gnome-control-center 2> /dev/null" >> src/uninstall.sh
 echo "rm -f $mandir/evilvte.1" >> src/uninstall.sh
-echo "echo rm -f $mandir/showvte.1" >> src/uninstall.sh
 echo "rm -f $mandir/showvte.1" >> src/uninstall.sh
-echo "echo rm -f $ICON_DIR/evilvte.png" >> src/uninstall.sh
+echo "rmdir $mandir 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $prefix/share/man 2> /dev/null" >> src/uninstall.sh
 echo "rm -f $ICON_DIR/evilvte.png" >> src/uninstall.sh
-echo "echo rmdir $ICON_DIR" >> src/uninstall.sh
-echo "rmdir $ICON_DIR" >> src/uninstall.sh
-echo "echo rmdir $mandir" >> src/uninstall.sh
-echo "rmdir $mandir" >> src/uninstall.sh
-echo "echo rmdir $prefix/share/man" >> src/uninstall.sh
-echo "rmdir $prefix/share/man" >> src/uninstall.sh
-echo "echo rmdir $GNOME_DEF_APP" >> src/uninstall.sh
-echo "rmdir $GNOME_DEF_APP" >> src/uninstall.sh
-echo "echo rmdir $prefix/share/gnome-control-center" >> src/uninstall.sh
-echo "rmdir $prefix/share/gnome-control-center" >> src/uninstall.sh
-echo "echo rmdir $deskdir" >> src/uninstall.sh
-echo "rmdir $deskdir" >> src/uninstall.sh
-echo "echo rmdir $prefix/share" >> src/uninstall.sh
-echo "rmdir $prefix/share" >> src/uninstall.sh
-echo "echo rmdir $bindir" >> src/uninstall.sh
-echo "rmdir $bindir" >> src/uninstall.sh
-echo "echo rmdir $prefix" >> src/uninstall.sh
-echo "rmdir $prefix" >> src/uninstall.sh
+echo "rmdir $ICON_DIR 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/16x16/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/16x16/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/16x16 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/20x20/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/20x20/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/20x20 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/22x22/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/22x22/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/22x22 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/24x24/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/24x24/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/24x24 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/32x32/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/32x32/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/32x32 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/36x36/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/36x36/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/36x36 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/40x40/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/40x40/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/40x40 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/48x48/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/48x48/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/48x48 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/64x64/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/64x64/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/64x64 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/72x72/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/72x72/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/72x72 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/96x96/apps/evilvte.png" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/96x96/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/96x96 2> /dev/null" >> src/uninstall.sh
+echo "rm -f $THEME_DIR/hicolor/scalable/apps/evilvte.svg" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/scalable/apps 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor/scalable 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR/hicolor 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $THEME_DIR 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $prefix/share 2> /dev/null" >> src/uninstall.sh
+echo "rmdir $prefix 2> /dev/null" >> src/uninstall.sh
 echo "true" >> src/uninstall.sh
