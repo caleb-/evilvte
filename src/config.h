@@ -33,7 +33,7 @@
 // #define DEFAULT_COLUMNS        80
 // #define DEFAULT_ROWS           24
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
-// #define DEFAULT_DIRECTORY      g_getenv("PWD")
+// #define DEFAULT_DIRECTORY      g_get_current_dir()
 // #define DEFAULT_EMULATION_TYPE "xterm"
 // #define DEFAULT_ENCODING       "UTF-8"
 // #define DEFAULT_ENVV           NULL
@@ -98,12 +98,15 @@
 // #define TABBAR_SCROLLABLE      TRUE
 // #define TABBAR_MENU_SELECT_TAB TRUE
 
-/* Use || for multiple hotkeys
+/* Use || for multiple hotkeys.
  * (event->keyval == GDK_A || event->keyval == GDK_a)
  *                   GDK_A = "Shift + a", so hotkey will be "Ctrl + Shift + a"
- * See /usr/include/gtk-2.0/gdk/gdkkeysyms.h for GDK_* definitions            */
+ * See /usr/include/gtk-2.0/gdk/gdkkeysyms.h for GDK_* definitions.
+ *
+ * If you enable "CTRL_ALT", all hotkeys will become Ctrl + Alt + hotkey(s).  */
 
 #define    CTRL                   TRUE
+// #define CTRL_ALT               TRUE
 // #define CTRL_COPY              (event->keyval == GDK_C)
 // #define CTRL_PASTE             (event->keyval == GDK_V)
 // #define CTRL_SELECT_ALL        (event->keyval == GDK_S)

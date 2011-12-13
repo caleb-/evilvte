@@ -19,7 +19,7 @@
  *
  *****************************************************************************/
 
-/* Copyright (C) 2008  Wen-Yen Chuang <caleb AT calno DOT com>
+/* Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
  *
  * Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  */
@@ -199,6 +199,11 @@
 
 #if !TAB_NEW_PATH_EQUAL_OLD
 #define VTE_DEFAULT_DIRECTORY DEFAULT_DIRECTORY
+#endif
+
+#if CTRL_ALT
+#undef CTRL
+#define CTRL TRUE
 #endif
 
 #if !CTRL
@@ -1063,7 +1068,12 @@ static void switch_page();
 #if CTRL
 static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
+#if !CTRL_ALT
   if (event->state & GDK_CONTROL_MASK) {
+#endif
+#if CTRL_ALT
+  if ((event->state & GDK_CONTROL_MASK) && (event->state & GDK_MOD1_MASK)) {
+#endif
 
 #ifdef CTRL_TOGGLE_HOTKEYS
     if CTRL_TOGGLE_HOTKEYS {
@@ -2956,7 +2966,7 @@ int main(int argc, char **argv)
     printf("\t-r                    \tmake %s run in root window\n", PROGRAM_NAME);
 #endif
 #if COMMAND_EXEC_PROGRAM
-    printf("\t-e [program] [options]\tspecifies the program to be run in %s\n", PROGRAM_NAME);
+    printf("\t-e [program] [options]\tspecify the program to be run in %s\n", PROGRAM_NAME);
 #endif
 #if COMMAND_FULLSCREEN
     printf("\t-f                    \tstart %s in fullscreen mode\n", PROGRAM_NAME);
@@ -2968,13 +2978,13 @@ int main(int argc, char **argv)
     printf("\t-v                    \tshow version\n");
 #endif
 #if COMMAND_TAB_NUMBERS
-    printf("\t-2 to -9              \tspecifies the initial tab numbers\n");
+    printf("\t-2 to -9              \tspecify the initial tab numbers\n");
 #endif
 #if COMMAND_SET_TITLE
     printf("\t-title [string]       \tset program title\n");
 #endif
 #ifdef BACKGROUND_IMAGE
-    printf("\nBackground image:\n\t$HOME/%s\n", BACKGROUND_IMAGE);
+    printf("\nBackground image:\n\t$HOME/%s\n\n", BACKGROUND_IMAGE);
 #endif
     return 0;
   }

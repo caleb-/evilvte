@@ -1,3 +1,8 @@
+0.4.4~pre10
+ * Support CTRL_ALT
+   If you enable it, all hotkeys will become Ctrl + Alt + hotkey(s). 
+ * Cosmetic minor changes
+
 0.4.4~pre9
  * Support command line -f option to start evilvte in fullscreen mode
  * New COLOR_STYLE option: VTE_FIXED
