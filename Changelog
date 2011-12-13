@@ -1,3 +1,13 @@
+0.4.5~pre2
+ * Support virtual keyboard with libXtst
+   You may disable libXtst by "./configure --disable-xtst".
+   You may define VIRTUAL_KEYBOARD_MENU_KEY and VIRTUAL_KEYBOARD_WINDOW_KEY  
+ * Detect GTK+ version and disable unsupported options automatically.
+ * Fix a displaying bug about toggling scrollbar or status bar.
+ * Avoid an GTK+ autohide bug when CLOSE_DIALOG is enabled.
+ * Avoid an GTK+ warning message when TAB_LABEL is customized.
+ * Update license to latest format published by the Free Software Foundation.
+
 0.4.5~pre1
  * Support command line -T option to assign program title.
    You may use -title as before.

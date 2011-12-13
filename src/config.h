@@ -60,6 +60,7 @@
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      TRUE
 #define    STATUS_BAR             TRUE
+// #define VIRTUAL_KEYBOARD       TRUE
 #define    WORD_CHARS             "-A-Za-z0-9_$.+!*(),;:@&=?/~#%"
 
 #define    MENU                   TRUE
@@ -157,5 +158,7 @@
 // #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
 // #define LABEL_SUBMENU_ENCODING       "Character Encoding"
 // #define LABEL_SUBMENU_IME            "Input Methods"
+// #define VIRTUAL_KEYBOARD_MENU_KEY    "Menu" /* " 目 "                    */
+// #define VIRTUAL_KEYBOARD_WINDOW_KEY  "Win"  /* "ﾐ田"                     */
 
 // #define VTE_DISABLE_DEPRECATED       TRUE

@@ -2,20 +2,28 @@ OPTFLAGS=-g
 
 include src/config.o
 
-OBJ=src/sakura.o
+OBJ=src/sakura.o src/win-kbm.o
 
-CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\" -DEVILVTE_VERSION=\"$(EVILVTE_VERSION)\"
+CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\" -DEVILVTE_VERSION=\"$(EVILVTE_VERSION)\" -DG_DISABLE_DEPRECATED -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
 ifneq (,$(findstring min,$(EVILVTE)))
 	CFLAGS += -DEVILVTE_MINIMUM=1
 endif
 
 ifneq (,$(findstring max,$(EVILVTE)))
-        CFLAGS += -DEVILVTE_MAXIMUM=1
+	CFLAGS += -DEVILVTE_MAXIMUM=1
+endif
+
+ifneq (,$(findstring test,$(EVILVTE)))
+	CFLAGS += -DEVILVTE_TESTING=1
 endif
 
 ifeq ($(SUSE_DETECTED),TRUE)
 CFLAGS += -DSUSE_DETECTED=1
+endif
+
+ifeq ($(XTST_DETECTED),TRUE)
+CFLAGS += -DXTST_DETECTED=1
 endif
 
 all: evilvte showvte misc/evilvte.1
@@ -61,7 +69,7 @@ installstrip: strip
 	install -m 644 misc/evilvte.desktop $(deskdir)
 
 clean: src/config.o
-	rm -f $(PROG) src/showvte src/*.o src/evilvte.h misc/evilvte.1 src/max.h
+	rm -f $(PROG) src/showvte src/*.o src/???????.h misc/evilvte.1 src/max.h src/test.h
 
 src/config.o:
 	./configure

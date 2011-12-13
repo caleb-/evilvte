@@ -1,32 +1,20 @@
-/***************************************************************************** *
- *  Filename: sakura.c
- *  Description: VTE-based terminal emulator
+/* Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
+ * Copyright (C) 2006-2008  David Gómez <david@pleyades.net>
+ * Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
  *
- *           Copyright (C) 2006-2008  David Gómez <david@pleyades.net>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License version 2 as
- *  published by the Free Software Foundation
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *****************************************************************************/
-
-/* Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
- *
- * Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-#define G_DISABLE_DEPRECATED   TRUE
-#define GDK_DISABLE_DEPRECATED TRUE
-#define GTK_DISABLE_DEPRECATED TRUE
 
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
@@ -58,11 +46,29 @@
 #include "max.h"
 #endif
 
+#if EVILVTE_TESTING
+#include "testing.h"
+#include "test.h"
+#endif
+
 #ifndef VTE_CHECK_VERSION
 #define VTE_CHECK_VERSION(major,minor,micro) \
   (VTE_MAJOR_VERSION > (major) || \
   (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION > (minor)) || \
   (VTE_MAJOR_VERSION == (major) && VTE_MINOR_VERSION == (minor) && VTE_MICRO_VERSION >= (micro)))
+#endif
+
+#if !GTK_CHECK_VERSION(2,7,1)
+#define VTE_STOCK_SUBMENU_IME GTK_STOCK_BOLD
+#define VTE_STOCK_TOGGLE GTK_STOCK_YES
+#endif
+#if GTK_CHECK_VERSION(2,7,1)
+#define VTE_STOCK_SUBMENU_IME GTK_STOCK_INFO
+#define VTE_STOCK_TOGGLE GTK_STOCK_LEAVE_FULLSCREEN
+#endif
+
+#if !GTK_CHECK_VERSION(2,10,0)
+#undef TAB_REORDERABLE
 #endif
 
 #if !VTE_CHECK_VERSION(0,11,0)
@@ -76,6 +82,12 @@
 #undef COLOR_TEXT_HIGHLIGHTED
 #undef CURSOR_COLOR
 #define DISABLE_ANTI_ALIAS 1
+#endif
+
+#if !VTE_CHECK_VERSION(0,13,3)
+#undef BACKGROUND_OPACITY
+#undef INIT_OPACITY
+#undef TOGGLE_BG_OPACITY
 #endif
 
 #if !VTE_CHECK_VERSION(0,16,0)
@@ -214,6 +226,12 @@
 #define GET_VTE_CHILD_PID 1
 #endif
 
+#if SUSE_DETECTED
+#ifndef TAB_LABEL
+#define TAB_LABEL "Page"
+#endif
+#endif
+
 #if !TAB
 #undef CTRL_TAB_ADD
 #undef CTRL_TAB_REMOVE
@@ -306,7 +324,12 @@
 #define BACKGROUND_SATURATION 0.4
 #endif
 #ifndef TOGGLE_BG_ORDER
+#if !VTE_CHECK_VERSION(0,13,3)
+#define TOGGLE_BG_ORDER "Image", "Transparent", "No background"
+#endif
+#if VTE_CHECK_VERSION(0,13,3)
 #define TOGGLE_BG_ORDER "Image", "Transparent", "No background", "Opacity"
+#endif
 #endif
 #define DO_TOGGLE_BACKGROUND 1
 static char *background_order[] = { TOGGLE_BG_ORDER };
@@ -452,7 +475,12 @@ GtkWidget *encoding_item;
 #define BACKGROUND_SATURATION 0.4
 #endif
 #ifndef TOGGLE_BG_ORDER
+#if !VTE_CHECK_VERSION(0,13,3)
+#define TOGGLE_BG_ORDER "Image", "Transparent", "No background"
+#endif
+#if VTE_CHECK_VERSION(0,13,3)
 #define TOGGLE_BG_ORDER "Image", "Transparent", "No background", "Opacity"
+#endif
 #endif
 #ifndef CTRL_TOGGLE_BACKGROUND
 #define DO_TOGGLE_BACKGROUND 1
@@ -529,10 +557,13 @@ int scrollbar_status = 0;
 #ifdef CTRL_TOGGLE_STATUS_BAR
 #if STATUS_BAR
 int status_bar_status = 0;
+#define DO_TOGGLE_STATUS_BAR 1
 #endif
 #endif
 
 #if MENU_TOGGLE_STATUS_BAR && STATUS_BAR
+#undef DO_TOGGLE_STATUS_BAR
+#define DO_TOGGLE_STATUS_BAR 1
 #ifndef CTRL_TOGGLE_STATUS_BAR
 int status_bar_status = 0;
 #endif
@@ -758,12 +789,6 @@ char program_name[64];
 GtkWidget *main_window;
 GtkWidget *notebook;
 
-#if SUSE_DETECTED
-#ifndef TAB_LABEL
-#define TAB_LABEL "Page"
-#endif
-#endif
-
 #if TAB_CLOSE_BUTTON
 #ifndef TAB_LABEL
 #define TAB_LABEL "Page"
@@ -782,7 +807,7 @@ static int label_style_size = sizeof(label_style_custom) / sizeof(label_style_cu
 #if TAB_LABEL_POEM
 #undef TAB_LABEL
 #define TAB_LABEL_INIT 1
-/* Taken from http://zh.wikipedia.org/wiki/千字文 */
+/* http://zh.wikisource.org/wiki/千字文 */
 static char *label_style_poem[] = {
 "天", "地", "玄", "黃", "宇", "宙", "洪", "荒",
 "日", "月", "盈", "昃", "辰", "宿", "列", "張",
@@ -926,27 +951,17 @@ const GdkColor color_xterm[16] =
 #endif
 
 #if MENU_FONT_BIGGER
-#ifndef FONT
-#define FONT "Monospace"
-#endif
+#define FONT_CHANGE_SIZE 1
 #endif
 
 #if MENU_FONT_SMALLER
-#ifndef FONT
-#define FONT "Monospace"
-#endif
-#endif
-
-#if MENU_FONT_DEFAULT_SIZE
-#ifndef FONT
-#define FONT "Monospace"
-#endif
+#undef FONT_CHANGE_SIZE
+#define FONT_CHANGE_SIZE 1
 #endif
 
 #if MENU_FONT_SELECT
-#ifndef FONT
-#define FONT "Monospace"
-#endif
+#undef FONT_CHANGE_SIZE
+#define FONT_CHANGE_SIZE 1
 static char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #endif
 
@@ -963,6 +978,7 @@ static char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" 
 #endif
 
 #ifdef CTRL_FONT_BIGGER
+#undef FONT_CHANGE_SIZE
 #define FONT_CHANGE_SIZE 1
 #endif
 
@@ -971,9 +987,12 @@ static char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" 
 #define FONT_CHANGE_SIZE 1
 #endif
 
-#ifdef CTRL_FONT_DEFAULT_SIZE
+#ifdef CTRL_FONT_SELECT
 #undef FONT_CHANGE_SIZE
 #define FONT_CHANGE_SIZE 1
+#if !MENU_FONT_SELECT
+static char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+#endif
 #endif
 
 #if FONT_CHANGE_SIZE
@@ -982,18 +1001,14 @@ static char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" 
 #endif
 #endif
 
+#if !FONT_CHANGE_SIZE
+#undef MENU_FONT_DEFAULT_SIZE
+#undef CTRL_FONT_DEFAULT_SIZE
+#endif
+
 #if FONT_SIZE
 #ifndef FONT
 #define FONT "Monospace"
-#endif
-#endif
-
-#ifdef CTRL_FONT_SELECT
-#ifndef FONT
-#define FONT "Monospace"
-#endif
-#if !MENU_FONT_SELECT
-static char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #endif
 #endif
 
@@ -1126,8 +1141,13 @@ static void do_toggle_tabbar();
 static void do_zoom_100();
 static void do_zoom_in();
 static void do_zoom_out();
+static void font_size_changed();
+static void recover_window_status();
 static void set_encoding(GtkWidget *widget, void *data);
 static void switch_page();
+void hide_kbm();
+void make_kbm();
+void move_kbm();
 
 #if CTRL
 static int key_press_event(GtkWidget *widget, GdkEventKey *event)
@@ -1188,10 +1208,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
         gtk_container_add(GTK_CONTAINER(GTK_DIALOG(saturation_dialog)->vbox), adjustment);
         gtk_dialog_set_default_response(GTK_DIALOG(saturation_dialog), GTK_RESPONSE_OK);
         gtk_widget_show_all(saturation_dialog);
-        if (gtk_dialog_run(GTK_DIALOG(saturation_dialog)) == GTK_RESPONSE_OK)
-          saturation_level = gtk_range_get_value(GTK_RANGE(adjustment));
-        else
-          saturation_level = saturation_level_old;
+        saturation_level = (gtk_dialog_run(GTK_DIALOG(saturation_dialog)) == GTK_RESPONSE_OK) ? gtk_range_get_value(GTK_RANGE(adjustment)) : saturation_level_old;
         gtk_widget_destroy(saturation_dialog);
 #if TAB
         int i = 0;
@@ -1236,10 +1253,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TOGGLE_DECORATED
       if CTRL_TOGGLE_DECORATED {
         window_decorated_status = !window_decorated_status;
-        if (window_decorated_status)
-          gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
-        else
-          gtk_window_set_decorated(GTK_WINDOW(main_window), 1);
+        gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status ? 0 : 1);
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if TAB
         current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
@@ -1247,6 +1261,9 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #endif
         gtk_widget_hide_all(main_window);
         gtk_widget_show_all(main_window);
+#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
+        recover_window_status();
+#endif
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
         gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
         return TRUE;
@@ -1256,10 +1273,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TOGGLE_FULLSCREEN
       if CTRL_TOGGLE_FULLSCREEN {
         window_fullscreen_status = !window_fullscreen_status;
-        if (window_fullscreen_status)
-          gtk_window_maximize(GTK_WINDOW(main_window));
-        else
-          gtk_window_unmaximize(GTK_WINDOW(main_window));
+        window_fullscreen_status ? gtk_window_maximize(GTK_WINDOW(main_window)) : gtk_window_unmaximize(GTK_WINDOW(main_window));
         return TRUE;
       }
 #endif
@@ -1267,10 +1281,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TOGGLE_TABBAR
       if CTRL_TOGGLE_TABBAR {
         tabbar_status = !tabbar_status;
-        if (tabbar_status)
-          gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
-        else
-          gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 1);
+        gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), tabbar_status ? 0 : 1);
 #if TABBAR_AUTOHIDE
         if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1)
           gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
@@ -1283,10 +1294,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TOGGLE_STATUS_BAR
       if CTRL_TOGGLE_STATUS_BAR {
         status_bar_status = !status_bar_status;
-        if (status_bar_status)
-          gtk_widget_hide(statusbar);
-        else
-          gtk_widget_show(statusbar);
+        status_bar_status ? gtk_widget_hide(statusbar) : gtk_widget_show(statusbar);
         gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
         return TRUE;
       }
@@ -1560,7 +1568,9 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #endif
             vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
             vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+#if VTE_CHECK_VERSION(0,13,3)
             vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
+#endif
 #if TAB
           }
 #endif
@@ -1686,21 +1696,24 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_FONT_BIGGER
       if CTRL_FONT_BIGGER {
         font_size++;
-        goto font_size_changed;
+        font_size_changed();
+        return TRUE;
       }
 #endif
 
 #ifdef CTRL_FONT_SMALLER
       if CTRL_FONT_SMALLER {
         font_size--;
-        goto font_size_changed;
+        font_size_changed();
+        return TRUE;
       }
 #endif
 
 #ifdef CTRL_FONT_DEFAULT_SIZE
       if CTRL_FONT_DEFAULT_SIZE {
         font_size = FONT_SIZE;
-        goto font_size_changed;
+        font_size_changed();
+        return TRUE;
       }
 #endif
 
@@ -1730,17 +1743,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
             font_name[len--] = 0;
           while (len > 0 && font_name[len] == ' ')
             font_name[len--] = 0;
-          sprintf(font_str, "%s %d", font_name, font_size);
-#if TAB
-          for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-            current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-            term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-            vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-          }
-#endif
-          gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+          font_size_changed();
         }
         gtk_widget_destroy(font_dialog);
         return TRUE;
@@ -1764,10 +1767,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TAB_PREVIOUS
       if CTRL_TAB_PREVIOUS {
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-        if (index)
-          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index - 1);
-        else
-          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index ? index - 1 : gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
         return TRUE;
       }
 #endif
@@ -1775,10 +1775,7 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_TAB_NEXT
       if CTRL_TAB_NEXT {
         int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-        if (index == (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1))
-          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
-        else
-          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index + 1);
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), (index == (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1)) ? 0 : index + 1);
         return TRUE;
       }
 #endif
@@ -1803,23 +1800,6 @@ static int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
   }
   return FALSE;
-
-#if FONT_CHANGE_SIZE
-font_size_changed:
-  sprintf(font_str, "%s %d", font_name, font_size);
-#if TAB
-  int i = 0;
-  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-  }
-#endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
-  return TRUE;
-#endif
 }
 #endif /* CTRL */
 
@@ -1962,6 +1942,13 @@ static void delete_event()
 #endif
     } else {
       gtk_widget_destroy(dialog);
+      /* In some strange cases, the main_window will autohide after the dialog closing.
+       * So main_window has to be shown here.
+       */
+      gtk_widget_show_all(main_window);
+#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
+      recover_window_status();
+#endif
       return;
     }
   }
@@ -2127,10 +2114,7 @@ static void do_menu_saturation()
   gtk_container_add(GTK_CONTAINER(GTK_DIALOG(saturation_dialog)->vbox), adjustment);
   gtk_dialog_set_default_response(GTK_DIALOG(saturation_dialog), GTK_RESPONSE_OK);
   gtk_widget_show_all(saturation_dialog);
-  if (gtk_dialog_run(GTK_DIALOG(saturation_dialog)) == GTK_RESPONSE_OK)
-    saturation_level = gtk_range_get_value(GTK_RANGE(adjustment));
-  else
-    saturation_level = saturation_level_old;
+  saturation_level = (gtk_dialog_run(GTK_DIALOG(saturation_dialog)) == GTK_RESPONSE_OK) ? gtk_range_get_value(GTK_RANGE(adjustment)) : saturation_level_old;
   gtk_widget_destroy(saturation_dialog);
 #if TAB
   int i = 0;
@@ -2241,17 +2225,7 @@ static void do_select_font()
       font_name[len--] = 0;
     while (len > 0 && font_name[len] == ' ')
       font_name[len--] = 0;
-    sprintf(font_str, "%s %d", font_name, font_size);
-#if TAB
-    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-      vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-    }
-#endif
-    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+    font_size_changed();
   }
   gtk_widget_destroy(font_dialog);
 }
@@ -2321,7 +2295,9 @@ static void do_toggle_bg()
 #endif
       vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
       vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+#if VTE_CHECK_VERSION(0,13,3)
       vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
+#endif
 #if TAB
     }
 #endif
@@ -2348,11 +2324,8 @@ static void do_toggle_bg()
 #if MENU_TOGGLE_DECORATED
 static void do_toggle_decorated()
 {
+  gtk_window_set_decorated(GTK_WINDOW(main_window), window_decorated_status);
   window_decorated_status = !window_decorated_status;
-  if (window_decorated_status)
-    gtk_window_set_decorated(GTK_WINDOW(main_window), 0);
-  else
-    gtk_window_set_decorated(GTK_WINDOW(main_window), 1);
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 #if TAB
   current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index);
@@ -2360,6 +2333,9 @@ static void do_toggle_decorated()
 #endif
   gtk_widget_hide_all(main_window);
   gtk_widget_show_all(main_window);
+#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
+  recover_window_status();
+#endif
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
   gtk_window_set_focus(GTK_WINDOW(main_window), term->vte);
 }
@@ -2369,10 +2345,7 @@ static void do_toggle_decorated()
 static void do_toggle_fullscreen()
 {
   window_fullscreen_status = !window_fullscreen_status;
-  if (window_fullscreen_status)
-    gtk_window_maximize(GTK_WINDOW(main_window));
-  else
-    gtk_window_unmaximize(GTK_WINDOW(main_window));
+  window_fullscreen_status ? gtk_window_maximize(GTK_WINDOW(main_window)) : gtk_window_unmaximize(GTK_WINDOW(main_window));
 }
 #endif
 
@@ -2421,10 +2394,7 @@ static void do_toggle_scrollbar()
 static void do_toggle_status_bar()
 {
   status_bar_status = !status_bar_status;
-  if (status_bar_status)
-    gtk_widget_hide(statusbar);
-  else
-    gtk_widget_show(statusbar);
+  status_bar_status ? gtk_widget_hide(statusbar) : gtk_widget_show(statusbar);
   gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
 }
 #endif
@@ -2432,11 +2402,8 @@ static void do_toggle_status_bar()
 #if MENU_TOGGLE_TABBAR
 static void do_toggle_tabbar()
 {
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), tabbar_status);
   tabbar_status = !tabbar_status;
-  if (tabbar_status)
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
-  else
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 1);
 #if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1)
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
@@ -2449,18 +2416,7 @@ static void do_toggle_tabbar()
 static void do_zoom_100()
 {
   font_size = FONT_SIZE;
-  sprintf(font_str, "%s %d", font_name, font_size);
-#if TAB
-  int i = 0;
-  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-  }
-#endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  font_size_changed();
 }
 #endif
 
@@ -2468,18 +2424,7 @@ static void do_zoom_100()
 static void do_zoom_in()
 {
   font_size++;
-  sprintf(font_str, "%s %d", font_name, font_size);
-#if TAB
-  int i = 0;
-  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-  }
-#endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  font_size_changed();
 }
 #endif
 
@@ -2487,18 +2432,7 @@ static void do_zoom_in()
 static void do_zoom_out()
 {
   font_size--;
-  sprintf(font_str, "%s %d", font_name, font_size);
-#if TAB
-  int i = 0;
-  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
-    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
-    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
-#endif
-    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
-#if TAB
-  }
-#endif
-  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  font_size_changed();
 }
 #endif
 
@@ -2527,23 +2461,23 @@ static void add_tab()
 #endif
 
 #ifdef TAB_LABEL_CUSTOM
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size)
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size) {
     label = gtk_label_new(g_strdup_printf("%s", label_style_custom[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
-  else
-    label = NULL;
 #if DO_TAB_EDIT_LABEL
-  label_exist = 1;
+    label_exist = 1;
 #endif
+  } else
+    label = NULL;
 #endif
 
 #if TAB_LABEL_POEM
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size)
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < label_style_size) {
     label = gtk_label_new(g_strdup_printf("%s", label_style_poem[gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))]));
-  else
-    label = NULL;
 #if DO_TAB_EDIT_LABEL
-  label_exist = 1;
+    label_exist = 1;
 #endif
+  } else
+    label = NULL;
 #endif
 
 #if TAB_CLOSE_BUTTON
@@ -2777,10 +2711,7 @@ static void add_tab()
 #endif
 
 #if TABBAR_AUTOHIDE
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1)
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), 0);
-  else
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), VTE_TABBAR);
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) ? 0 : VTE_TABBAR);
   gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
 #endif
 
@@ -2799,7 +2730,9 @@ static void add_tab()
   if (background_order[background_status] == "No background") {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
     vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+#if VTE_CHECK_VERSION(0,13,3)
     vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
+#endif
   }
 #endif
 #if TOGGLE_BG_OPACITY
@@ -2865,10 +2798,7 @@ static void button_clicked(GtkWidget *widget, void *data)
       killed = i;
     }
   }
-  if (killed < index)
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index - 1);
-  else
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
+  gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), (killed < index) ? index - 1 : index);
 }
 #endif
 
@@ -2953,10 +2883,7 @@ static void del_tab(GtkWidget *widget, int do_close_dialog)
 #endif
   g_free(term);
 
-  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2)
-    gtk_main_quit();
-  else
-    gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
+  (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 2) ? gtk_main_quit() : gtk_notebook_remove_page(GTK_NOTEBOOK(notebook), index);
 
 #if TAB
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
@@ -2969,6 +2896,53 @@ static void del_tab(GtkWidget *widget, int do_close_dialog)
   }
 #endif
 }
+
+#if FONT_CHANGE_SIZE
+static void font_size_changed()
+{
+  sprintf(font_str, "%s %d", font_name, font_size);
+#if TAB
+  int i = 0;
+  for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+    vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
+#if TAB
+  }
+#endif
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+}
+#endif
+
+#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
+static void recover_window_status()
+{
+#if DO_TOGGLE_SCROLLBAR
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
+  if (scrollbar_status) {
+#if TAB
+    int i = 0;
+    for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
+      current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), i);
+      term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+      gtk_widget_hide(term->scrollbar);
+#if TAB
+    }
+#endif
+    gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+  }
+#endif
+#endif
+
+#if DO_TOGGLE_STATUS_BAR
+  if (status_bar_status)
+    gtk_widget_hide(statusbar);
+  gtk_window_resize(GTK_WINDOW(main_window), 1, 1);
+#endif
+}
+#endif /* DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR */
 
 static void set_encoding(GtkWidget *widget, void *data)
 {
@@ -3448,7 +3422,7 @@ int main(int argc, char **argv)
 #if MENU_TOGGLE_ON_TOP
     if (menu_custom[m] == "Toggle always on top") {
       GtkWidget *menu_toggle_on_top = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_ON_TOP);
-      GtkWidget *image_toggle_on_top = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_on_top = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_on_top), image_toggle_on_top);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_on_top);
       g_signal_connect(menu_toggle_on_top, "activate", do_always_on_top, NULL);
@@ -3482,7 +3456,7 @@ int main(int argc, char **argv)
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
     if (menu_custom[m] == "Toggle scrollbar") {
       GtkWidget *menu_toggle_scrollbar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_SCROLLBAR);
-      GtkWidget *image_toggle_scrollbar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_scrollbar = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_scrollbar), image_toggle_scrollbar);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_scrollbar);
       g_signal_connect(menu_toggle_scrollbar, "activate", do_toggle_scrollbar, NULL);
@@ -3494,7 +3468,7 @@ int main(int argc, char **argv)
 #if MENU_TOGGLE_STATUS_BAR && STATUS_BAR
     if (menu_custom[m] == "Toggle status bar") {
       GtkWidget *menu_toggle_status_bar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_STATUS_BAR);
-      GtkWidget *image_toggle_status_bar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_status_bar = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_status_bar), image_toggle_status_bar);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_status_bar);
       g_signal_connect(menu_toggle_status_bar, "activate", do_toggle_status_bar, NULL);
@@ -3505,7 +3479,7 @@ int main(int argc, char **argv)
 #if MENU_TOGGLE_TABBAR
     if (menu_custom[m] == "Toggle tabbar") {
       GtkWidget *menu_toggle_tabbar = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_TABBAR);
-      GtkWidget *image_toggle_tabbar = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_tabbar = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_tabbar), image_toggle_tabbar);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_tabbar);
       g_signal_connect(menu_toggle_tabbar, "activate", do_toggle_tabbar, NULL);
@@ -3516,7 +3490,7 @@ int main(int argc, char **argv)
 #if MENU_TOGGLE_DECORATED
     if (menu_custom[m] == "Toggle window decorated") {
       GtkWidget *menu_toggle_decorated = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_DECORATED);
-      GtkWidget *image_toggle_decorated = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_decorated = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_decorated), image_toggle_decorated);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_decorated);
       g_signal_connect(menu_toggle_decorated, "activate", do_toggle_decorated, NULL);
@@ -3527,7 +3501,7 @@ int main(int argc, char **argv)
 #if MENU_TOGGLE_FULLSCREEN
     if (menu_custom[m] == "Toggle fullscreen") {
       GtkWidget *menu_toggle_fullscreen = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_FULLSCREEN);
-      GtkWidget *image_toggle_fullscreen = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_fullscreen = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_fullscreen), image_toggle_fullscreen);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_fullscreen);
       g_signal_connect(menu_toggle_fullscreen, "activate", do_toggle_fullscreen, NULL);
@@ -3538,7 +3512,7 @@ int main(int argc, char **argv)
 #if MENU_TOGGLE_ANTI_ALIAS
     if (menu_custom[m] == "Toggle anti-alias") {
       GtkWidget *menu_toggle_antialias = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_ANTI_ALIAS);
-      GtkWidget *image_toggle_antialias = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_toggle_antialias = gtk_image_new_from_stock(VTE_STOCK_TOGGLE, GTK_ICON_SIZE_MENU);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_antialias), image_toggle_antialias);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_toggle_antialias);
       g_signal_connect(menu_toggle_antialias, "activate", do_toggle_antialias, NULL);
@@ -3696,7 +3670,7 @@ int main(int argc, char **argv)
     if (menu_custom[m] == "Submenu input method") {
       GtkWidget *subitem_ime = gtk_image_menu_item_new_with_label(LABEL_SUBMENU_IME);
       GtkWidget *submenu_ime = gtk_menu_new();
-      GtkWidget *image_submenu_ime = gtk_image_new_from_stock(GTK_STOCK_INFO, GTK_ICON_SIZE_MENU);
+      GtkWidget *image_submenu_ime = gtk_image_new_from_stock(VTE_STOCK_SUBMENU_IME, GTK_ICON_SIZE_MENU);
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), subitem_ime);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(subitem_ime), image_submenu_ime);
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(subitem_ime), submenu_ime);
@@ -3714,6 +3688,15 @@ int main(int argc, char **argv)
   gtk_widget_hide(match_open);
   gtk_widget_hide(match_copy);
   gtk_widget_hide(match_item);
+#endif
+
+#if VIRTUAL_KEYBOARD && XTST_DETECTED
+  make_kbm();
+  g_signal_connect_after(main_window, "focus_in_event", move_kbm, NULL);
+  g_signal_connect_after(main_window, "focus_out_event", hide_kbm, NULL);
+  g_signal_connect_after(main_window, "size_request", move_kbm, NULL);
+  g_signal_connect_after(main_window, "style-set", move_kbm, NULL);
+  g_signal_connect_after(main_window, "window_state_event", move_kbm, NULL);
 #endif
 
   gtk_main();
