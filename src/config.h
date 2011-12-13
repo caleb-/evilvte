@@ -12,6 +12,7 @@
                          /*          DELETE_SEQUENCE                          */
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
+// #define BELL_URGENT            TRUE
 // #define BUTTON_ORDER_BY_RCFILE TRUE
 // #define CLOSE_DIALOG           TRUE  /* Dialog to confirm close event      */
 // #define CLOSE_SAFELY           TRUE  /* Do not kill running applications   */

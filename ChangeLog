@@ -1,3 +1,9 @@
+0.4.7~pre2
+ * Support BELL_URGENT, aka WM_URGENT hint
+   Thanks to L29Ah
+ * Make everything GTK+ 2.90.0 compatible
+ * Sync gpl-2.0.txt with http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
 0.4.7~pre1
 
  The "Thanks to Aragon!" Release

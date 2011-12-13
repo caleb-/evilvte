@@ -5,7 +5,8 @@ ifeq ($(CFLAGS),)
 endif
 
 ifeq ($(LDLIBS),)
-	LDLIBS = -L/usr/local/lib -lgdk-x11-2.0 -lgdk_pixbuf-2.0 -lglib-2.0 -lgobject-2.0 -lgtk-x11-2.0 -lvte
+	LDLIBS = -L/usr/local/lib
+	LDLIBS += `pkg-config --libs vte`
 endif
 
 CFLAGS += $(OPTFLAGS) $(VTEINC)

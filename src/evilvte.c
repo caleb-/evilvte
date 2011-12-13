@@ -76,6 +76,12 @@
 #define gtk_dialog_get_content_area(x) (x)->vbox
 #endif
 
+#if GTK_CHECK_VERSION(2,90,0)
+#undef TAB_BORDER
+#undef TAB_BORDER_HORIZONTAL
+#undef TAB_BORDER_VERTICAL
+#endif
+
 #if !VTE_CHECK_VERSION(0,11,0)
 #undef BACKGROUND_SCROLLABLE
 #undef BACKGROUND_TINT_COLOR
@@ -921,6 +927,13 @@ void do_title_changed()
 }
 #endif
 
+#if BELL_URGENT
+void do_beep()
+{
+  gtk_window_set_urgency_hint(GTK_WINDOW(main_window), TRUE);
+}
+#endif
+
 #if MENU || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
 int menu_popup(GtkWidget *widget, GdkEventButton *event)
 {
@@ -1354,6 +1367,10 @@ void add_tab()
   g_signal_connect(term->vte, "window-title-changed", do_title_changed, NULL);
 #endif
 
+#if BELL_URGENT
+  g_signal_connect(term->vte, "beep", do_beep, NULL);
+#endif
+
 #if MENU || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
   g_signal_connect(term->vte, "button-press-event", G_CALLBACK(menu_popup), NULL);
 #endif
@@ -1503,9 +1520,20 @@ void recover_window_status()
 }
 #endif
 
+#if BELL_URGENT
+gboolean focus_in_event()
+{
+  gtk_window_set_urgency_hint(GTK_WINDOW(main_window), FALSE);
+  return FALSE;
+}
+#endif
+
 #if HOTKEY
 int key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
+#if BELL_URGENT
+  gtk_window_set_urgency_hint(GTK_WINDOW(main_window), FALSE);
+#endif
 #if !CTRL_ALT
   if (event->state & GDK_CONTROL_MASK) {
 #endif
@@ -2946,6 +2974,10 @@ int at_dock_mode = 0;
 
 #if HOTKEY
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(key_press_event), NULL);
+#endif
+
+#if BELL_URGENT
+  g_signal_connect(main_window, "focus-in-event", G_CALLBACK(focus_in_event), NULL);
 #endif
 
 #if TAB
