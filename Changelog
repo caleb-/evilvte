@@ -1,3 +1,6 @@
+0.1.3
+ * Configurable hotkeys
+
 0.1.2
  * Support DOUBLE_PRESS_HOTKEY
    Applications can keep using Ctrl + T/W as hotkey

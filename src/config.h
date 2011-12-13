@@ -42,7 +42,7 @@
  */
 
 // #define DOUBLE_PRESS_HOTKEY TRUE
-// #define DOUBLE_PRESS_TIME   300000 /* Do not set it a too small number */
+// #define DOUBLE_PRESS_TIME   300000 /* 0.3 second = 300000 microseconds */
 
 /* Do not comment out options below */
 
@@ -53,6 +53,14 @@
 static char *encoding[] = {"UTF-8"}; /* Add encoding options as you like */
 // static char *encoding[] = {"UTF-8", "BIG-5", "GBK", "EUC-JP", "SHIFT-JIS"};
 #endif
+
+/* Hotkey definitions. Please see /usr/include/gtk-2.0/gdk/gdkkeysyms.h */
+/* GDK_A = "Shift + a", so hotkey will be "Ctrl + Shift + a" */
+
+#define CTRL_PREVIOUS_TAB (event->keyval == GDK_Page_Up) /* Ctrl + Page Up */
+#define CTRL_NEXT_TAB     (event->keyval == GDK_Page_Down)
+#define CTRL_NEW_TAB      (event->keyval == GDK_t || event->keyval == GDK_T)
+#define CTRL_REMOVE_TAB   (event->keyval == GDK_w || event->keyval == GDK_W)
 
 /* Do not edit options below unless you know what you are doing */
 

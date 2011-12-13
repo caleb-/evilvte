@@ -192,7 +192,8 @@ void set_encoding(GtkWidget *widget, void *data);
 gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
-    if (event->keyval == GDK_Page_Up) {
+#ifdef CTRL_PREVIOUS_TAB
+    if CTRL_PREVIOUS_TAB {
       int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
       if (npages)
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), npages - 1);
@@ -202,8 +203,10 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       change_statusbar_encoding();
 #endif
       return TRUE;
+#endif /* CTRL_PREVIOUS_TAB */
     }
-    if (event->keyval == GDK_Page_Down) {
+#ifdef CTRL_NEXT_TAB
+    if CTRL_NEXT_TAB {
       int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
       if (npages == (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1))
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
@@ -213,8 +216,10 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       change_statusbar_encoding();
 #endif
       return TRUE;
+#endif /* CTRL_NEXT_TAB */
     }
-    if (event->keyval == GDK_t || event->keyval == GDK_T) {
+#ifdef CTRL_NEW_TAB
+    if CTRL_NEW_TAB {
 #if DOUBLE_PRESS_HOTKEY
       if (last_time_1 != 0) {
         now_time_1 = current_time();
@@ -237,8 +242,10 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #endif
 
       return FALSE;
+#endif /* CTRL_NEW_TAB */
     }
-    if (event->keyval == GDK_w || event->keyval == GDK_W) {
+#ifdef CTRL_REMOVE_TAB
+    if CTRL_REMOVE_TAB {
 #if DOUBLE_PRESS_HOTKEY
       if (last_time_2 != 0) {
         now_time_2 = current_time();
@@ -261,6 +268,7 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #endif
 
       return FALSE;
+#endif /* CTRL_REMOVE_TAB */
     }
   }
   return FALSE;
