@@ -1088,7 +1088,7 @@ void change_statusbar_encoding();
 void add_tab();
 void button_clicked(GtkWidget *widget, void *data);
 void del_tab(GtkWidget *widget, int do_close_dialog);
-void delete_event();
+gboolean delete_event();
 void do_always_on_top();
 void do_change_saturation();
 void do_clear();
@@ -1866,7 +1866,7 @@ void change_statusbar_encoding()
 }
 #endif
 
-void delete_event()
+gboolean delete_event()
 {
 #if CLOSE_DIALOG && TAB
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1) {
@@ -1895,14 +1895,7 @@ void delete_event()
 #endif
     } else {
       gtk_widget_destroy(dialog);
-      /* In some strange cases, the main_window will autohide after the dialog closing.
-       * So main_window has to be shown here.
-       */
-      gtk_widget_show_all(main_window);
-#if DO_TOGGLE_SCROLLBAR || DO_TOGGLE_STATUS_BAR
-      recover_window_status();
-#endif
-      return;
+      return TRUE;
     }
   }
 #endif
@@ -1916,6 +1909,7 @@ void delete_event()
 #if !TAB
   del_tab(NULL, DO_CLOSE_DIALOG);
 #endif
+  return FALSE;
 }
 
 #if MENU_TOGGLE_ON_TOP

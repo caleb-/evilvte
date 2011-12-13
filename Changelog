@@ -1,3 +1,6 @@
+0.4.5~pre5
+ * Merge changes from 0.4.4.2
+
 0.4.5~pre4
  * New option DEFAULT_TERMINAL_SIZE, remove DEFAULT_COLUMNS and DEFAULT_ROWS
  * New option SCROLLBAR, remove SCROLLBAR_LEFT and SCROLLBAR_RIGHT
@@ -9,7 +12,6 @@
  * Improve hotkey customization a bit
    Please note that almost all CTRL_* in src/config.h are renamed to HOTKEY_*.
  * Limit font size range. Only 1 to 99 are accepted.
- * Remove VTE_DISABLE_DEPRECATED
 
 0.4.5~pre2
  * Support virtual keyboard with libXtst
@@ -17,16 +19,21 @@
    You may define VIRTUAL_KEYBOARD_MENU_KEY and VIRTUAL_KEYBOARD_WINDOW_KEY  
  * Detect GTK+ version and disable unsupported options automatically.
  * Fix a displaying bug about toggling scrollbar or status bar.
- * Avoid an GTK+ autohide bug when CLOSE_DIALOG is enabled.
  * Avoid an GTK+ warning message when TAB_LABEL is customized.
  * Update license to latest format published by the Free Software Foundation.
 
 0.4.5~pre1
  * Detect VTE version and disable unsupported options automatically.
- * Support VTE_DISABLE_DEPRECATED
-   You may use deprecated VTE functions that were disabled in evilvte 0.4.4.
+ * Enable deprecated VTE functions that were disabled in evilvte 0.4.4.
  * Support environment variable EVILVTE=min to build a minimal usable terminal.
  * Disable deprecated GLib, GDK and GTK+ functions.
+
+0.4.4.2
+ * Fix an CLOSE_DIALOG bug which could destroy the program by accident.
+   Thanks to an anonymous guest.
+   (http://hyperrate.com/thread.php?tid=11916#11916)
+ * Do not remove src/config.o in "make clean"
+ * Support "make distclean"
 
 0.4.4.1
  * Support command line -T option to assign program title.

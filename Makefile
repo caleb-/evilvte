@@ -69,9 +69,12 @@ installstrip: strip
 	install -m 644 misc/evilvte.desktop $(deskdir)
 
 clean: src/config.o
-	rm -f $(PROG) src/showvte src/*.o src/???????.h misc/evilvte.1 src/max.h src/test.h
+	rm -f $(PROG) src/showvte src/sakura.o src/???????.h misc/evilvte.1 src/max.h src/test.h
+
+distclean: clean
+	rm -f src/*.o
 
 src/config.o:
 	./configure
 
-.PHONY: all evilvte strip showvte install installstrip clean
+.PHONY: all evilvte strip showvte install installstrip clean distclean
