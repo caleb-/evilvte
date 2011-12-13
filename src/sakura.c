@@ -47,6 +47,29 @@
 #include "config.h"
 #include "evilvte.h"
 
+#if VTE_MINOR_VERSION >= 19 && VTE_MICRO_VERSION >= 4
+#define VTE_VERSION_NEW 1
+#endif
+
+#if VTE_MAJOR_VERSION >= 1
+#undef VTE_VERSION_NEW
+#define VTE_VERSION_NEW 1
+#endif
+
+#if VTE_VERSION_NEW
+#undef FONT_ANTI_ALIAS
+#undef CTRL_TOGGLE_ANTI_ALIAS
+#undef MENU_TOGGLE_ANTI_ALIAS
+#ifdef CURSOR_BLINKS
+#if CURSOR_BLINKS
+#define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_ON
+#endif
+#if !CURSOR_BLINKS
+#define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
+#endif
+#endif
+#endif
+
 #ifndef DEFAULT_COMMAND
 #define DEFAULT_COMMAND g_getenv("SHELL")
 #endif
@@ -997,6 +1020,13 @@ GtkWidget *match_open;
 GtkWidget *match_copy;
 GtkWidget *match_item;
 char *matched_url = (char*)NULL;
+#endif
+
+#ifdef MATCH_STRING
+#if VTE_VERSION_NEW
+GRegex *regex;
+GRegexMatchFlags flags = 0;
+#endif
 #endif
 
 #if STATUS_BAR
@@ -2539,7 +2569,12 @@ static void add_tab()
 #endif
 
 #ifdef MATCH_STRING
-   vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_STRING);
+#if !VTE_VERSION_NEW
+  vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_STRING);
+#endif
+#if VTE_VERSION_NEW
+  vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), regex, flags);
+#endif
 #endif
 
 #ifdef DEFAULT_EMULATION_TYPE
@@ -2635,7 +2670,12 @@ static void add_tab()
 #endif
 
 #ifdef CURSOR_BLINKS
+#if !VTE_VERSION_NEW
   vte_terminal_set_cursor_blinks(VTE_TERMINAL(term->vte), CURSOR_BLINKS);
+#endif
+#if VTE_VERSION_NEW
+  vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINKS);
+#endif
 #endif
 
 #ifdef DEFAULT_ENCODING
@@ -2643,11 +2683,16 @@ static void add_tab()
 #endif
 
 #ifdef FONT
+#if !VTE_VERSION_NEW
 #if INT_ANTI_ALIAS_STATUS
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, antialias_status);
 #endif
 #if !INT_ANTI_ALIAS_STATUS
   vte_terminal_set_font_from_string_full(VTE_TERMINAL(term->vte), font_str, VTE_ANTI_ALIAS);
+#endif
+#endif
+#if VTE_VERSION_NEW
+  vte_terminal_set_font_from_string(VTE_TERMINAL(term->vte), font_str);
 #endif
 #endif
 
@@ -3012,6 +3057,12 @@ int main(int argc, char **argv)
 #endif
 
   main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+#ifdef MATCH_STRING
+#if VTE_VERSION_NEW
+  regex = g_regex_new(MATCH_STRING, 0, 0, NULL);
+#endif
+#endif
 
 #if PROGRAM_WM_CLASS
   gtk_window_set_wmclass(GTK_WINDOW(main_window), VTE_PROGRAM_NAME, PROGRAM_NAME);

@@ -1,3 +1,7 @@
+0.4.4
+ * Disable deprecated VTE functions if VTE version >= 0.19.4
+   Latest VTE no longer supports ANTI_ALIAS associated options.
+
 0.4.4~pre10
  * Support CTRL_ALT
    If you enable it, all hotkeys will become Ctrl + Alt + hotkey(s). 
