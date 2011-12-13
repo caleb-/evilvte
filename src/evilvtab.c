@@ -259,7 +259,7 @@ void add_tab()
 #ifdef SCROLL_ON_OUTPUT
   vte_terminal_set_scroll_on_output(VTE_TERMINAL(tab.vte_box), SCROLL_ON_OUTPUT);
 #endif
-#if SCROLLBACK_LINES
+#ifdef SCROLLBACK_LINES
   vte_terminal_set_scrollback_lines(VTE_TERMINAL(tab.vte_box), SCROLLBACK_LINES);
 #endif
 #if TERMINAL_COLS && TERMINAL_ROWS
@@ -269,8 +269,12 @@ void add_tab()
   vte_terminal_set_word_chars(VTE_TERMINAL(tab.vte_box), WORD_CHARS);
 #endif
 #ifdef TAB_LABEL
+#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), tab.hbox, tab.label);
 #else
+  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), tab.vte_box, tab.label);
+#endif
+#else /* TAB_LABEL */
 #if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), tab.hbox, NULL);
 #else
@@ -282,6 +286,18 @@ void add_tab()
   g_signal_connect_swapped(tab.vte_box, "button-press-event", G_CALLBACK(right_click_menu), menu);
 #endif
   g_array_append_val(tabs, tab);
+#ifdef SHOW_WINDOW_BORDER
+  gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), WINDOW_BORDER);
+#endif
+#ifdef TAB_BORDER
+  gtk_notebook_set_tab_border(GTK_NOTEBOOK(notebook), TAB_BORDER);
+#endif
+#ifdef TAB_BORDER_V
+  gtk_notebook_set_tab_hborder(GTK_NOTEBOOK(notebook), TAB_BORDER_V);
+#endif
+#ifdef TAB_BORDER_H
+  gtk_notebook_set_tab_vborder(GTK_NOTEBOOK(notebook), TAB_BORDER_H);
+#endif
 #if AUTOHIDE_TAB
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);

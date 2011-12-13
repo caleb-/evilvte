@@ -1,3 +1,7 @@
+0.0.7
+ * Fix define TAB_LABEL without scrollbar
+ * Support SHOW_WINDOW_BORDER and TAB_BORDER
+
 0.0.6
  * Support color scheme
  * Support tabbar autohide

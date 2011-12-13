@@ -29,6 +29,10 @@
 
 // #define AUTOHIDE_TAB        TRUE
 // #define INITIAL_TAB_NUMBER  1
+// #define SHOW_WINDOW_BORDER  FALSE
+// #define TAB_BORDER          0
+// #define TAB_BORDER_V        0
+// #define TAB_BORDER_H        0
 // #define TAB_LABEL           "Page"
 // #define TAB_LABEL_NUMBER    TRUE /* This option depends on TAB_LABEL */
 
