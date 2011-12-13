@@ -1,3 +1,9 @@
+0.2.6
+ * Support CTRL_MORE_SATURATION and CTRL_LESS_SATURATION
+ * Support ENCODING_LIST_LABEL
+ * Auto-detect FONT_CHANGE_SIZE and remove the option from src/config.h
+   Just define CTRL_FONT_BIGGER or CTRL_FONT_SMALLER to enable it
+
 0.2.5
  * Support all arguments in -e option
    Thanks to Tetralet <tetralet@gmail.com>

@@ -8,7 +8,7 @@
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
 // #define BINDING_BACKSPACE_KEY  VTE_ERASE_AUTO
-#define    BINDING_BACKSPACE_KEY  VTE_ERASE_ASCII_BACKSPACE
+// #define BINDING_BACKSPACE_KEY  VTE_ERASE_ASCII_BACKSPACE
 // #define BINDING_BACKSPACE_KEY  VTE_ERASE_ASCII_DELETE
 // #define BINDING_BACKSPACE_KEY  VTE_ERASE_DELETE_SEQUENCE
 // #define BINDING_DELETE_KEY     VTE_ERASE_AUTO
@@ -30,7 +30,7 @@
 // #define DEFAULT_COLUMNS        80
 // #define DEFAULT_ROWS           24
 // #define DEFAULT_ENCODING       "UTF-8"
-// #define DEFAULT_FONT           "Monospace" /* Supports FONT_CHANGE_SIZE */
+// #define DEFAULT_FONT           "Monospace"
 // #define DEFAULT_FONT_SIZE      10
 // #define DEFAULT_FONT_SIMPLE    "Monospace 10" /* Can not change font size */
 // #define ANTI_ALIAS             VTE_ANTI_ALIAS_USE_DEFAULT
@@ -40,11 +40,11 @@
 // #define ENABLE_LASTLOG         TRUE
 // #define ENABLE_UTMP            TRUE
 // #define ENABLE_WTMP            TRUE
+// #define ENCODING_LIST_LABEL    "Default Encoding" /* Label for "Default" */
 // #define ENCODING_LIST_DEFAULT  TRUE /* Support "Default" in ENCODING_LIST */
 // #define ENCODING_LIST          "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
 #define    ENCODING_LIST          "UTF-8" /* Right click to switch encoding */
 #define    EXECUTE_COMMAND        TRUE /* Command line -e option */
-// #define FONT_CHANGE_SIZE       TRUE /* Change font size with hotkey */
 #define    MENU_INPUT_METHOD      TRUE
 // #define MOUSE_AUTOHIDE         TRUE
 // #define SCROLL_BACKGROUND      TRUE
@@ -90,13 +90,15 @@
 #define    CTRL_NEXT_TAB          (event->keyval == GDK_Page_Down)
 #define    CTRL_NEW_TAB           (event->keyval == GDK_T)
 #define    CTRL_REMOVE_TAB        (event->keyval == GDK_W)
-#define    CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
-#define    CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
+// #define CTRL_FONT_BIGGER       (event->keyval == GDK_KP_Add)
+// #define CTRL_FONT_SMALLER      (event->keyval == GDK_KP_Subtract)
 // #define CTRL_FONT_DEFAULT_SIZE (event->keyval == GDK_KP_Insert)
 // #define CTRL_COPY_TO_CLIPBOARD (event->keyval == GDK_C)
 // #define CTRL_PASTE_FROM_CLIPBD (event->keyval == GDK_V)
 // #define CTRL_RESET_TERMINAL    (event->keyval == GDK_R)
 // #define CTRL_RESET_AND_CLEAR   (event->keyval == GDK_A)
+// #define CTRL_MORE_SATURATION   (event->keyval == GDK_KP_Multiply)
+// #define CTRL_LESS_SATURATION   (event->keyval == GDK_KP_Divide)
 
 /* If you enable DOUBLE_PRESS_HOTKEY,
  * press CTRL_NEW_TAB or CTRL_REMOVE_TAB twice quickly to add or remove a tab

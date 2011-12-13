@@ -49,7 +49,7 @@
 #endif
 
 #ifdef BACKGROUND_TRANSPARENT
-#undef BACKGROUND_EXIST /* undefine it here to prevent duplicated definition warning */
+#undef BACKGROUND_EXIST /* prevent duplicated definitions */
 #define BACKGROUND_EXIST TRUE
 #endif
 
@@ -59,6 +59,10 @@
 
 #if !TAB
 #undef SHOW_WINDOW_BORDER
+#undef CTRL_PREVIOUS_TAB
+#undef CTRL_NEXT_TAB
+#undef CTRL_NEW_TAB
+#undef CTRL_REMOVE_TAB
 #undef TAB_AT_BOTTOM
 #undef TAB_AT_LEFT
 #undef TAB_AT_RIGHT
@@ -151,6 +155,12 @@
 #if COLOR_STYLE_XTERM
 #undef SET_DEFAULT_COLORS
 #define SET_DEFAULT_COLORS 0
+#endif
+
+#if ENCODING_LIST_DEFAULT
+#ifndef ENCODING_LIST_LABEL
+#define ENCODING_LIST_LABEL "Default Encoding"
+#endif
 #endif
 
 GtkWidget *main_window;
@@ -248,12 +258,21 @@ const GdkColor color_xterm[16] =
 #undef DEFAULT_FONT
 #endif
 
-#ifdef FONT_CHANGE_SIZE
+#ifdef CTRL_FONT_BIGGER
+#define FONT_CHANGE_SIZE TRUE
+#endif
+
+#ifdef CTRL_FONT_SMALLER
+#undef FONT_CHANGE_SIZE /* prevent duplicated definitions */
+#define FONT_CHANGE_SIZE TRUE
+#endif
+
+#if FONT_CHANGE_SIZE
 #ifndef DEFAULT_FONT
 #define DEFAULT_FONT "Monospace"
 #endif
 #undef DEFAULT_FONT_SIMPLE
-#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
 #define ENABLE_KEY_PRESS TRUE
 int width_f;
 int height_f;
@@ -290,28 +309,48 @@ char **default_argv = NULL;
 #endif
 
 #if MENU_INPUT_METHOD
-#undef SHOW_MENU /* undefine it here to prevent duplicated definition warning */
+#undef SHOW_MENU /* prevent duplicated definitions */
 #define SHOW_MENU TRUE
 #endif
 
 #ifdef CTRL_COPY_TO_CLIPBOARD
-#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
 #define ENABLE_KEY_PRESS TRUE
 #endif
 
 #ifdef CTRL_PASTE_FROM_CLIPBD
-#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
 #define ENABLE_KEY_PRESS TRUE
 #endif
 
 #ifdef CTRL_RESET_TERMINAL
-#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
 #define ENABLE_KEY_PRESS TRUE
 #endif
 
 #ifdef CTRL_RESET_AND_CLEAR
-#undef ENABLE_KEY_PRESS /* undefine it here to prevent duplicated definition warning */
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
 #define ENABLE_KEY_PRESS TRUE
+#endif
+
+#ifdef CTRL_MORE_SATURATION
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
+#define ENABLE_KEY_PRESS TRUE
+#define ADJUST_SATURATION TRUE
+#endif
+
+#ifdef CTRL_LESS_SATURATION
+#undef ENABLE_KEY_PRESS /* prevent duplicated definitions */
+#define ENABLE_KEY_PRESS TRUE
+#undef ADJUST_SATURATION /* prevent duplicated definitions */
+#define ADJUST_SATURATION TRUE
+#endif
+
+#if ADJUST_SATURATION
+#ifndef BACKGROUND_SATURATION
+#define BACKGROUND_SATURATION 0.5
+#endif
+double saturation_level = BACKGROUND_SATURATION;
 #endif
 
 #if TAB
@@ -372,6 +411,26 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 {
   if (event->state & GDK_CONTROL_MASK) {
 
+#ifdef CTRL_MORE_SATURATION
+    if CTRL_MORE_SATURATION {
+      saturation_level += 0.1;
+      if (saturation_level > 1)
+        saturation_level = 1;
+      vte_terminal_set_background_saturation(VTE_TERMINAL(term.vte), saturation_level);
+      return TRUE;
+    }
+#endif
+
+#ifdef CTRL_LESS_SATURATION
+    if CTRL_LESS_SATURATION {
+      saturation_level -= 0.1;
+      if (saturation_level < 0)
+        saturation_level = 0;
+      vte_terminal_set_background_saturation(VTE_TERMINAL(term.vte), saturation_level);
+      return TRUE;
+    }
+#endif
+
 #ifdef CTRL_RESET_TERMINAL
     if CTRL_RESET_TERMINAL {
       vte_terminal_reset(VTE_TERMINAL(term.vte), 1,  0);
@@ -400,30 +459,27 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
     }
 #endif
 
-#if FONT_CHANGE_SIZE
 #ifdef CTRL_FONT_BIGGER
     if CTRL_FONT_BIGGER {
       font1_size++;
       goto font_size_changed;
     }
-#endif /* CTRL_FONT_BIGGER */
+#endif
 
 #ifdef CTRL_FONT_SMALLER
     if CTRL_FONT_SMALLER {
       font1_size--;
       goto font_size_changed;
     }
-#endif /* CTRL_FONT_SMALLER */
+#endif
 
 #ifdef CTRL_FONT_DEFAULT_SIZE
     if CTRL_FONT_DEFAULT_SIZE {
       font1_size = DEFAULT_FONT_SIZE;
       goto font_size_changed;
     }
-#endif /* CTRL_FONT_DEFAULT_SIZE */
-#endif /* FONT_CHANGE_SIZE */
+#endif
 
-#if TAB
 #ifdef CTRL_PREVIOUS_TAB
     if CTRL_PREVIOUS_TAB {
       int npages = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
@@ -516,7 +572,6 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
       return FALSE;
     }
 #endif /* CTRL_REMOVE_TAB */
-#endif /* TAB */
 
   }
   return FALSE; /* (event->state & GDK_CONTROL_MASK) */
@@ -1036,7 +1091,7 @@ int main(int argc, char **argv)
 #if ENCODING_LIST_DEFAULT
     if (encoding[i] == "Default") {
       encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term.vte));
-      encoding_item[i] = gtk_menu_item_new_with_label("Default Encoding");
+      encoding_item[i] = gtk_menu_item_new_with_label(ENCODING_LIST_LABEL);
     } else
 #endif
       encoding_item[i] = gtk_menu_item_new_with_label(encoding[i]);
