@@ -8,14 +8,14 @@
 // #define BELL_AUDIBLE           TRUE
 // #define BELL_VISIBLE           TRUE
 // #define BINDING_BACKSPACE_KEY  VTE_ERASE_AUTO
-// #define BINDING_BACKSPACE_KEY  VTE_ERASE_ASCII_BACKSPACE
+#define    BINDING_BACKSPACE_KEY  VTE_ERASE_ASCII_BACKSPACE
 // #define BINDING_BACKSPACE_KEY  VTE_ERASE_ASCII_DELETE
 // #define BINDING_BACKSPACE_KEY  VTE_ERASE_DELETE_SEQUENCE
 // #define BINDING_DELETE_KEY     VTE_ERASE_AUTO
 // #define BINDING_DELETE_KEY     VTE_ERASE_ASCII_BACKSPACE
 // #define BINDING_DELETE_KEY     VTE_ERASE_ASCII_DELETE
 // #define BINDING_DELETE_KEY     VTE_ERASE_DELETE_SEQUENCE
-#define    CLOSE_SAFE             TRUE /* Do not kill background applications */
+// #define CLOSE_SAFE             TRUE /* Do not kill background applications */
 // #define COLOR_STYLE_LINUX      TRUE
 // #define COLOR_STYLE_RXVT       TRUE
 // #define COLOR_STYLE_TANGO      TRUE
@@ -53,7 +53,7 @@
 // #define SCROLL_ON_OUTPUT       TRUE
 // #define SCROLLBAR_LEFT         TRUE
 #define    SCROLLBAR_RIGHT        TRUE
-// #define SHOW_WINDOW_BORDER     TRUE
+#define    SHOW_WINDOW_BORDER     FALSE
 #define    SHOW_WINDOW_ICON       TRUE
 #define    SHOW_WINDOW_TITLE      "evilvte"
 #define    SHOW_WINDOW_VERSION    TRUE      /* Command line -v option */
@@ -64,16 +64,17 @@
 // #define TAB_AT_LEFT            TRUE
 // #define TAB_AT_RIGHT           TRUE
 // #define TAB_AT_TOP             TRUE
-// #define TAB_AUTOHIDE           TRUE
 // #define TAB_BORDER             0
 // #define TAB_BORDER_H           0
 // #define TAB_BORDER_V           0
+#define    TAB_INFO_AT_TITLE      TRUE /* Show tab infomation at window title */
 // #define TAB_INITIAL_NUMBER     1
 // #define TAB_LABEL              "Page"
 // #define TAB_LABEL_NUMBER       TRUE   /* Depends on TAB_LABEL */
 // #define TAB_MENU_SELECT_TAB    TRUE
 // #define TAB_MOUSE_SCROLLABLE   TRUE
-// #define TAB_REORDERABLE        TRUE
+#define    TABBAR                 FALSE
+// #define TABBAR_AUTOHIDE        TRUE
 
 /* Hotkey definitions
  *

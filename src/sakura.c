@@ -54,6 +54,9 @@
 #endif
 
 #if TAB
+#ifndef TABBAR
+#define TABBAR FALSE
+#endif
 #define ENABLE_KEY_PRESS TRUE
 #endif
 
@@ -63,20 +66,27 @@
 #undef TAB_AT_LEFT
 #undef TAB_AT_RIGHT
 #undef TAB_AT_TOP
-#undef TAB_AUTOHIDE
 #undef TAB_BORDER
 #undef TAB_BORDER_H
 #undef TAB_BORDER_V
+#undef TAB_INFO_AT_TITLE
 #undef TAB_INITIAL_NUMBER
 #undef TAB_LABEL
 #undef TAB_MENU_SELECT_TAB
 #undef TAB_MOUSE_SCROLLABLE
-#undef TAB_REORDERABLE
+#undef TABBAR
+#undef TABBAR_AUTOHIDE
 #define SHOW_WINDOW_BORDER FALSE
 #endif
 
 #ifndef TAB_LABEL
 #undef TAB_LABEL_NUMBER
+#endif
+
+#ifdef TAB_INFO_AT_TITLE
+#ifndef SHOW_WINDOW_TITLE
+#define SHOW_WINDOW_TITLE "evilvte"
+#endif
 #endif
 
 #if DOUBLE_PRESS_HOTKEY
@@ -292,7 +302,7 @@ char default_command[32];
 GArray *terminals;
 #endif
 
-#if TAB_AUTOHIDE
+#if TABBAR_AUTOHIDE
 int width;
 int height;
 #endif
@@ -335,6 +345,7 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 gboolean sakura_popup(GtkWidget *widget, GdkEvent *event);
 gint64 current_time();
 void change_statusbar_encoding();
+void change_window_title();
 void delete_event();
 void sakura_add_tab();
 void sakura_del_tab();
@@ -393,6 +404,9 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #if STATUS_BAR
       change_statusbar_encoding();
 #endif
+#if TAB_INFO_AT_TITLE
+      change_window_title();
+#endif
       return TRUE;
     }
 #endif /* CTRL_PREVIOUS_TAB */
@@ -406,6 +420,9 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), npages + 1);
 #if STATUS_BAR
       change_statusbar_encoding();
+#endif
+#if TAB_INFO_AT_TITLE
+      change_window_title();
 #endif
       return TRUE;
     }
@@ -422,6 +439,9 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 
 #if STATUS_BAR
           change_statusbar_encoding();
+#endif
+#if TAB_INFO_AT_TITLE
+          change_window_title();
 #endif
 
 #if DOUBLE_PRESS_HOTKEY
@@ -450,10 +470,6 @@ gboolean sakura_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 #endif
 
           sakura_del_tab();
-
-#if STATUS_BAR
-          change_statusbar_encoding();
-#endif
 
 #if DOUBLE_PRESS_HOTKEY
           last_time_2 = 0;
@@ -524,6 +540,20 @@ void change_statusbar_encoding()
   term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
 #endif
   gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term.vte)));
+}
+#endif
+
+#if TAB_INFO_AT_TITLE
+void change_window_title()
+{
+  int index = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook));
+  if (index == 1)
+    gtk_window_set_title(GTK_WINDOW(main_window), SHOW_WINDOW_TITLE);
+  else {
+    char tabtitle[32];
+    sprintf(tabtitle, "%s - tab %d of %d", SHOW_WINDOW_TITLE, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)) + 1, index);
+    gtk_window_set_title(GTK_WINDOW(main_window), tabtitle);
+  }
 }
 #endif
 
@@ -751,12 +781,12 @@ void sakura_add_tab()
   g_array_append_val(terminals, term);
 #endif
 
-#if TAB_AUTOHIDE
+#if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
     gtk_window_get_size(GTK_WINDOW(main_window), &width, &height);
   } else
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TRUE);
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
   gtk_window_resize(GTK_WINDOW(main_window), width, height);
 #endif
 
@@ -767,14 +797,6 @@ void sakura_add_tab()
 #if TAB_MENU_SELECT_TAB
   gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
 #endif
-
-#if TAB_REORDERABLE
-#if SCROLLBAR_LEFT || SCROLLBAR_RIGHT
-  gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), term.hbox, TRUE);
-#else
-  gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(notebook), term.vte, TRUE);
-#endif
-#endif /* TAB_REORDERABLE */
 
 #if TAB_AT_BOTTOM
   gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), 3);
@@ -811,7 +833,7 @@ void sakura_del_tab()
 #endif
   /* Dirty hack. Prevent background applications close with tab */
   char pidstr[32];
-  sprintf(pidstr, "kill -KILL %d", term.pid);
+  sprintf(pidstr, "kill -KILL %d\0", term.pid);
   system(pidstr);
 #endif /* CLOSE_SAFE */
 
@@ -827,7 +849,7 @@ void sakura_del_tab()
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), npages);
 #endif
 
-#if TAB_AUTOHIDE
+#if TABBAR_AUTOHIDE
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
     gtk_window_resize(GTK_WINDOW(main_window), width, height);
@@ -841,6 +863,13 @@ void sakura_del_tab()
     term.label = gtk_label_new(g_strdup_printf("%s %d", TAB_LABEL, (i + 1)));
     gtk_notebook_set_tab_label(GTK_NOTEBOOK(notebook), term.hbox, term.label);
   }
+#endif
+
+#if STATUS_BAR
+  change_statusbar_encoding();
+#endif
+#if TAB_INFO_AT_TITLE
+  change_window_title();
 #endif
 }
 
@@ -930,7 +959,7 @@ int main(int argc, char **argv)
   gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, 1, 0);
   statusbar = gtk_statusbar_new();
   change_statusbar_encoding();
-  gtk_box_pack_start(GTK_BOX(vbox), statusbar, TRUE, 1, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), statusbar, 0, 1, 0);
 #else
   gtk_container_add(GTK_CONTAINER(main_window), notebook);
 #endif
@@ -943,7 +972,9 @@ int main(int argc, char **argv)
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(sakura_key_press), NULL);
 #endif
 
-#if !TAB
+#if TAB
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TABBAR);
+#else
   gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
 #endif
 

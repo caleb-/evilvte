@@ -58,6 +58,7 @@ fi
 
 bindir=$prefix/bin
 mandir=$prefix/share/man/man1
+deskdir=$prefix/share/applications
 ICON_DIR=$prefix/share/pixmaps
 
 if [ $prefix = /usr ]; then
@@ -72,6 +73,7 @@ echo "VTEINC=$VTEINC" >> src/config.o
 echo "prefix=$prefix" >> src/config.o
 echo "bindir=\$(DESTDIR)$bindir" >> src/config.o
 echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
+echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
 echo "ICON_DIR=$ICON_DIR" >> src/config.o
 echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
 # echo "LDFLAGS=-L/usr/local/lib $VTELDFLAGS" >> src/config.o

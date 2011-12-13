@@ -1,3 +1,14 @@
+0.2.3
+ * New option TABBAR
+ * Support TAB_INFO_AT_TITLE
+ * Remove TAB_REORDERABLE
+ * Fix a CLOSE_SAFE bug for i386 system
+ * Fix a statusbar size bug
+ * Add a .desktop file
+ * New icon with BSD License
+   misc/evilvte.xpm: Copyright (c) Lu, Chao-Ming (Tetralet)
+   You can see the license with: tail -n 26 misc/evilvte.xpm
+
 0.2.2
  * Support TAB_REORDERABLE
  * Support TAB_MENU_SELECT_TAB
@@ -47,8 +58,8 @@
 0.1.1
  * Remove an useless g_signal_connect
  * New icon with BSD License
-   src/evilvte.png: Copyright (c) Lu, Chao-Ming (Tetralet)
-   You can see the license with: tail -n 26 src/evilvte.png
+   misc/evilvte.png: Copyright (c) Lu, Chao-Ming (Tetralet)
+   You can see the license with: tail -n 26 misc/evilvte.png
 
 0.1.0
  * Support window title
