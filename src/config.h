@@ -1,4 +1,4 @@
-/* Comment out options to reduce binary size and consumption of resources.    */
+/* Use // to comment out options                                              */
 
 #define    BACKGROUND_IMAGE       ".config/evilvte/background.png"
 // #define BACKGROUND_SATURATION  0.4
@@ -86,6 +86,7 @@
 // #define TAB_LABEL_POEM         TRUE
 // #define TAB_LABEL_CUSTOM       "One", "Two", "Three", "Four", "Five", "Six"
 // #define TAB_NEW_PATH_EQUAL_OLD TRUE
+// #define TAB_REORDERABLE        TRUE
 // #define TAB_SHOW_INFO_AT_TITLE TRUE
 // #define TABBAR                 TRUE
 // #define TABBAR_PLACE           TOP    /* Options: TOP, BOTTOM, LEFT, RIGHT */

@@ -58,4 +58,4 @@ clean: src/config.o
 src/config.o:
 	./configure
 
-.PHONY: all strip install installstrip clean
+.PHONY: all evilvte strip showvte install installstrip clean

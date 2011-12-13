@@ -1,7 +1,11 @@
-0.4.4~pre1
+0.4.4~pre2
+ * Support TAB_REORDERABLE
  * Support command line -r option to run in root window
  * Support command line -h option to show help messages
  * Support command line -2 to -9 options to set initial tab numbers
+ * Fix a switch-page bug
+ * Always handle delete_event, aka program closing event
+ * Disable tab label auto-resorting
  * Remove TAB_INITIAL_NUMBER
  * Make icons smaller, and update their copyright to year 2008 with permission
    from the author, Tetralet <tetralet AT gmail DOT com>
