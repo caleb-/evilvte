@@ -26,6 +26,11 @@ if [ "$COMMAND_EXEC_PROGRAM" != "" ]; then
   COMMAND_ENABLED=1
 fi
 
+COMMAND_FULLSCREEN=`grep COMMAND_FULLSCREEN src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+if [ "$COMMAND_FULLSCREEN" != "" ]; then
+  COMMAND_ENABLED=1
+fi
+
 COMMAND_SHOW_HELP=`grep COMMAND_SHOW_HELP src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 if [ "$COMMAND_SHOW_HELP" != "" ]; then
   COMMAND_ENABLED=1
@@ -63,6 +68,10 @@ fi
 
 if [ "$COMMAND_EXEC_PROGRAM" != "" ]; then
   grep '^.\\" E ' misc/manpage.1 | sed 's/^.\\" E //' >> misc/evilvte.1
+fi
+
+if [ "$COMMAND_FULLSCREEN" != "" ]; then
+  grep '^.\\" F ' misc/manpage.1 | sed 's/^.\\" F //' >> misc/evilvte.1
 fi
 
 if [ "$COMMAND_SHOW_HELP" != "" ]; then

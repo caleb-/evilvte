@@ -1,3 +1,8 @@
+0.4.4~pre9
+ * Support command line -f option to start evilvte in fullscreen mode
+ * New COLOR_STYLE option: VTE_FIXED
+   This is default color setting of VTE with the fixed color ^[[1;30m
+
 0.4.4~pre8
 
  The "Thanks to Samuli Suominen!" Release.

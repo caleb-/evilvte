@@ -15,12 +15,13 @@
 // #define CLOSE_SAFELY           TRUE  /* Do not kill running applications   */
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
-// #define COLOR_STYLE            LINUX /* Options: LINUX, RXVT, TANGO, XTERM */
+// #define COLOR_STYLE   /* Options: VTE_FIXED, LINUX, RXVT, TANGO, XTERM     */
 // #define COLOR_TEXT_BOLD        "red"
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"
 // #define COMMAND_AT_ROOT_WINDOW TRUE  /* -r option, run in root window      */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
+// #define COMMAND_FULLSCREEN     TRUE  /* -f option, init in fullscreen mode */
 // #define COMMAND_SET_TITLE      TRUE  /* -title option, set program title   */
 // #define COMMAND_SHOW_HELP      TRUE  /* -h option, show help               */
 #define    COMMAND_SHOW_OPTIONS   TRUE  /* -o option, show build-time options */

@@ -23,6 +23,9 @@ if [ "$MENU_DEFAULT_ENCODING" != "" ]; then
 fi
 
 COLOR_STYLE_DEFINE=`grep COLOR_STYLE src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | awk '{print $3}'`
+if [ "$COLOR_STYLE_DEFINE" = "VTE_FIXED" ]; then
+  echo \#define COLOR_VTE_FIXED 1 >> src/evilvte.h
+fi
 if [ "$COLOR_STYLE_DEFINE" = "LINUX" ]; then
   echo \#define COLOR_LINUX 1 >> src/evilvte.h
 fi

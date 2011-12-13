@@ -33,10 +33,11 @@
 #define DELETE          VTE_ERASE_ASCII_DELETE
 #define DELETE_SEQUENCE VTE_ERASE_DELETE_SEQUENCE
 
-#define LINUX color_linux
-#define RXVT  color_rxvt
-#define TANGO color_tango
-#define XTERM color_xterm
+#define VTE_FIXED color_vte_fixed
+#define LINUX     color_linux
+#define RXVT      color_rxvt
+#define TANGO     color_tango
+#define XTERM     color_xterm
 
 #define LEFT   0
 #define RIGHT  1
@@ -744,6 +745,28 @@ static int label_style_size = sizeof(label_style_poem) / sizeof(label_style_poem
 
 #ifndef TAB_LABEL
 #undef TAB_LABEL_NUMBER
+#endif
+
+#if COLOR_VTE_FIXED
+const GdkColor color_vte_fixed[16] =
+{
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0xc0c0, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xc0c0, 0x0000 },
+  { 0, 0xc0c0, 0xc0c0, 0x0000 },
+  { 0, 0x0000, 0x0000, 0xc0c0 },
+  { 0, 0xc0c0, 0x0000, 0xc0c0 },
+  { 0, 0x0000, 0xc0c0, 0xc0c0 },
+  { 0, 0xc0c0, 0xc0c0, 0xc0c0 },
+  { 0, 0x3f3f, 0x3f3f, 0x3f3f },
+  { 0, 0xffff, 0x3f3f, 0x3f3f },
+  { 0, 0x3f3f, 0xffff, 0x3f3f },
+  { 0, 0xffff, 0xffff, 0x3f3f },
+  { 0, 0x3f3f, 0x3f3f, 0xffff },
+  { 0, 0xffff, 0x3f3f, 0xffff },
+  { 0, 0x3f3f, 0xffff, 0xffff },
+  { 0, 0xffff, 0xffff, 0xffff }
+};
 #endif
 
 #if COLOR_LINUX
@@ -2935,6 +2958,9 @@ int main(int argc, char **argv)
 #if COMMAND_EXEC_PROGRAM
     printf("\t-e [program] [options]\tspecifies the program to be run in %s\n", PROGRAM_NAME);
 #endif
+#if COMMAND_FULLSCREEN
+    printf("\t-f                    \tstart %s in fullscreen mode\n", PROGRAM_NAME);
+#endif
 #if COMMAND_SHOW_OPTIONS
     printf("\t-o                    \tshow build-time configuration\n");
 #endif
@@ -3146,6 +3172,27 @@ int main(int argc, char **argv)
 #endif
 
   gtk_widget_show_all(main_window);
+
+#if COMMAND_FULLSCREEN
+  if (argc > 1 && !strcmp(argv[1], "-f")) {
+    gtk_window_maximize(GTK_WINDOW(main_window));
+#ifdef CTRL_TOGGLE_FULLSCREEN
+    window_fullscreen_status = 1;
+#endif
+#if MENU_TOGGLE_FULLSCREEN
+    window_fullscreen_status = 1;
+#endif
+  }
+  if (argc > 2 && !strcmp(argv[2], "-f")) {
+    gtk_window_maximize(GTK_WINDOW(main_window));
+#ifdef CTRL_TOGGLE_FULLSCREEN
+    window_fullscreen_status = 1;
+#endif
+#if MENU_TOGGLE_FULLSCREEN
+    window_fullscreen_status = 1;
+#endif
+  }
+#endif
 
 #if MENU
   menu = gtk_menu_new();
