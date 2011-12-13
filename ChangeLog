@@ -1,3 +1,18 @@
+0.4.8
+
+ The "Welcome, GTK+ 3.0.0!" Release
+
+ * Better compatibility with string matching
+ * Fix a bug that made MATCH_STRING fail when MENU is not enabled
+   Thanks to Kabakov Boris <pigritor AT gmail DOT com>
+ * New COLOR_STYLE option: ZENBURN
+   Thanks to thagraal and <ezrgzx AT gmail DOT com>
+ * New options: MATCH_STRING_HTTP
+                MATCH_STRING_MAIL
+                MATCH_STRING_FILE
+ * Hide MATCH_STRING
+ * Make everything GTK+ 3.0.0 compatible
+
 0.4.8~pre3
  * Fix a bug for multiple -e options in command line
  * Fix an i18n bug when linked to GTK+ version >= 2.90.0

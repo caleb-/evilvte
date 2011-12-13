@@ -1,22 +1,22 @@
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-a8cbe4cb894d48c4d8ea77c729f37cbf19a9fef4  14034 ChangeLog
+0309fa7d0e630901edf2d81b906d8927365a76a5  14496 ChangeLog
 5a08fc9fc6a4bdee8637f9b509bcd3fc7597a81c   1356 Makefile
-a195674f6b59f4bb6b62317665de797ed5ba8abd   7216 configure
+f199c10514868012f4d5d115245656eecff4b053   7212 configure
 4cc77b90af91e615a64ae04893fdffa7939db84c  18092 gpl-2.0.txt
 0a23169107aaa7cd45541422bbfa8b67357e4364   1426 misc/evilvte.desktop
 277e5a3c9c73bdcf6526f5ee67f5241cc7b30e7a   2023 misc/evilvte.png
 83055c532a24e778aabd9b5aa86cf9ee3d1f17a9    353 misc/evilvte.xml
 877f9894db8361809ed0bb3fe06cd971dd1a9d24   1585 misc/manpage.1
 a83357473eb7c431a9f8e2813e02553d5ffa54b7    338 misc/showvte.1
-d1eb5165813dd1c36ab4dd76f8eae4e31b50d3ac   9491 src/config.h
-4d9a4ad4c30a3cf5ff17c32d946162ccf8a8d3f6 102934 src/evilvte.c
+033e67d2532ca2f9e5b64d3d6d5ffe1fcde2a781   9701 src/config.h
+935c6980595537e7c97a0a182a405dbc0ea24d1e 104828 src/evilvte.c
 abc9e0942ecf4fe153b08068a5b9c66f75597658  14317 src/process.sh
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAk0333wACgkQdEpXpumNYVl8igCfUCgmxiqmPoBvmout0GNwIQWL
-+BkAoIwD32aypw86dSluS6c9l4UvlOKS
-=Ndho
+iEYEARECAAYFAk1hGMAACgkQdEpXpumNYVl13wCdGE5oMnJ7DaceENm41xOBq9eM
+EqcAoIZyMxNIyVBS/5p8RzayV1yiUvAO
+=3ooZ
 -----END PGP SIGNATURE-----

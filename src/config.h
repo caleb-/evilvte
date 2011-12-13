@@ -18,7 +18,8 @@
 // #define CLOSE_SAFELY           TRUE  /* Do not kill running applications   */
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
-// #define COLOR_STYLE   /* Options: VTE_FIXED, LINUX, RXVT, TANGO, XTERM     */
+// #define COLOR_STYLE   /* Options: VTE_FIXED, LINUX, RXVT, TANGO, XTERM,    */
+                         /*          ZENBURN                                  */
 // #define COLOR_TEXT_BOLD        "red"
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"
@@ -70,7 +71,9 @@
 // #define MENU_MATCH_STRING_EXEC "firefox"
 // #define      MATCH_STRING_L    "firefox" /* left click to open without menu*/
 // #define      MATCH_STRING_M    "firefox" /* middle click to open           */
-// #define      MATCH_STRING      "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
+// #define      MATCH_STRING_HTTP TRUE      /* Detect http(s) and ftp(s)      */
+// #define      MATCH_STRING_MAIL TRUE      /* Detect mailto:                 */
+// #define      MATCH_STRING_FILE TRUE      /* Detect file:///                */
 // #define MENU_CUSTOM            "Copy", "Separator", "Paste", "Separator"
            /* Options: "Copy",         "Zoom in",       "Add tab",
             *          "Paste",        "Zoom out",      "Remove tab",

@@ -51,6 +51,7 @@
 #define TANGO     3
 #define VTE_FIXED 4
 #define XTERM     5
+#define ZENBURN   6
 
 #define LEFT   0
 #define RIGHT  1
@@ -252,6 +253,10 @@ GtkBorder *inner_border;
 #define LABEL_SUBMENU_IME "_Input Methods"
 #endif
 
+#define MATCH_HTTP_DATA "((f|F)|(h|H)(t|T))(t|T)(p|P)(s|S)?://(([^|.< \t\r\n\\\"]*([.][^|< \t\r\n\\\"])?[^|.< \t\r\n\\\"]*)*[^< \t\r\n,;|\\\"]*[^|.< \t\r\n\\\"])?/*"
+#define MATCH_FILE_DATA "(f|F)(i|I)(l|L)(e|E):///(([^|.< \t\r\n\\\"]*([.][^|< \t\r\n\\\"])?[^|.< \t\r\n\\\"]*)*[^< \t\r\n,;|\\\"]*[^|.< \t\r\n\\\"])?/*"
+#define MATCH_MAIL_DATA "(m|M)(a|A)(i|I)(l|L)(t|T)(o|O):(([^|.< \t\r\n\\\"]*([.][^|< \t\r\n\\\"])?[^|.< \t\r\n\\\"]*)*@[^< \t\r\n,;|\\\"]*[^|.< \t\r\n\\\"])?/*"
+
 #if CLOSE_DIALOG
 #define DEL_TAB del_tab
 #endif
@@ -357,7 +362,6 @@ int button_order = 0;
 #undef MENU_INPUT_METHOD
 #undef MENU_ENCODING_LIST
 #undef MENU_MATCH_STRING_EXEC
-#undef MATCH_STRING
 #undef MENU_CUSTOM
 #endif
 
@@ -548,9 +552,10 @@ int tabbar_status = 1;
 #define VTE_TABBAR TABBAR
 #endif
 
-#ifndef MATCH_STRING
 #if defined(MENU_MATCH_STRING_EXEC) || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
-#define MATCH_STRING "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
+#if !MATCH_STRING_HTTP && !MATCH_STRING_MAIL && !MATCH_STRING_FILE && !defined(MATCH_STRING)
+#undef MATCH_STRING_HTTP
+#define MATCH_STRING_HTTP 1
 #endif
 #endif
 
@@ -714,6 +719,24 @@ const GdkColor color_style[16] = {
   { 0, 0x4645, 0x8281, 0xb4ae },
   { 0, 0xffff, 0x0000, 0xffff },
   { 0, 0x0000, 0xffff, 0xffff },
+  { 0, 0xffff, 0xffff, 0xffff }
+#endif
+#if COLOR_STYLE == ZENBURN
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0x9e9e, 0x1818, 0x2828 },
+  { 0, 0xaeae, 0xcece, 0x9292 },
+  { 0, 0x9696, 0x8a8a, 0x3838 },
+  { 0, 0x4141, 0x4141, 0x7171 },
+  { 0, 0x9696, 0x3c3c, 0x5959 },
+  { 0, 0x4141, 0x8181, 0x7979 },
+  { 0, 0xbebe, 0xbebe, 0xbebe },
+  { 0, 0x6666, 0x6666, 0x6666 },
+  { 0, 0xcfcf, 0x6161, 0x7171 },
+  { 0, 0xc5c5, 0xf7f7, 0x7979 },
+  { 0, 0xffff, 0xf7f7, 0x9696 },
+  { 0, 0x4141, 0x8686, 0xbebe },
+  { 0, 0xcfcf, 0x9e9e, 0xbebe },
+  { 0, 0x7171, 0xbebe, 0xbebe },
   { 0, 0xffff, 0xffff, 0xffff }
 #endif
 };
@@ -1249,6 +1272,33 @@ void add_tab()
 #endif
 #if VTE_CHECK_VERSION(0,17,1)
   vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), g_regex_new(MATCH_STRING, 0, 0, NULL), 0);
+#endif
+#endif
+
+#if MATCH_STRING_HTTP
+#if !VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_HTTP_DATA);
+#endif
+#if VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), g_regex_new(MATCH_HTTP_DATA, 0, 0, NULL), 0);
+#endif
+#endif
+
+#if MATCH_STRING_MAIL
+#if !VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_MAIL_DATA);
+#endif
+#if VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), g_regex_new(MATCH_MAIL_DATA, 0, 0, NULL), 0);
+#endif
+#endif
+
+#if MATCH_STRING_FILE
+#if !VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add(VTE_TERMINAL(term->vte), MATCH_FILE_DATA);
+#endif
+#if VTE_CHECK_VERSION(0,17,1)
+  vte_terminal_match_add_gregex(VTE_TERMINAL(term->vte), g_regex_new(MATCH_FILE_DATA, 0, 0, NULL), 0);
 #endif
 #endif
 
