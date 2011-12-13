@@ -234,6 +234,16 @@ gboolean sakura_popup(GtkWidget *widget, GdkEvent *event)
 }
 #endif
 
+#if STATUS_BAR
+void change_statusbar_encoding()
+{
+#if TAB
+  term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+#endif
+  gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term.vte)));
+}
+#endif
+
 void sakura_add_tab()
 {
 #ifdef TAB_LABEL
@@ -327,7 +337,7 @@ void sakura_add_tab()
 #endif /* TAB_LABEL */
   g_signal_connect(term.vte, "child-exited", sakura_del_tab, NULL);
 #if SWITCH_ENCODING
-  g_signal_connect_swapped(term.vte, "button-press-event", G_CALLBACK(sakura_popup), menu);
+  g_signal_connect(term.vte, "button-press-event", G_CALLBACK(sakura_popup), NULL);
 #endif
 #if TAB
   g_array_append_val(terminals, term);
@@ -386,16 +396,6 @@ void set_encoding(GtkWidget *widget, void *data)
 #endif
 }
 
-#if STATUS_BAR
-void change_statusbar_encoding()
-{
-#if TAB
-  term = g_array_index(terminals, struct terminal, gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
-#endif
-  gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, vte_terminal_get_encoding(VTE_TERMINAL(term.vte)));
-}
-#endif
-
 int main()
 {
   gtk_init(NULL, NULL);
@@ -452,7 +452,6 @@ int main()
 #else
   gtk_container_add(GTK_CONTAINER(main_window), notebook);
 #endif
-  g_signal_connect(main_window, "delete_event", gtk_main_quit, NULL);
 #if TAB
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(sakura_key_press), NULL);
 #endif

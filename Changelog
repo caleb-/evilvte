@@ -1,3 +1,9 @@
+0.1.1
+ * Remove an useless g_signal_connect
+ * New icon with BSD License
+   src/evilvte.png: Copyright (c) Lu, Chao-Ming (Tetralet)
+   You can see the license with: tail -n 26 src/evilvte.png
+
 0.1.0
  * Support window title
  * Support window icon
@@ -26,7 +32,7 @@
 
 0.0.3
  * Fix a bug of toggle tabs with hotkey
-   Thanks to Tetralet <tetralet@debian.org.tw>
+   Thanks to Tetralet <tetralet@gmail.com>
 
 0.0.2
  * Initial release
