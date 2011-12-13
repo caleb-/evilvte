@@ -1,3 +1,13 @@
+0.3.7
+ * Support MOUSE_CTRL_SATURATION
+   Scroll left to decrease saturation, and scroll right to increase it.
+   (Almost all Logitech® wheel mice support tilt left and tilt right.)
+ * Support "Toggle scrollbar", "Toggle status bar", and "Toggle tabbar" items
+   in menu
+ * Disable menu when MENU_CUSTOM defines nothing or only separators.
+ * Fix build failure when CTRL_TOGGLE_BACKGROUND is enabled without defining
+   BACKGROUND_SATURATION
+
 0.3.6
  * Support BACKGROUND_OPACITY and SHOW_WINDOW_DECORATION
    Thanks to dx <dx AT dxzone DOT com DOT ar>
@@ -70,7 +80,6 @@
  * Support TOGGLE_BG_ORDER
  * Support new tab with current tab's working directory
  * Fix a gtk_notebook_set_scrollable bug.
-   It is an GTK+ bug exists in version 2.12.9.
 
 0.2.8
  * Support TAB_LABEL_STYLE_*
@@ -88,7 +97,7 @@
 
 0.2.7
  * Support COMMAND_SHOW_OPTIONS
- * Add a script "showvte" to show buildtime configuration
+ * Add a script "showvte" to show build-time configuration
  * Show configuration status in configure script
  * Simplify src/config.h
 
@@ -111,7 +120,7 @@
  * New option TABBAR
  * Support TAB_SHOW_INFO_AT_TITLE
  * Remove TAB_REORDERABLE
- * Fix a CLOSE_SAFELY bug for i386 system
+ * Fix a CLOSE_SAFELY bug for i386 architecture
  * Fix a statusbar size bug
  * Add a .desktop file
  * New icon with BSD License
@@ -122,16 +131,15 @@
  * Support TAB_REORDERABLE
  * Support TABBAR_MENU_SELECT_TAB
  * Support TABBAR_SCROLLABLE
- * Support tab at bottom, left, right, and top
+ * Support tabbar at bottom, left, right, and top
  * Add a manpage
 
 0.2.1
  * Support DEFAULT_EMULATION_TYPE
  * Support a simple COMMAND_EXEC_PROGRAM function
-   You can use command line -e option to run applications
 
 0.2.0
- * Support hotkey for copy to clipboard and paste from clipboard
+ * Support hotkeys for copy and paste
 
 0.1.9
  * Support transparent background
@@ -183,7 +191,7 @@
  * Fix WINDOW_BORDER -> SHOW_WINDOW_BORDER
 
 0.0.7
- * Fix define TAB_LABEL without scrollbar
+ * Fix defining TAB_LABEL without scrollbar
  * Support SHOW_WINDOW_BORDER and TAB_BORDER
 
 0.0.6

@@ -35,6 +35,7 @@
 // #define FONT_SIZE              10
 // #define FONT_ANTI_ALIAS        TRUE
 // #define FONT_ENABLE_BOLD_TEXT  TRUE
+// #define MOUSE_CTRL_SATURATION  TRUE /* Scroll left or right to adjust it */
 // #define MOUSE_CURSOR_AUTOHIDE  TRUE
 // #define PROGRAM_NAME           "evilvte"
 // #define PROGRAM_VERSION        "7.7.7"
@@ -63,7 +64,9 @@
             *          "Zoom default", "Reset", "Reset and clear",
             *          "Select font", "Separator", "Encoding list",
             *          "Input method", "Submenu encoding list",
-            *          "Submenu input method", "Toggle background"            */
+            *          "Submenu input method", "Toggle background",
+            *          "Toggle scrollbar", "Toggle status bar",
+            *          "Toggle tabbar"                                        */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -113,7 +116,10 @@
 // #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
 // #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background", "Opacity"
 
-// #define LABEL_DEFAULT_ENCODING "Default Encoding"
-// #define LABEL_MENU_TOGGLE_BG   "Toggle background"
-// #define LABEL_SUBMENU_ENCODING "Character Encoding"
-// #define LABEL_SUBMENU_IME      "Input Methods"
+// #define LABEL_DEFAULT_ENCODING       "Default Encoding"
+// #define LABEL_MENU_TOGGLE_BG         "Toggle background"
+// #define LABEL_MENU_TOGGLE_SCROLLBAR  "Toggle scrollbar"
+// #define LABEL_MENU_TOGGLE_STATUS_BAR "Toggle status bar"
+// #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"
+// #define LABEL_SUBMENU_ENCODING       "Character Encoding"
+// #define LABEL_SUBMENU_IME            "Input Methods"
