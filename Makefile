@@ -10,7 +10,7 @@ evilvte: src/evilvte.h src/evilvte.o
 	$(CC) $(LDFLAGS) src/evilvte.o $(LDLIBS) -o src/$(PROG)
 
 prepare:
-	rm -f src/custom.h
+	rm -f src/custom.h src/evilvte.h src/evilvte.o
 
 src/custom.h: prepare
 	cp $(CONF_FILE) src/custom.h

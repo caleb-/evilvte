@@ -1,3 +1,7 @@
+0.4.6
+ * Apply a workaround for VTE 0.24.0 vte_terminal_set_background_image_file()
+   bug
+
 0.4.6~pre6
  * Support CURSOR_SHAPE
  * New BACKSPACE_KEY and DELETE_KEY option: ERASE_TTY

@@ -207,8 +207,18 @@
 #define LABEL_SUBMENU_IME "Input Methods"
 #endif
 
+#ifdef CLOSE_DIALOG
+#if CLOSE_DIALOG
+#define DEL_TAB(major,minor) del_tab(major,minor)
+#endif
+#if !CLOSE_DIALOG
+#undef CLOSE_DIALOG
+#endif
+#endif
+
 #ifndef CLOSE_DIALOG
 #define CLOSE_DIALOG 0
+#define DEL_TAB(major,minor) del_tab()
 #endif
 
 #if DEF_TAB_LABEL && !defined(TAB_LABEL)
@@ -377,6 +387,11 @@ char *encoding[] = { MENU_ENCODING_LIST };
 GtkWidget *encoding_item;
 #endif
 
+#if TOGGLE_BG_ORDER_SIZE == 1
+#undef HOTKEY_TOGGLE_BACKGROUND
+#undef MENU_TOGGLE_BACKGROUND
+#endif
+
 #if defined(HOTKEY_TOGGLE_BACKGROUND) || MENU_TOGGLE_BACKGROUND
 #ifndef BACKGROUND_IMAGE
 #define BACKGROUND_IMAGE ".config/evilvte/background.png"
@@ -384,9 +399,11 @@ GtkWidget *encoding_item;
 #ifndef TOGGLE_BG_ORDER
 #if !VTE_CHECK_VERSION(0,13,3)
 #define TOGGLE_BG_ORDER "Image", "Transparent", "No background"
+#define TOGGLE_BG_ORDER_SIZE 3
 #endif
 #if VTE_CHECK_VERSION(0,13,3)
 #define TOGGLE_BG_ORDER "Image", "Transparent", "No background", "Opacity"
+#define TOGGLE_BG_ORDER_SIZE 4
 #define TOGGLE_BG_OPACITY 1
 #endif
 #define TOGGLE_BG_IMAGE 1
@@ -397,8 +414,7 @@ GtkWidget *encoding_item;
 #define INIT_OPACITY 1
 #endif
 #define DO_TOGGLE_BACKGROUND 1
-char *background_order[] = { TOGGLE_BG_ORDER };
-const int background_order_size = sizeof(background_order) / sizeof(background_order[0]);
+const char *background_order[] = { TOGGLE_BG_ORDER };
 int background_status = 0;
 #endif
 
@@ -468,7 +484,7 @@ int antialias_status = VTE_ANTI_ALIAS_FORCE_ENABLE;
 #endif
 
 #ifdef MENU_CUSTOM
-char *menu_custom[] = { MENU_CUSTOM };
+const char *menu_custom[] = { MENU_CUSTOM };
 int menu_item_success = 0;
 #endif
 
@@ -768,7 +784,7 @@ struct terminal *term;
 GtkWidget *current_tab;
 #endif
 
-void del_tab(GtkWidget *widget, int do_close_dialog)
+void DEL_TAB(GtkWidget *widget, int do_close_dialog)
 {
 #if TAB
   int index = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
@@ -876,7 +892,7 @@ void button_clicked(GtkWidget *widget, void *data)
     term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
     if (data == term->button) {
       gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i);
-      del_tab(NULL, CLOSE_DIALOG);
+      DEL_TAB(NULL, CLOSE_DIALOG);
       killed = i;
     }
   }
@@ -1200,7 +1216,7 @@ void add_tab()
 #endif
 
 #ifdef BACKGROUND_IMAGE
-  vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
+  vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_file(imgstr, NULL));
 #endif
 
 #if BACKGROUND_OPACITY
@@ -1372,13 +1388,13 @@ void add_tab()
 #if TOGGLE_BG_IMAGE
   if (!strncmp(background_order[background_status], "Image", 6)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
+    vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_file(imgstr, NULL));
   }
 #endif
 #if TOGGLE_BG_NO_BACKGROUND
   if (!strncmp(background_order[background_status], "No background", 14)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+    vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_xpm_data(NULL));
 #if INIT_OPACITY || BACKGROUND_OPACITY
     vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
@@ -1387,7 +1403,7 @@ void add_tab()
 #if TOGGLE_BG_OPACITY
   if (!strncmp(background_order[background_status], "Opacity", 8)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-    vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+    vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_xpm_data(NULL));
     vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
   }
 #endif
@@ -1860,7 +1876,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #if TAB
         int i = 0;
 #endif
-        if (background_status == background_order_size)
+        if (background_status >= TOGGLE_BG_ORDER_SIZE)
           background_status = 0;
 #if TOGGLE_BG_TRANSPARENT
         if (!strncmp(background_order[background_status], "Transparent", 12)) {
@@ -1884,7 +1900,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
             term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
             vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-            vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
+            vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_file(imgstr, NULL));
 #if TAB
           }
 #endif
@@ -1899,7 +1915,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
             term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
             vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-            vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+            vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_xpm_data(NULL));
 #if INIT_OPACITY || BACKGROUND_OPACITY
             vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
@@ -1917,7 +1933,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
             term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
             vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-            vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+            vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_xpm_data(NULL));
             vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
 #if TAB
           }
@@ -2124,7 +2140,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_TAB_REMOVE
       if (HOTKEY_TAB_REMOVE) {
-        del_tab(NULL, CLOSE_DIALOG);
+        DEL_TAB(NULL, CLOSE_DIALOG);
         return TRUE;
       }
 #endif
@@ -2185,11 +2201,11 @@ void delete_event()
   int i = 0;
   for (i = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i > 0 ; i--) {
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i - 1);
-    del_tab(NULL, 0);
+    DEL_TAB(NULL, 0);
   }
 #endif
 #if !TAB
-  del_tab(NULL, CLOSE_DIALOG);
+  DEL_TAB(NULL, CLOSE_DIALOG);
 #endif
 #if CLOSE_DIALOG
   return FALSE;
@@ -2468,7 +2484,7 @@ void do_toggle_antialias()
 void do_toggle_bg()
 {
   background_status++;
-  if (background_status == background_order_size)
+  if (background_status >= TOGGLE_BG_ORDER_SIZE)
     background_status = 0;
 #if TAB
   int i = 0;
@@ -2494,7 +2510,7 @@ void do_toggle_bg()
       term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
       vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-      vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
+      vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_file(imgstr, NULL));
 #if TAB
     }
 #endif
@@ -2508,7 +2524,7 @@ void do_toggle_bg()
       term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
       vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-      vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+      vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_xpm_data(NULL));
 #if INIT_OPACITY || BACKGROUND_OPACITY
       vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
@@ -2525,7 +2541,7 @@ void do_toggle_bg()
       term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
 #endif
       vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), 0);
-      vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
+      vte_terminal_set_background_image(VTE_TERMINAL(term->vte), gdk_pixbuf_new_from_xpm_data(NULL));
       vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
 #if TAB
     }
@@ -3065,8 +3081,7 @@ int at_dock_mode = 0;
 #if MENU_SEPARATOR
   GtkWidget *menu_item;
 #endif
-  const int menu_custom_size = sizeof(menu_custom) / sizeof(menu_custom[0]);
-  for (j = 0 ; j < menu_custom_size ; j++)
+  for (j = 0 ; j < MENU_CUSTOM_SIZE ; j++)
 #endif
   {
 #if MENU_COPY
@@ -3333,12 +3348,11 @@ int at_dock_mode = 0;
 #endif
 #ifdef MENU_ENCODING_LIST
     {
-      const int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
-      GtkWidget *encoding_item[encoding_size];
+      GtkWidget *encoding_item[MENU_ENCODING_LIST_SIZE];
 #ifdef MENU_CUSTOM
       GtkWidget *image_menu_enc;
 #endif
-      for (i = 0 ; i < encoding_size ; i++) {
+      for (i = 0 ; i < MENU_ENCODING_LIST_SIZE ; i++) {
 #if MENU_DEFAULT_ENCODING
         if (!strncmp(encoding[i], "Default Encoding", 17)) {
           encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term->vte));
@@ -3411,9 +3425,8 @@ int at_dock_mode = 0;
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), subitem_enc);
       gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(subitem_enc), image_submenu_enc);
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(subitem_enc), submenu_enc);
-      const int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
-      GtkWidget *encoding_sub[encoding_size];
-      for (i = 0 ; i < encoding_size ; i++) {
+      GtkWidget *encoding_sub[MENU_ENCODING_LIST_SIZE];
+      for (i = 0 ; i < MENU_ENCODING_LIST_SIZE ; i++) {
 #if MENU_DEFAULT_ENCODING
         if (!strncmp(encoding[i], "Default Encoding", 17)) {
           encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term->vte));

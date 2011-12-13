@@ -24,6 +24,13 @@ if [ "$MENU_DEFAULT_ENCODING" != "" ]; then
   echo \#define MENU_DEFAULT_ENCODING 1 >> $NEWCONFFILE
 fi
 
+MENU_ENCODING_LIST_SIZE=`grep MENU_ENCODING_LIST src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | sed 's/,/\n/g' | wc -l`
+TOGGLE_BG_ORDER_SIZE=`grep    TOGGLE_BG_ORDER    src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | sed 's/,/\n/g' | wc -l`
+MENU_CUSTOM_SIZE=`grep        MENU_CUSTOM        src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | sed 's/,/\n/g' | wc -l`
+echo \#define MENU_ENCODING_LIST_SIZE $MENU_ENCODING_LIST_SIZE              >> $NEWCONFFILE
+echo \#define TOGGLE_BG_ORDER_SIZE    $TOGGLE_BG_ORDER_SIZE | grep -v ' 0$' >> $NEWCONFFILE
+echo \#define MENU_CUSTOM_SIZE        $MENU_CUSTOM_SIZE                     >> $NEWCONFFILE
+
 DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1`
 if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
   COLUMNS_DEFINE=`echo $DEFAULT_TERMINAL_SIZE_DEFINE | awk '{print $3}' | cut -d x -f 1`
@@ -220,7 +227,7 @@ fi
 
 echo echo Configuration of $SHOWVTE_PROG_NAME $SHOWVTE_VERSION: >> src/showvte
 
-DEFINE_LINES=`grep ^\#define src/showvte | wc | awk '{print $1}'`
+DEFINE_LINES=`grep ^\#define src/showvte | wc -l`
 
 if [ "$DEFINE_LINES" = "0" ]; then
   echo echo [1m[31mDisable everything.[m >> src/showvte
@@ -295,7 +302,7 @@ fi
 
 tail -n 4 misc/manpage.1 >> misc/evilvte.1
 
-COMMAND_NUMBERS=`grep '^.B..-' misc/evilvte.1 | wc | awk '{print $1}'`
+COMMAND_NUMBERS=`grep '^.B..-' misc/evilvte.1 | wc -l`
 if [ "$COMMAND_NUMBERS" = "0" ]; then
   grep -v -i option misc/manpage.1 > misc/evilvte.1
   exit

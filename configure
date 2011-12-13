@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -f src/config.o src/custom.h src/evilvte.h src/install.sh src/uninstall.sh
+rm -f src/*.o src/custom.h src/evilvte.h src/install.sh src/uninstall.sh
 
 DO_SED=sed
 DO_ECHO=echo
@@ -64,7 +64,7 @@ fi
 
 GNU_GOLD=`ld -v | tr A-Z a-z | tr -s ' ' ' ' | grep 'gnu gold'`
 if [ "$GNU_GOLD" != "" ]; then
-  LDLIBS="-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lglib-2.0"
+  LDLIBS="-L/usr/local/lib -lvte -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lglib-2.0 -lgdk_pixbuf-2.0"
 else
   LDLIBS="-L/usr/local/lib -lvte"
 fi
@@ -78,7 +78,7 @@ else
   $DO_ECHO [1m[33mSUSE system detected[m $SUSE_DETECTED | sed 's/TRUE//' | grep -v FALSE$
   $DO_ECHO [1m[33mArch Linux detected[m $ARCH_DETECTED | sed 's/TRUE//' | grep -v FALSE$
   $DO_ECHO -n "Configuration: "
-  DEFINE_LINES=`sed 's/\t/ /g' $CONF_FILE | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc | awk '{print $1}'`
+  DEFINE_LINES=`sed 's/\t/ /g' $CONF_FILE | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc -l`
   if [ "$DEFINE_LINES" = "0" ]; then
     $DO_ECHO [1m[31mDisable everything.[m
   else
