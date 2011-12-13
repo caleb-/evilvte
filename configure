@@ -40,10 +40,17 @@ fi
 
 VTELDFLAGS=`pkg-config --libs $VTE`
 
+if [ -e /etc/SuSE-release ]; then
+  SUSE_DETECTED=TRUE
+else
+  SUSE_DETECTED=FALSE
+fi
+
 if [ $? != 0 ]; then
   exit
 else
   echo Prefix: [1m[33m$prefix[m
+  echo System is SUSE: $SUSE_DETECTED | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
   echo Configuration:
   sed 's/\t/ /g' src/config.h | tr -s ' ' ' ' | sed 's/^ //' | grep ^\#define | sed 's~/\*~\n~g' | grep -v \*\/ | sed -e 's/TRUE/[1m[32mTRUE[m/' -e 's/FALSE/[1m[31mFALSE[m/'
   echo
@@ -75,3 +82,4 @@ echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
 echo LDFLAGS=-L/usr/local/lib -lvte -lgtk-x11-2.0 >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> src/config.o
+echo "SUSE_DETECTED=$SUSE_DETECTED" >> src/config.o

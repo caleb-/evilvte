@@ -76,8 +76,15 @@
 // #define MENU_PASTE             TRUE
 // #define MENU_TAB_ADD_TAB       TRUE
 // #define MENU_TAB_CLOSE_TAB     TRUE
-// #define MENU_CLEAR             TRUE /* Reset and clear terminal */
+// #define MENU_RESET             TRUE
+// #define MENU_RESET_AND_CLEAR   TRUE
+// #define MENU_QUIT              TRUE
+// #define MENU_SEPARATOR_1       TRUE /* Separator above MENU_ENCODING_LIST */
+// #define MENU_SEPARATOR_2       TRUE /* Separator below MENU_ENCODING_LIST */
 #define    MENU_INPUT_METHOD      TRUE
+// #define MENU_CUSTOM            "Copy","Paste","Add tab","Close tab","Reset"
+// #define MENU_CUSTOM            "Reset and clear","Quit","Separator"
+// #define MENU_CUSTOM            "Encoding list","Input method"
 #define    MENU_ENCODING_LIST     "UTF-8"
 // #define MENU_ENCODING_LIST     "BIG-5","Default","GBK","EUC-JP","SHIFT-JIS"
 // #define MENU_ENCODING_DEFAULT  "Default Encoding"

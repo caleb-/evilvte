@@ -1,3 +1,11 @@
+0.3.1
+ * Fix an openSUSE 10.3 KDE bug.
+   When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
+   crash.
+   Fix this by defining TAB_LABEL when SUSE system is detected.
+ * Support MENU_CUSTOM
+ * Support MENU_RESET, MENU_QUIT, and MENU_SEPARATOR_*
+
 0.3.0
  * Support MENU_COPY and MENU_PASTE
  * Support MENU_TAB_ADD_TAB and MENU_TAB_CLOSE_TAB

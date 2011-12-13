@@ -6,6 +6,10 @@ OBJ=src/sakura.o
 
 CFLAGS=$(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\" -DEVILVTE_VERSION=\"$(EVILVTE_VERSION)\"
 
+ifeq ($(SUSE_DETECTED),TRUE)
+CFLAGS += -DSUSE_DETECTED=1
+endif
+
 all: evilvte showvte
 
 evilvte: $(OBJ)

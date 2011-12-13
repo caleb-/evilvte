@@ -88,7 +88,6 @@
 #ifndef TOGGLE_BG_ORDER
 #define TOGGLE_BG_ORDER "Image","Transparent","No background"
 #endif
-
 static char *background_order[] = {
 TOGGLE_BG_ORDER
 };
@@ -110,8 +109,11 @@ int background_status = 0;
 #undef MENU_PASTE
 #undef MENU_TAB_ADD_TAB
 #undef MENU_TAB_CLOSE_TAB
-#undef MENU_CLEAR
+#undef MENU_RESET
+#undef MENU_RESET_AND_CLEAR
+#undef MENU_QUIT
 #undef MENU_INPUT_METHOD
+#undef MENU_CUSTOM
 #undef MENU_ENCODING_LIST
 #endif
 
@@ -195,6 +197,34 @@ int background_status = 0;
 #undef DOUBLE_PRESS_HOTKEY
 #endif
 
+#ifdef MENU_CUSTOM
+#undef MENU_SEPARATOR_1
+#undef MENU_SEPARATOR_2
+#undef MENU_COPY
+#undef MENU_PASTE
+#undef MENU_TAB_ADD_TAB
+#undef MENU_TAB_CLOSE_TAB
+#undef MENU_RESET
+#undef MENU_RESET_AND_CLEAR
+#undef MENU_QUIT
+#undef MENU_INPUT_METHOD
+#define MENU_COPY TRUE
+#define MENU_PASTE TRUE
+#define MENU_TAB_ADD_TAB TRUE
+#define MENU_TAB_CLOSE_TAB TRUE
+#define MENU_RESET TRUE
+#define MENU_RESET_AND_CLEAR TRUE
+#define MENU_QUIT TRUE
+#define MENU_INPUT_METHOD TRUE
+#ifndef MENU_ENCODING_LIST
+#define MENU_ENCODING_LIST "UTF-8"
+#endif
+static char *menu_custom[] = {
+MENU_CUSTOM
+};
+int menu_custom_size = sizeof(menu_custom) / sizeof(menu_custom[0]);
+#endif
+
 #ifdef TAB_INFO_AT_TITLE
 #undef SHOW_WINDOW_TITLE /* prevent duplicated definitions */
 #define SHOW_WINDOW_TITLE TRUE
@@ -275,6 +305,12 @@ int background_status = 0;
 
 GtkWidget *main_window;
 GtkWidget *notebook;
+
+#if SUSE_DETECTED
+#ifndef TAB_LABEL
+#define TAB_LABEL "Page"
+#endif
+#endif
 
 #ifdef TAB_LABEL_STYLE_CUSTOM
 #undef TAB_LABEL
@@ -514,6 +550,7 @@ void delete_event();
 void do_clear();
 void do_copy();
 void do_paste();
+void do_reset();
 void sakura_add_tab();
 void sakura_del_tab();
 void scroll_event();
@@ -965,7 +1002,7 @@ void do_copy()
 }
 #endif
 
-#if MENU_CLEAR
+#if MENU_RESET_AND_CLEAR
 void do_clear()
 {
   vte_terminal_reset(VTE_TERMINAL(term.vte), 1,  1);
@@ -976,6 +1013,13 @@ void do_clear()
 void do_paste()
 {
   vte_terminal_paste_clipboard(VTE_TERMINAL(term.vte));
+}
+#endif
+
+#if MENU_RESET
+void do_reset()
+{
+  vte_terminal_reset(VTE_TERMINAL(term.vte), 1,  0);
 }
 #endif
 
@@ -1474,65 +1518,156 @@ int main(int argc, char **argv)
   gtk_window_get_size(GTK_WINDOW(main_window), &width_f, &height_f);
 #endif
 
+  gtk_widget_show_all(main_window);
+
 #if MENU
   menu = gtk_menu_new();
 #endif
 
+#if MENU_SEPARATOR_1 || MENU_SEPARATOR_2
+  GtkWidget *menu_item;
+#endif
+
+#ifdef MENU_CUSTOM
+  GtkWidget *menu_item;
+  int m;
+  for (m = 0 ; m < menu_custom_size ; m++)
+#endif
+
+  { /* MENU_CUSTOM */
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Copy")
+#endif
 #if MENU_COPY
-  GtkWidget *menu_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
-  gtk_menu_append(GTK_MENU(menu), menu_copy);
-  g_signal_connect(menu_copy, "activate", do_copy, NULL);
+    {
+      GtkWidget *menu_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, NULL);
+      gtk_menu_append(menu, menu_copy);
+      g_signal_connect(menu_copy, "activate", do_copy, NULL);
+    }
 #endif
 
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Paste")
+#endif
 #if MENU_PASTE
-  GtkWidget *menu_paste = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, NULL);
-  gtk_menu_append(GTK_MENU(menu), menu_paste);
-  g_signal_connect(menu_paste, "activate", do_paste, NULL);
+    {
+      GtkWidget *menu_paste = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, NULL);
+      gtk_menu_append(menu, menu_paste);
+      g_signal_connect(menu_paste, "activate", do_paste, NULL);
+    }
 #endif
 
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Add tab")
+#endif
 #if MENU_TAB_ADD_TAB
-  GtkWidget *menu_add_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_ADD, NULL);
-  gtk_menu_append(GTK_MENU(menu), menu_add_tab);
-  g_signal_connect(menu_add_tab, "activate", sakura_add_tab, NULL);
+    {
+      GtkWidget *menu_add_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_ADD, NULL);
+      gtk_menu_append(menu, menu_add_tab);
+      g_signal_connect(menu_add_tab, "activate", sakura_add_tab, NULL);
+    }
 #endif
 
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Close tab")
+#endif
 #if MENU_TAB_CLOSE_TAB
-  GtkWidget *menu_close_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, NULL);
-  gtk_menu_append(GTK_MENU(menu), menu_close_tab);
-  g_signal_connect(menu_close_tab, "activate", sakura_del_tab, NULL);
+    {
+      GtkWidget *menu_close_tab = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, NULL);
+      gtk_menu_append(menu, menu_close_tab);
+      g_signal_connect(menu_close_tab, "activate", sakura_del_tab, NULL);
+    }
 #endif
 
-#if MENU_CLEAR
-  GtkWidget *menu_clear = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLEAR, NULL);
-  gtk_menu_append(GTK_MENU(menu), menu_clear);
-  g_signal_connect(menu_clear, "activate", do_clear, NULL);
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Reset")
+#endif
+#if MENU_RESET
+    {
+      GtkWidget *menu_reset = gtk_image_menu_item_new_from_stock(GTK_STOCK_REFRESH, NULL);
+      gtk_menu_append(menu, menu_reset);
+      g_signal_connect(menu_reset, "activate", do_reset, NULL);
+    }
 #endif
 
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Reset and clear")
+#endif
+#if MENU_RESET_AND_CLEAR
+    {
+      GtkWidget *menu_clear = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLEAR, NULL);
+      gtk_menu_append(menu, menu_clear);
+      g_signal_connect(menu_clear, "activate", do_clear, NULL);
+    }
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Quit")
+#endif
+#if MENU_QUIT
+    {
+      GtkWidget *menu_quit = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL);
+      gtk_menu_append(menu, menu_quit);
+#if CLOSE_SAFELY
+      g_signal_connect(menu_quit, "activate", delete_event, NULL);
+#else
+      g_signal_connect(menu_quit, "activate", gtk_main_quit, NULL);
+#endif
+    }
+#endif /* MENU_QUIT */
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Separator") {
+      menu_item = gtk_separator_menu_item_new();
+      gtk_menu_append(menu, menu_item);
+    }
+#endif
+
+#if MENU_SEPARATOR_1
+  menu_item = gtk_separator_menu_item_new();
+  gtk_menu_append(menu, menu_item);
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Encoding list")
+#endif
 #ifdef MENU_ENCODING_LIST
-  int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
-  GtkWidget *encoding_item[encoding_size];
-  int i;
-  for (i = 0 ; i < encoding_size ; i++) {
+    {
+      int encoding_size = sizeof(encoding) / sizeof(encoding[0]);
+      GtkWidget *encoding_item[encoding_size];
+      int i;
+      for (i = 0 ; i < encoding_size ; i++) {
 #ifdef MENU_ENCODING_DEFAULT
-    if (encoding[i] == "Default") {
-      encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term.vte));
-      encoding_item[i] = gtk_menu_item_new_with_label(MENU_ENCODING_DEFAULT);
-    } else
+        if (encoding[i] == "Default") {
+          encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term.vte));
+          encoding_item[i] = gtk_menu_item_new_with_label(MENU_ENCODING_DEFAULT);
+        } else
 #endif
-      encoding_item[i] = gtk_menu_item_new_with_label(encoding[i]);
-    gtk_menu_append(GTK_MENU(menu), encoding_item[i]);
-    g_signal_connect(encoding_item[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
-  }
+          encoding_item[i] = gtk_menu_item_new_with_label(encoding[i]);
+        gtk_menu_append(menu, encoding_item[i]);
+        g_signal_connect(encoding_item[i], "activate", G_CALLBACK(set_encoding), encoding[i]);
+      }
+    }
 #endif /* MENU_ENCODING_LIST */
+
+#if MENU_SEPARATOR_2
+  menu_item = gtk_separator_menu_item_new();
+  gtk_menu_append(menu, menu_item);
+#endif
+
+#ifdef MENU_CUSTOM
+    if (menu_custom[m] == "Input method")
+#endif
+#if MENU_INPUT_METHOD
+    {
+      vte_terminal_im_append_menuitems(VTE_TERMINAL(term.vte), GTK_MENU_SHELL(menu));
+    }
+#endif
+
+  } /* MENU_CUSTOM */
 
 #if MENU
   gtk_widget_show_all(menu);
-#endif
-
-  gtk_widget_show_all(main_window);
-
-#if MENU_INPUT_METHOD
-  vte_terminal_im_append_menuitems(VTE_TERMINAL(term.vte), GTK_MENU_SHELL(menu));
 #endif
 
   gtk_main();
