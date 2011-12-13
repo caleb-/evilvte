@@ -1,3 +1,6 @@
+0.4.4~pre7
+ * Fix configure script for pkgsrc system
+
 0.4.4~pre6
  * Support PROGRAM_WM_CLASS
    Thanks to Bruno Vieira <mail AT bmpvieira DOT com> for reporting this issue.
