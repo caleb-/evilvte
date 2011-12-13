@@ -61,10 +61,10 @@
 // #define      MATCH_STRING      "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
 // #define MENU_CUSTOM            "Copy", "Separator", "Paste", "Separator"
            /* Options: "Copy", "Paste", "Select_all", "Add tab", "Remove tab",
-            *          "Edit label", "New window", "Zoom in", "Zoom out",
-            *          "Zoom default", "Reset", "Reset and clear",
-            *          "Select font", "Separator", "Encoding list",
-            *          "Input method", "Submenu encoding list",
+            *          "Edit label", "New window", "Quit", "Zoom in",
+            *          "Zoom out", "Zoom default", "Reset terminal",
+            *          "Reset and clear", "Select font", "Separator",
+            *          "Encoding list", "Input method", "Submenu encoding list",
             *          "Submenu input method", "Toggle background",
             *          "Toggle scrollbar", "Toggle status bar",
             *          "Toggle tabbar", "Toggle window decorated",
@@ -115,6 +115,11 @@
 // #define CTRL_TAB_LAST          (event->keyval == GDK_End)
 // #define CTRL_TAB_GO_TO_NUMBER  TRUE
 // #define CTRL_TAB_EDIT_LABEL    (event->keyval == GDK_E)
+// #define CTRL_TOGGLE_ANTI_ALIAS (event->keyval == GDK_L)
+// #define CTRL_TOGGLE_DECORATED  (event->keyval == GDK_Left)
+// #define CTRL_TOGGLE_SCROLLBAR  (event->keyval == GDK_Right)
+// #define CTRL_TOGGLE_STATUS_BAR (event->keyval == GDK_Down)
+// #define CTRL_TOGGLE_TABBAR     (event->keyval == GDK_Up)
 // #define CTRL_TOGGLE_BACKGROUND (event->keyval == GDK_KP_Delete)
 // #define      TOGGLE_BG_ORDER   "Image", "Transparent", "No background", "Opacity"
 

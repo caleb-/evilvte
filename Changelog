@@ -1,3 +1,13 @@
+0.3.9
+ * Parse src/config.h to make binary smaller.
+   Only defined menu items will be compiled.
+ * Support CTRL_TOGGLE_ANTI_ALIAS
+ * Support CTRL_TOGGLE_DECORATED
+ * Support CTRL_TOGGLE_SCROLLBAR
+ * Support CTRL_TOGGLE_STATUS_BAR
+ * Support CTRL_TOGGLE_TABBAR
+ * Support "Quit" item in menu
+
 0.3.8
  * Support CLOSE_DIALOG
    Let user confirm close event.
@@ -69,7 +79,7 @@
    Fix this by defining TAB_LABEL when SUSE system is detected.
    Thanks to swyear <swyear AT gmail DOT com> for reporting and testing the bug.
  * Support MENU_CUSTOM
- * Support "Reset" "Quit" and "Separator" items in menu
+ * Support "Reset terminal", "Quit", and "Separator" items in menu
 
 0.3.0
  * Support "Copy" and "Paste" items in menu

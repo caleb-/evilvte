@@ -12,7 +12,10 @@ endif
 
 all: evilvte showvte
 
-evilvte: $(OBJ)
+parsecfg:
+	sh src/evilvte.c
+
+evilvte: parsecfg $(OBJ)
 	$(CC) -o $(PROG) $(OBJ) $(LDFLAGS)
 
 strip: all
@@ -38,7 +41,7 @@ install:
 installstrip: strip install
 
 clean: src/config.o
-	rm -f $(PROG) src/showvte src/*.o
+	rm -f $(PROG) src/showvte src/*.o src/evilvte.h
 
 src/config.o:
 	./configure
