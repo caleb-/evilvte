@@ -38,6 +38,7 @@
 // #define FONT_ENABLE_BOLD_TEXT  TRUE
 // #define MOUSE_CTRL_SATURATION  TRUE  /* Scroll left or right to adjust it  */
 // #define MOUSE_CURSOR_AUTOHIDE  TRUE
+// #define PROGRAM_ALWAYS_ON_TOP  TRUE
 // #define PROGRAM_NAME           "evilvte"
 // #define PROGRAM_VERSION        "7.7.7"
 // #define RECORD_LASTLOG         TRUE
@@ -69,7 +70,8 @@
             *          "Toggle scrollbar", "Toggle status bar",
             *          "Toggle tabbar", "Toggle window decorated",
             *          "Toggle anti-alias", "Toggle hotkeys locking",
-            *          "Adjust saturation", "Background tint"                 */
+            *          "Toggle always on top", "Adjust saturation",
+            *          "Background tint"                                      */
 
 #define    TAB                    TRUE
 // #define TAB_BORDER             0
@@ -121,6 +123,7 @@
 // #define CTRL_TOGGLE_ANTI_ALIAS (event->keyval == GDK_L)
 // #define CTRL_TOGGLE_DECORATED  (event->keyval == GDK_Left)
 // #define CTRL_TOGGLE_HOTKEYS    (event->keyval == GDK_quoteleft)
+// #define CTRL_TOGGLE_ON_TOP     (event->keyval == GDK_O)
 // #define CTRL_TOGGLE_SCROLLBAR  (event->keyval == GDK_Right)
 // #define CTRL_TOGGLE_STATUS_BAR (event->keyval == GDK_Down)
 // #define CTRL_TOGGLE_TABBAR     (event->keyval == GDK_Up)
@@ -136,6 +139,7 @@
 // #define LABEL_MENU_TOGGLE_BG         "Toggle background"
 // #define LABEL_MENU_TOGGLE_DECORATED  "Toggle window decorated"
 // #define LABEL_MENU_TOGGLE_HOTKEYS    "Toggle hotkeys locking"
+// #define LABEL_MENU_TOGGLE_ON_TOP     "Toggle always on top"
 // #define LABEL_MENU_TOGGLE_SCROLLBAR  "Toggle scrollbar"
 // #define LABEL_MENU_TOGGLE_STATUS_BAR "Toggle status bar"
 // #define LABEL_MENU_TOGGLE_TABBAR     "Toggle tabbar"

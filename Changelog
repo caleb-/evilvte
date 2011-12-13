@@ -1,6 +1,8 @@
-0.4.3~pre1
+0.4.3
  * Fix Segmentation fault when closing program
    Please enable CLOSE_SAFELY or CLOSE_DIALOG
+ * Support PROGRAM_ALWAYS_ON_TOP
+ * Support CTRL_TOGGLE_ON_TOP and "Toggle always on top" item in menu
 
 0.4.2
  * Clarify licenses

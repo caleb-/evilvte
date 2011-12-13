@@ -110,6 +110,10 @@
 #define LABEL_MENU_TOGGLE_HOTKEYS "Toggle hotkeys locking"
 #endif
 
+#ifndef LABEL_MENU_TOGGLE_ON_TOP
+#define LABEL_MENU_TOGGLE_ON_TOP "Toggle always on top"
+#endif
+
 #ifndef LABEL_MENU_TOGGLE_SCROLLBAR
 #define LABEL_MENU_TOGGLE_SCROLLBAR "Toggle scrollbar"
 #endif
@@ -218,6 +222,7 @@
 #undef CTRL_TOGGLE_ANTI_ALIAS
 #undef CTRL_TOGGLE_DECORATED
 #undef CTRL_TOGGLE_HOTKEYS
+#undef CTRL_TOGGLE_ON_TOP
 #undef CTRL_TOGGLE_SCROLLBAR
 #undef CTRL_TOGGLE_STATUS_BAR
 #undef CTRL_TOGGLE_TABBAR
@@ -297,12 +302,25 @@ GtkWidget *adjustment;
 #undef SUBMENU_INPUT_METHOD
 #undef MENU_TOGGLE_BACKGROUND
 #undef MENU_TOGGLE_HOTKEYS
+#undef MENU_TOGGLE_ON_TOP
 #undef MENU_TOGGLE_SCROLLBAR
 #undef MENU_TOGGLE_STATUS_BAR
 #undef MENU_TOGGLE_TABBAR
 #undef MENU_TOGGLE_DECORATED
 #undef MENU_TOGGLE_ANTI_ALIAS
 #undef MENU_CHANGE_SATURATION
+#endif
+
+#ifdef CTRL_TOGGLE_ON_TOP
+#ifndef PROGRAM_ALWAYS_ON_TOP
+#define PROGRAM_ALWAYS_ON_TOP 0
+#endif
+#endif
+
+#if MENU_TOGGLE_ON_TOP
+#ifndef PROGRAM_ALWAYS_ON_TOP
+#define PROGRAM_ALWAYS_ON_TOP 0
+#endif
 #endif
 
 #if MENU_CHANGE_SATURATION
@@ -835,6 +853,10 @@ char **default_argv = NULL;
 #endif
 #endif
 
+#ifdef PROGRAM_ALWAYS_ON_TOP
+int always_on_top = PROGRAM_ALWAYS_ON_TOP;
+#endif
+
 #ifdef BACKGROUND_SATURATION
 double saturation_level = BACKGROUND_SATURATION;
 #endif
@@ -878,6 +900,7 @@ void change_window_title();
 void add_tab();
 void del_tab(int do_close_dialog);
 void delete_event();
+void do_always_on_top();
 void do_change_saturation();
 void do_clear();
 void do_copy();
@@ -1081,6 +1104,14 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef CTRL_OPEN_NEW_WINDOW
       if CTRL_OPEN_NEW_WINDOW {
         system(PROGRAM_NAME " &");
+        return TRUE;
+      }
+#endif
+
+#ifdef CTRL_TOGGLE_ON_TOP
+      if CTRL_TOGGLE_ON_TOP {
+        always_on_top = !always_on_top;
+        gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
         return TRUE;
       }
 #endif
@@ -1722,6 +1753,14 @@ void delete_event()
 #if !TAB
   del_tab(DO_CLOSE_DIALOG);
 #endif
+}
+#endif
+
+#if MENU_TOGGLE_ON_TOP
+void do_always_on_top()
+{
+  always_on_top = !always_on_top;
+  gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
 }
 #endif
 
@@ -2799,6 +2838,10 @@ int main(int argc, char **argv)
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(key_press_event), NULL);
 #endif
 
+#ifdef PROGRAM_ALWAYS_ON_TOP
+  gtk_window_set_keep_above(GTK_WINDOW(main_window), always_on_top);
+#endif
+
   gtk_widget_show_all(main_window);
 
 #if MENU
@@ -2952,6 +2995,17 @@ int main(int argc, char **argv)
       GtkWidget *menu_font = gtk_image_menu_item_new_from_stock(GTK_STOCK_SELECT_FONT, NULL);
       gtk_menu_append(menu, menu_font);
       g_signal_connect(menu_font, "activate", do_select_font, NULL);
+      menu_item_success++;
+    }
+#endif
+
+#if MENU_TOGGLE_ON_TOP
+    if (menu_custom[m] == "Toggle always on top") {
+      GtkWidget *menu_toggle_on_top = gtk_image_menu_item_new_with_label(LABEL_MENU_TOGGLE_ON_TOP);
+      GtkWidget *image_toggle_on_top = gtk_image_new_from_stock(GTK_STOCK_LEAVE_FULLSCREEN, GTK_ICON_SIZE_MENU);
+      gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_toggle_on_top), image_toggle_on_top);
+      gtk_menu_append(menu, menu_toggle_on_top);
+      g_signal_connect(menu_toggle_on_top, "activate", do_always_on_top, NULL);
       menu_item_success++;
     }
 #endif

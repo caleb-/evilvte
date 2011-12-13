@@ -189,6 +189,11 @@ if [ "$MENU_TOGGLE_HOTKEYS" != "" ]; then
   echo \#define MENU_TOGGLE_HOTKEYS 1 >> src/evilvte.h
 fi
 
+MENU_TOGGLE_ON_TOP=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle always on top'`
+if [ "$MENU_TOGGLE_ON_TOP" != "" ]; then
+  echo \#define MENU_TOGGLE_ON_TOP 1 >> src/evilvte.h
+fi
+
 MENU_TOGGLE_SCROLLBAR=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle scrollbar'`
 if [ "$MENU_TOGGLE_SCROLLBAR" != "" ]; then
   echo \#define MENU_TOGGLE_SCROLLBAR 1 >> src/evilvte.h
