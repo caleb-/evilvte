@@ -287,7 +287,7 @@ void add_tab()
 #endif
   g_array_append_val(tabs, tab);
 #ifdef SHOW_WINDOW_BORDER
-  gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), WINDOW_BORDER);
+  gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), SHOW_WINDOW_BORDER);
 #endif
 #ifdef TAB_BORDER
   gtk_notebook_set_tab_border(GTK_NOTEBOOK(notebook), TAB_BORDER);

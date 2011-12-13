@@ -1,3 +1,6 @@
+0.0.8
+ * Fix WINDOW_BORDER -> SHOW_WINDOW_BORDER
+
 0.0.7
  * Fix define TAB_LABEL without scrollbar
  * Support SHOW_WINDOW_BORDER and TAB_BORDER
