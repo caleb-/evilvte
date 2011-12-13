@@ -16,7 +16,7 @@ src/evilvte.h:
 	sh src/evilvte.sh
 
 evilvte: src/evilvte.h $(OBJ)
-	$(CC) -o $(PROG) $(OBJ) $(LDFLAGS)
+	$(CC) $(LDFLAGS) $(OBJ) $(LDLIBS) -o $(PROG)
 
 strip: all
 	strip --remove-section=.comment --remove-section=.note $(PROG)
@@ -32,7 +32,7 @@ showvte:
 misc/evilvte.1:
 	sh src/manpage.sh
 
-install: all
+install:
 	install -d $(bindir)
 	install -m 755 $(PROG) src/showvte $(bindir)
 	install -d $(ICON_DIR_INSTALL)

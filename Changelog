@@ -1,5 +1,14 @@
+0.4.4~pre8
+
+ The "Thanks to Samuli Suominen!" Release.
+
+ * Rename libraries variable to LDLIBS
+ * Fix Makefile to work with LDFLAGS="-Wl,--as-needed"
+ * Remove target "all" from target "install" which caused everything to get
+   re-compiled at install phase.
+
 0.4.4~pre7
- * Fix configure script for pkgsrc system
+ * Respect LDFLAGS
 
 0.4.4~pre6
  * Support PROGRAM_WM_CLASS
