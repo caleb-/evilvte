@@ -1,3 +1,13 @@
+0.4.6~pre4
+ * Support MATCH_STRING_EXEC
+   You may click an url to open it without menu
+ * Fix an Arch Linux bug.
+   When TAB_LABEL is not defined, move mouse cursor to tabbar will make evilvte
+   crash.
+   Fix this by defining TAB_LABEL when Arch Linux is detected.
+   Thanks to Ethan.
+ * Remove evilvte.xpm
+
 0.4.6~pre3
  * Respect CC
    Switch auto-detect-SUSE from gcc to ld

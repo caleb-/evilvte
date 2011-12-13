@@ -1,6 +1,6 @@
 /* Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  * Copyright (C) 2006-2008  David Gómez <david@pleyades.net>
- * Copyright (C) 2008-2009  Wen-Yen Chuang <caleb AT calno DOT com>
+ * Copyright (C) 2008-2010  Wen-Yen Chuang <caleb AT calno DOT com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@
 #define CLOSE_DIALOG 0
 #endif
 
-#if SUSE_DETECTED && !defined(TAB_LABEL)
+#if DEF_TAB_LABEL && !defined(TAB_LABEL)
 #define TAB_LABEL "Page %u"
 #endif
 
@@ -479,8 +479,10 @@ int tabbar_status = 0;
 #endif
 #endif
 
-#if defined(MENU_MATCH_STRING_EXEC) && !defined(MATCH_STRING)
+#if !defined(MATCH_STRING)
+#if defined(MENU_MATCH_STRING_EXEC) || defined(MATCH_STRING_EXEC)
 #define MATCH_STRING "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
+#endif
 #endif
 
 #ifdef FONT_ANTI_ALIAS
@@ -724,6 +726,9 @@ GtkWidget *menu;
 GtkWidget *match_open;
 GtkWidget *match_copy;
 GtkWidget *match_item;
+#endif
+
+#if defined(MENU_MATCH_STRING_EXEC) || defined(MATCH_STRING_EXEC)
 char *matched_url = (char*)NULL;
 #endif
 
@@ -912,13 +917,29 @@ void do_title_changed()
 }
 #endif
 
-#if MENU
+#if MENU || defined(MATCH_STRING_EXEC)
 int menu_popup(GtkWidget *widget, GdkEventButton *event)
 {
-  GdkEventButton *event_button;
-  if (event->type == GDK_BUTTON_PRESS) {
-    event_button = (GdkEventButton*)event;
-    if (event_button->button == 3) {
+#ifdef MATCH_STRING_EXEC
+  if (event->button == 1) {
+    int tag = -1;
+#if TAB
+    current_tab = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    term = (struct terminal*)g_object_get_data(G_OBJECT(current_tab), "current_tab");
+#endif
+    matched_url = vte_terminal_match_check(VTE_TERMINAL(term->vte), event->x / vte_terminal_get_char_width(VTE_TERMINAL(term->vte)), event->y / vte_terminal_get_char_height(VTE_TERMINAL(term->vte)), &tag);
+    if (matched_url != NULL) {
+      char new_window_str[256];
+      g_snprintf(new_window_str, sizeof(new_window_str), "%s %s &", MATCH_STRING_EXEC, matched_url);
+      system(new_window_str);
+      matched_url = NULL;
+    }
+    return TRUE;
+  }
+#endif
+
+#if MENU
+  if (event->button == 3) {
 #ifdef MENU_MATCH_STRING_EXEC
       int tag = -1;
 #if TAB
@@ -932,7 +953,7 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
         if (menu_item_success == 100)
           gtk_widget_hide(match_item);
 #endif
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
       } else {
         gtk_widget_hide(match_open);
         gtk_widget_hide(match_copy);
@@ -940,7 +961,7 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #ifdef MENU_CUSTOM
         if (menu_item_success > 100)
 #endif
-          gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
+          gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
       }
 #endif /* MENU_MATCH_STRING_EXEC */
 
@@ -948,14 +969,14 @@ int menu_popup(GtkWidget *widget, GdkEventButton *event)
 #ifdef MENU_CUSTOM
       if (menu_item_success > 0)
 #endif
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event_button->button, event_button->time);
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
 #endif
       return TRUE;
-    }
   }
+#endif /* MENU */
   return FALSE;
 }
-#endif /* MENU */
+#endif
 
 #if MOUSE_CTRL_SATURATION
 int scroll_event(GtkWidget *widget, GdkEventScroll *event)
@@ -1267,7 +1288,7 @@ void add_tab()
   g_signal_connect(term->vte, "icon-title-changed", do_title_changed, NULL);
 #endif
 
-#if MENU
+#if MENU || defined(MATCH_STRING_EXEC)
   g_signal_connect(term->vte, "button-press-event", G_CALLBACK(menu_popup), NULL);
 #endif
 
@@ -1459,7 +1480,7 @@ int key_press_event(GtkWidget *widget, GdkEventKey *event)
           }
 #endif
         }
-        gtk_widget_destroy((GtkWidget*)(color_tint_dialog));
+        gtk_widget_destroy(GTK_WIDGET(color_tint_dialog));
         return TRUE;
       }
 #endif
@@ -2279,7 +2300,7 @@ void do_menu_tint_color()
     }
 #endif
   }
-  gtk_widget_destroy((GtkWidget*)(color_tint_dialog));
+  gtk_widget_destroy(GTK_WIDGET(color_tint_dialog));
 }
 #endif
 

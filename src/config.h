@@ -63,6 +63,7 @@
 #define    MENU                   TRUE
 // #define MENU_ENCODING_LIST     "BIG-5", "Default Encoding", "GBK", "EUC-JP"
 // #define MENU_MATCH_STRING_EXEC "firefox"
+// #define      MATCH_STRING_EXEC "firefox" /* click to open, no menu needed  */
 // #define      MATCH_STRING      "((f|F)(t|T)(p|P)|((h|H)(t|T)(t|T)(p|P)(s|S)*))://[-a-zA-Z0-9.?$%&/=_~#.,:;+]*"
 // #define MENU_CUSTOM            "Copy", "Separator", "Paste", "Separator"
            /* Options: "Copy", "Paste", "Select all", "Add tab", "Remove tab",

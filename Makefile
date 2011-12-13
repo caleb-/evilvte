@@ -11,7 +11,10 @@ endif
 CFLAGS += $(OPTFLAGS) $(VTEINC) -DICON_DIR=\"$(ICON_DIR)\" -DEVILVTE_VERSION=\"$(EVILVTE_VERSION)\"
 
 ifeq ($(SUSE_DETECTED),TRUE)
-	CFLAGS += -DSUSE_DETECTED=1
+	CFLAGS += -DDEF_TAB_LABEL=1
+endif
+ifeq ($(ARCH_DETECTED),TRUE)
+        CFLAGS += -DDEF_TAB_LABEL=1
 endif
 
 all: evilvte showvte manpage

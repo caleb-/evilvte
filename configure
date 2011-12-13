@@ -56,6 +56,14 @@ else
   SUSE_DETECTED=FALSE
 fi
 
+ARCH_UNAME=`uname -a | grep -- '-ARCH '`
+
+if [ "$ARCH_UNAME" != "" ]; then
+  ARCH_DETECTED=TRUE
+else
+  ARCH_DETECTED=FALSE
+fi
+
 GNU_GOLD=`ld -v | tr A-Z a-z | tr -s ' ' ' ' | grep 'gnu gold'`
 
 if [ "$GNU_GOLD" != "" ]; then
@@ -71,6 +79,7 @@ else
   $DO_ECHO
   $DO_ECHO Prefix: [1m[33m$prefix[m
   $DO_ECHO [1m[33mSUSE system detected[m $SUSE_DETECTED | sed 's/TRUE//' | grep -v FALSE$
+  $DO_ECHO [1m[33mArch Linux detected[m $ARCH_DETECTED | sed 's/TRUE//' | grep -v FALSE$
   $DO_ECHO -n "Configuration: "
   DEFINE_LINES=`sed 's/\t/ /g' $CONF_FILE | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc | awk '{print $1}'`
   if [ "$DEFINE_LINES" = "0" ]; then
@@ -133,6 +142,7 @@ echo "LDLIBS=$LDLIBS" >> src/config.o
 echo "PROG=$PROG" >> src/config.o
 echo "EVILVTE_VERSION=$EVILVTE_VERSION" >> src/config.o
 echo "SUSE_DETECTED=$SUSE_DETECTED" >> src/config.o
+echo "ARCH_DETECTED=$ARCH_DETECTED" >> src/config.o
 echo "CONF_FILE=$CONF_FILE" >> src/config.o
 head -n 1 $0 > src/uninstall.sh
 echo "echo rm -f $bindir/$PROG" >> src/uninstall.sh
