@@ -594,6 +594,10 @@ int tabbar_status = 0;
 char *program_name = PROGRAM_NAME;
 #endif
 
+#if COMMAND_FONT
+char *command_font = NULL;
+#endif
+
 #if !COMMAND_SET_TITLE
 #define VTE_PROGRAM_NAME PROGRAM_NAME
 #endif
@@ -725,7 +729,7 @@ const GdkColor color_style[16] = {
 };
 #endif
 
-#if defined(FONT_ANTI_ALIAS) || MENU_FONT_BIGGER || MENU_FONT_SMALLER || MENU_FONT_SELECT || MENU_TOGGLE_ANTI_ALIAS || defined(HOTKEY_TOGGLE_ANTI_ALIAS) || defined(HOTKEY_FONT_BIGGER) || defined(HOTKEY_FONT_SMALLER) || defined(HOTKEY_FONT_SELECT)
+#if defined(FONT_ANTI_ALIAS) || MENU_FONT_BIGGER || MENU_FONT_SMALLER || MENU_FONT_SELECT || MENU_TOGGLE_ANTI_ALIAS || defined(HOTKEY_TOGGLE_ANTI_ALIAS) || defined(HOTKEY_FONT_BIGGER) || defined(HOTKEY_FONT_SMALLER) || defined(HOTKEY_FONT_SELECT) || COMMAND_FONT
 #define FONT_CHANGE_SIZE 1
 #ifndef FONT
 #define FONT "Monospace 10"
@@ -2763,10 +2767,10 @@ int at_dock_mode = 0;
   textdomain("gtk20");
 #endif
 
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
   int i = 0;
 #endif
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_CUSTOM)
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(MENU_CUSTOM)
   int j = 0;
 #endif
 
@@ -2794,13 +2798,18 @@ int at_dock_mode = 0;
   }
 #endif
 
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
   i = 1;
   j = 1;
   while ((j < argc) && strncmp(argv[j], "-e", 3)) {
 #if COMMAND_SET_TITLE
     if (argc > (j + 1) && (!strncmp(argv[j], "-title", 7) || !strncmp(argv[j], "-T", 3)))
       program_name = argv[j + 1];
+#endif
+
+#if COMMAND_FONT
+    if (argc > (j + 1) && !strncmp(argv[j], "-fn", 4))
+      command_font = argv[j + 1];
 #endif
 
 #if COMMAND_SHOW_VERSION
@@ -2820,10 +2829,10 @@ int at_dock_mode = 0;
 #if COMMAND_SHOW_HELP
     if (!strncmp(argv[j], "-h", 3)) {
       printf("%s, version %s\n\nUsage:\n\t%s [option%s]\n\nOption%s:\n", PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_NAME,
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
              "s", "s");
 #endif
-#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_DOCK_MODE && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
+#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_DOCK_MODE && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_FONT && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
              "", "");
 #endif
 #if COMMAND_DOCK_MODE
@@ -2834,6 +2843,9 @@ int at_dock_mode = 0;
 #endif
 #if COMMAND_FULLSCREEN
       printf("\t-f                    \tstart %s in fullscreen mode\n", PROGRAM_NAME);
+#endif
+#if COMMAND_FONT
+      printf("\t-fn \"font [size]\"     \tset font and font size\n");
 #endif
       printf("\t-h                    \tshow this help\n");
 #if COMMAND_LOGIN_SHELL
@@ -2899,7 +2911,7 @@ int at_dock_mode = 0;
 
     j++;
   }
-#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS */
+#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS */
 
 #ifdef BACKGROUND_IMAGE
   g_snprintf(imgstr, sizeof(imgstr), "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);
@@ -2910,7 +2922,12 @@ int at_dock_mode = 0;
 #endif
 
 #ifdef FONT
-  g_snprintf(font_name, sizeof(font_name), "%s", FONT);
+#if COMMAND_FONT
+  if (command_font)
+    g_snprintf(font_name, sizeof(font_name), "%s", command_font);
+  else
+#endif
+    g_snprintf(font_name, sizeof(font_name), "%s", FONT);
   int len = strlen(font_name) - 1;
   int loop = 1;
   font_size = 0;

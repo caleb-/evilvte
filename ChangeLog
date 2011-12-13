@@ -1,3 +1,7 @@
+0.4.7~pre5
+ * Support -fn command line option to assign font and font size
+ * Better compatibility with configure options
+
 0.4.7~pre4
  * Support HOTKEY_MIMIC_SCROLL_*
    Thanks to qotsa

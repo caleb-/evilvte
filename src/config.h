@@ -26,6 +26,7 @@
 // #define COMMAND_DOCK_MODE      TRUE  /* -d option, run as a dock           */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
 // #define COMMAND_FULLSCREEN     TRUE  /* -f option, init in fullscreen mode */
+// #define COMMAND_FONT           TRUE  /* -fn option, to assign font & size  */
 // #define COMMAND_LOGIN_SHELL    TRUE  /* -ls option, to enable login shell  */
 // #define COMMAND_SET_TITLE      TRUE  /* -T or -title to set program title  */
 // #define COMMAND_SHOW_HELP      TRUE  /* -h option, show help               */

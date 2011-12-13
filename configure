@@ -18,7 +18,8 @@ for opt do
   ;;
   --config=*) CONF_FILE=`echo $opt | cut -d '=' -f 2`
   ;;
-  *) echo
+  -h | "-?" | --help | --config | --prefix | --quiet=* | --with-gtk)
+     echo
      echo " Options: --prefix=/usr/local (default)"
      echo "          --prefix=/usr"
      echo
@@ -28,6 +29,10 @@ for opt do
      echo "          --with-gtk=2.0 (default)"
      echo "          --with-gtk=3.0"
      exec echo
+  ;;
+  *)
+     $DO_ECHO
+     $DO_ECHO Option '"'$opt'"' is not supported yet. | sed 's/=.* is/" is/'
   ;;
   esac
 done

@@ -181,6 +181,7 @@ COMMAND_AT_ROOT_WINDOW=`grep COMMAND_AT_ROOT_WINDOW src/custom.h | tr -s ' ' ' '
 COMMAND_DOCK_MODE=`grep      COMMAND_DOCK_MODE      src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 COMMAND_EXEC_PROGRAM=`grep   COMMAND_EXEC_PROGRAM   src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 COMMAND_FULLSCREEN=`grep     COMMAND_FULLSCREEN     src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
+COMMAND_FONT=`grep           COMMAND_FONT           src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 COMMAND_LOGIN_SHELL=`grep    COMMAND_LOGIN_SHELL    src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 COMMAND_SET_TITLE=`grep      COMMAND_SET_TITLE      src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
 COMMAND_SHOW_HELP=`grep      COMMAND_SHOW_HELP      src/custom.h | tr -s ' ' ' ' | sed 's/^ //' | grep -v ^\/\/ | tail -n 1 | grep -v FALSE | grep -v 0`
@@ -192,6 +193,7 @@ head -n 10 misc/manpage.1 > misc/evilvte.1
 [ "$COMMAND_DOCK_MODE" != "" ]      && grep '^.\\" D ' misc/manpage.1 | sed 's/^.\\" D //' >> misc/evilvte.1
 [ "$COMMAND_EXEC_PROGRAM" != "" ]   && grep '^.\\" E ' misc/manpage.1 | sed 's/^.\\" E //' >> misc/evilvte.1
 [ "$COMMAND_FULLSCREEN" != "" ]     && grep '^.\\" F ' misc/manpage.1 | sed 's/^.\\" F //' >> misc/evilvte.1
+[ "$COMMAND_FONT" != "" ]           && grep '^.\\" 7 ' misc/manpage.1 | sed 's/^.\\" 7 //' >> misc/evilvte.1
 [ "$COMMAND_SHOW_HELP" != "" ]      && grep '^.\\" H ' misc/manpage.1 | sed 's/^.\\" H //' >> misc/evilvte.1
 [ "$COMMAND_LOGIN_SHELL" != "" ]    && grep '^.\\" L ' misc/manpage.1 | sed 's/^.\\" L //' >> misc/evilvte.1
 [ "$COMMAND_SHOW_OPTIONS" != "" ]   && grep '^.\\" O ' misc/manpage.1 | sed 's/^.\\" O //' >> misc/evilvte.1
