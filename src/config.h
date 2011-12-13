@@ -4,10 +4,6 @@
 // #define BELL_AUDIBLE        TRUE
 // #define BELL_VISIBLE        TRUE
 // #define DEFAULT_ENCODING    "UTF-8"
-
-/* If you encounter focus problem, try edit this option */
-// #define FOCUS_BUG           TRUE
-
 // #define INITIAL_TAB_NUMBER  1
 // #define TAB_LABEL           "Page"
 

@@ -56,36 +56,20 @@ gboolean kbd_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
   if (event->state & GDK_CONTROL_MASK) {
     if (event->keyval == GDK_Page_Up) {
-
-      /* Prevent inputing keystrokes to vte_box */
-#if FOCUS_BUG
-      gtk_window_set_focus(GTK_WINDOW(main_window), notebook);
-#endif
-
       current_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
       if (current_page)
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), current_page - 1);
       else
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
-#if FOCUS_BUG
-      gtk_window_set_focus(GTK_WINDOW(main_window), tab.vte_box);
-#endif
+      return TRUE;
     }
     if (event->keyval == GDK_Page_Down) {
       current_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-
-      /* Prevent inputing keystrokes to vte_box */
-#if FOCUS_BUG
-      gtk_window_set_focus(GTK_WINDOW(main_window), notebook);
-#endif
-
       if (current_page == (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1))
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
       else
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), current_page + 1);
-#if FOCUS_BUG
-      gtk_window_set_focus(GTK_WINDOW(main_window), tab.vte_box);
-#endif
+      return TRUE;
     }
     if (event->keyval == GDK_t || event->keyval == GDK_T) {
       add_tab();
