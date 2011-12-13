@@ -1,3 +1,7 @@
+0.0.6
+ * Support color scheme
+ * Support tabbar autohide
+
 0.0.5
  * Remove an useless gtk_box_pack_start
 

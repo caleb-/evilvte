@@ -16,6 +16,99 @@ GArray *tabs;
 GtkWidget *main_window;
 GtkWidget *notebook;
 
+#if COLOR_STYLE_TANGO
+const GdkColor color_tango[16] =
+{
+  { 0, 0x2e2e, 0x3434, 0x3636 },
+  { 0, 0xcccc, 0x0000, 0x0000 },
+  { 0, 0x4e4e, 0x9a9a, 0x0606 },
+  { 0, 0xc4c4, 0xa0a0, 0x0000 },
+  { 0, 0x3434, 0x6565, 0xa4a4 },
+  { 0, 0x7575, 0x5050, 0x7b7b },
+  { 0, 0x0606, 0x9820, 0x9a9a },
+  { 0, 0xd3d3, 0xd7d7, 0xcfcf },
+  { 0, 0x5555, 0x5757, 0x5353 },
+  { 0, 0xefef, 0x2929, 0x2929 },
+  { 0, 0x8a8a, 0xe2e2, 0x3434 },
+  { 0, 0xfcfc, 0xe9e9, 0x4f4f },
+  { 0, 0x7272, 0x9f9f, 0xcfcf },
+  { 0, 0xadad, 0x7f7f, 0xa8a8 },
+  { 0, 0x3434, 0xe2e2, 0xe2e2 },
+  { 0, 0xeeee, 0xeeee, 0xecec }
+};
+#endif
+
+#if COLOR_STYLE_LINUX
+const GdkColor color_linux[16] =
+{
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0xaaaa, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xaaaa, 0x0000 },
+  { 0, 0xaaaa, 0x5555, 0x0000 },
+  { 0, 0x0000, 0x0000, 0xaaaa },
+  { 0, 0xaaaa, 0x0000, 0xaaaa },
+  { 0, 0x0000, 0xaaaa, 0xaaaa },
+  { 0, 0xaaaa, 0xaaaa, 0xaaaa },
+  { 0, 0x5555, 0x5555, 0x5555 },
+  { 0, 0xffff, 0x5555, 0x5555 },
+  { 0, 0x5555, 0xffff, 0x5555 },
+  { 0, 0xffff, 0xffff, 0x5555 },
+  { 0, 0x5555, 0x5555, 0xffff },
+  { 0, 0xffff, 0x5555, 0xffff },
+  { 0, 0x5555, 0xffff, 0xffff },
+  { 0, 0xffff, 0xffff, 0xffff }
+};
+#endif
+
+#if COLOR_STYLE_XTERM
+const GdkColor color_xterm[16] =
+{
+    {0, 0x0000, 0x0000, 0x0000 },
+    {0, 0xcdcb, 0x0000, 0x0000 },
+    {0, 0x0000, 0xcdcb, 0x0000 },
+    {0, 0xcdcb, 0xcdcb, 0x0000 },
+    {0, 0x1e1a, 0x908f, 0xffff },
+    {0, 0xcdcb, 0x0000, 0xcdcb },
+    {0, 0x0000, 0xcdcb, 0xcdcb },
+    {0, 0xe5e2, 0xe5e2, 0xe5e2 },
+    {0, 0x4ccc, 0x4ccc, 0x4ccc },
+    {0, 0xffff, 0x0000, 0x0000 },
+    {0, 0x0000, 0xffff, 0x0000 },
+    {0, 0xffff, 0xffff, 0x0000 },
+    {0, 0x4645, 0x8281, 0xb4ae },
+    {0, 0xffff, 0x0000, 0xffff },
+    {0, 0x0000, 0xffff, 0xffff },
+    {0, 0xffff, 0xffff, 0xffff }
+};
+#endif
+
+#if COLOR_STYLE_RXVT
+const GdkColor color_rxvt[16] =
+{
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0xcdcd, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xcdcd, 0x0000 },
+  { 0, 0xcdcd, 0xcdcd, 0x0000 },
+  { 0, 0x0000, 0x0000, 0xcdcd },
+  { 0, 0xcdcd, 0x0000, 0xcdcd },
+  { 0, 0x0000, 0xcdcd, 0xcdcd },
+  { 0, 0xfafa, 0xebeb, 0xd7d7 },
+  { 0, 0x4040, 0x4040, 0x4040 },
+  { 0, 0xffff, 0x0000, 0x0000 },
+  { 0, 0x0000, 0xffff, 0x0000 },
+  { 0, 0xffff, 0xffff, 0x0000 },
+  { 0, 0x0000, 0x0000, 0xffff },
+  { 0, 0xffff, 0x0000, 0xffff },
+  { 0, 0x0000, 0xffff, 0xffff },
+  { 0, 0xffff, 0xffff, 0xffff }
+};
+#endif
+
+#if AUTOHIDE_TAB
+int winWidth;
+int winHeight;
+#endif
+
 #if MENU_POPUP
 GtkWidget *menu;
 #endif
@@ -132,6 +225,18 @@ void add_tab()
 #ifdef BELL_VISIBLE
   vte_terminal_set_visible_bell(VTE_TERMINAL(tab.vte_box), BELL_VISIBLE);
 #endif
+#if COLOR_STYLE_TANGO
+  vte_terminal_set_colors(VTE_TERMINAL(tab.vte_box), NULL, NULL, color_tango, 16);
+#endif
+#if COLOR_STYLE_LINUX
+  vte_terminal_set_colors(VTE_TERMINAL(tab.vte_box), NULL, NULL, color_linux, 16);
+#endif
+#if COLOR_STYLE_XTERM
+  vte_terminal_set_colors(VTE_TERMINAL(tab.vte_box), NULL, NULL, color_xterm, 16);
+#endif
+#if COLOR_STYLE_RXVT
+  vte_terminal_set_colors(VTE_TERMINAL(tab.vte_box), NULL, NULL, color_rxvt, 16);
+#endif
 #ifdef DEFAULT_ENCODING
   vte_terminal_set_encoding(VTE_TERMINAL(tab.vte_box), DEFAULT_ENCODING);
 #endif
@@ -177,6 +282,14 @@ void add_tab()
   g_signal_connect_swapped(tab.vte_box, "button-press-event", G_CALLBACK(right_click_menu), menu);
 #endif
   g_array_append_val(tabs, tab);
+#if AUTOHIDE_TAB
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
+    gtk_window_get_size(GTK_WINDOW(main_window), &winWidth, &winHeight);
+  } else
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), TRUE);
+  gtk_window_resize(GTK_WINDOW(main_window), winWidth, winHeight);
+#endif
   gtk_widget_show_all(notebook);
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), index);
   gtk_window_set_focus(GTK_WINDOW(main_window), tab.vte_box);
@@ -190,6 +303,12 @@ void rm_tab()
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) < 1)
     gtk_main_quit();
   gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), current_page);
+#if AUTOHIDE_TAB
+  if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) == 1) {
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
+    gtk_window_resize(GTK_WINDOW(main_window), winWidth, winHeight);
+  }
+#endif
 #ifdef TAB_LABEL
 #if TAB_LABEL_NUMBER
   int i;
