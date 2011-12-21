@@ -1,4 +1,6 @@
-UNRELEASED
+0.5.1~pre2
+ * Support TAB_NEW_TAB_AT_TAB_ONE, let new tab always be the first tab
+   Thanks to shenfeng <https://github.com/shenfeng>
  * Make close button smaller
  * Improve resizing behavior with "-VteTerminal-inner-border" property
 

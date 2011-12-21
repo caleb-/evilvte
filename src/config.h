@@ -102,6 +102,7 @@
 // #define TAB_LABEL_DYNAMIC      TRUE      /* for xterm escape sequences     */
 // #define TAB_LABEL_CUSTOM       "One", "Two", "Three", "Four", "Five", "Six"
 // #define TAB_NEW_PATH_EQUAL_OLD TRUE
+// #define TAB_NEW_TAB_AT_TAB_ONE TRUE   /* New tab will always the first tab */
 // #define TAB_REORDERABLE        TRUE
 // #define TAB_SHOW_INFO_AT_TITLE TRUE
 // #define TABBAR                 TRUE

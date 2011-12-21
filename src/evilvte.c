@@ -204,6 +204,7 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_notebook_get_tab_label (*p_gtk_notebook_get_tab_label)
 #define gtk_notebook_new (*p_gtk_notebook_new)
 #define gtk_notebook_popup_enable (*p_gtk_notebook_popup_enable)
+#define gtk_notebook_prepend_page (*p_gtk_notebook_prepend_page)
 #define gtk_notebook_remove_page (*p_gtk_notebook_remove_page)
 #define gtk_notebook_set_current_page (*p_gtk_notebook_set_current_page)
 #define gtk_notebook_set_scrollable (*p_gtk_notebook_set_scrollable)
@@ -1279,6 +1280,7 @@ gboolean (*p_gtk_notebook_get_show_tabs)(GtkNotebook *notebook);
 GtkWidget* (*p_gtk_notebook_get_tab_label)(GtkNotebook *notebook, GtkWidget *child);
 GtkWidget* (*p_gtk_notebook_new)(void);
 void (*p_gtk_notebook_popup_enable)(GtkNotebook *notebook);
+gint (*p_gtk_notebook_prepend_page)(GtkNotebook *notebook, GtkWidget *child, GtkWidget *tab_label);
 void (*p_gtk_notebook_remove_page)(GtkNotebook *notebook, gint page_num);
 void (*p_gtk_notebook_set_current_page)(GtkNotebook *notebook, gint page_num);
 void (*p_gtk_notebook_set_scrollable)(GtkNotebook *notebook, gboolean scrollable);
@@ -2011,7 +2013,12 @@ void add_tab()
 
   gtk_widget_show_all(VTE_HBOX);
 
+#if TAB_NEW_TAB_AT_TAB_ONE
+  int index = gtk_notebook_prepend_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
+#endif
+#if !TAB_NEW_TAB_AT_TAB_ONE
   int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
+#endif
   g_object_set_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index)), "current_tab", term);
 
   g_signal_connect(term->vte, "child-exited", G_CALLBACK(del_tab), (bool*)CLOSE_DIALOG);
@@ -3330,6 +3337,7 @@ bool at_dock_mode = FALSE;
   *(void **)(&p_gtk_notebook_get_tab_label) = dlsym(p_hdl_gtk, "gtk_notebook_get_tab_label");
   *(void **)(&p_gtk_notebook_new) = dlsym(p_hdl_gtk, "gtk_notebook_new");
   *(void **)(&p_gtk_notebook_popup_enable) = dlsym(p_hdl_gtk, "gtk_notebook_popup_enable");
+  *(void **)(&p_gtk_notebook_prepend_page) = dlsym(p_hdl_gtk, "gtk_notebook_prepend_page");
   *(void **)(&p_gtk_notebook_remove_page) = dlsym(p_hdl_gtk, "gtk_notebook_remove_page");
   *(void **)(&p_gtk_notebook_set_current_page) = dlsym(p_hdl_gtk, "gtk_notebook_set_current_page");
   *(void **)(&p_gtk_notebook_set_scrollable) = dlsym(p_hdl_gtk, "gtk_notebook_set_scrollable");
