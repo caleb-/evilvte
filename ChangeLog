@@ -1,3 +1,7 @@
+UNRELEASED
+ * Some distributions backports gtk_*_resize_grip to GTK+ 2.x.
+   Try export CFLAGS="-DGTK_HAS_RESIZE_GRIP" and rebuild evilvte
+
 0.5.1~pre2
  * Support TAB_NEW_TAB_AT_TAB_ONE, let new tab always be the first tab
    Thanks to shenfeng <https://github.com/shenfeng>

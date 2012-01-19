@@ -346,8 +346,16 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gdk_screen_get_rgba_colormap gdk_screen_get_rgba_visual
 #endif
 
-#if !RULE_THEM_ALL && !GTK_CHECK_VERSION(2,91,1)
+#if GTK_CHECK_VERSION(2,91,1)
+#undef GTK_HAS_RESIZE_GRIP
+#define GTK_HAS_RESIZE_GRIP
+#endif
+
+#if !RULE_THEM_ALL && !defined(GTK_HAS_RESIZE_GRIP)
 #define gtk_window_set_has_resize_grip(x,y)
+#endif
+
+#if !RULE_THEM_ALL && !GTK_CHECK_VERSION(2,91,1)
 #define gtk_widget_set_hexpand(x,y);
 #define gtk_widget_set_vexpand(x,y);
 #endif
@@ -3367,6 +3375,10 @@ bool at_dock_mode = FALSE;
   *(void **)(&p_gtk_window_new) = dlsym(p_hdl_gtk, "gtk_window_new");
   *(void **)(&p_gtk_window_parse_geometry) = dlsym(p_hdl_gtk, "gtk_window_parse_geometry");
   *(void **)(&p_gtk_window_resize) = dlsym(p_hdl_gtk, "gtk_window_resize");
+#ifdef GTK_HAS_RESIZE_GRIP
+  *(void **)(&p_gtk_window_resize_grip_is_visible) = dlsym(p_hdl_gtk, "gtk_window_resize_grip_is_visible");
+  *(void **)(&p_gtk_window_set_has_resize_grip) = dlsym(p_hdl_gtk, "gtk_window_set_has_resize_grip");
+#endif
   *(void **)(&p_gtk_window_set_decorated) = dlsym(p_hdl_gtk, "gtk_window_set_decorated");
   *(void **)(&p_gtk_window_set_focus) = dlsym(p_hdl_gtk, "gtk_window_set_focus");
   *(void **)(&p_gtk_window_set_icon_from_file) = dlsym(p_hdl_gtk, "gtk_window_set_icon_from_file");
@@ -3461,8 +3473,6 @@ bool at_dock_mode = FALSE;
     *(void **)(&p_gtk_widget_set_vexpand) = dlsym(p_hdl_gtk, "gtk_widget_set_vexpand");
     *(void **)(&p_gtk_widget_set_visual) = dlsym(p_hdl_gtk, "gtk_widget_set_visual");
     *(void **)(&p_gtk_widget_style_get) = dlsym(p_hdl_gtk, "gtk_widget_style_get");
-    *(void **)(&p_gtk_window_resize_grip_is_visible) = dlsym(p_hdl_gtk, "gtk_window_resize_grip_is_visible");
-    *(void **)(&p_gtk_window_set_has_resize_grip) = dlsym(p_hdl_gtk, "gtk_window_set_has_resize_grip");
     *(void **)(&p_vte_terminal_accessible_new) = dlsym(p_hdl_vte, "vte_terminal_accessible_new");
   }
 #endif
@@ -3533,7 +3543,7 @@ bool at_dock_mode = FALSE;
 #if RULE_THEM_ALL
   if (with_gtk == 3)
 #endif
-#if RULE_THEM_ALL || GTK_CHECK_VERSION(2,91,1)
+#if RULE_THEM_ALL || defined(GTK_HAS_RESIZE_GRIP)
   {
 #if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
     status_bar_resize_grip = gtk_window_resize_grip_is_visible(GTK_WINDOW(main_window));
