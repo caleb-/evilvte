@@ -1,4 +1,5 @@
 UNRELEASED
+ * Support TAB_NEW_PATH_EQUAL_OLD when open new evilvte window, closes #3.
  * Support HOTKEY_SCROLL_ONE_PAGE_*, closes #4.
  * Some distributions backports gtk_*_resize_grip to GTK+ 2.x.
    Try export CFLAGS="-DGTK_HAS_RESIZE_GRIP" and rebuild evilvte

@@ -625,6 +625,7 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define DEFAULT_DIRECTORY g_get_current_dir()
 #endif
 #define VTE_DEFAULT_DIRECTORY default_directory
+char *default_directory;
 #endif
 
 #if !TAB_NEW_PATH_EQUAL_OLD
@@ -1823,9 +1824,10 @@ void add_tab()
 #endif
 
 #if TAB_NEW_PATH_EQUAL_OLD
-  char *default_directory = DEFAULT_DIRECTORY;
   if (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 0)
     default_directory = g_file_read_link(g_strdup_printf("/proc/%d/cwd", ((struct terminal*)g_object_get_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), (gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook))))), "current_tab"))->pid), NULL);
+  else
+    default_directory = DEFAULT_DIRECTORY;
 #endif
 
 #if !VTE_FORK_CMD_OLD
@@ -2595,7 +2597,15 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 #ifdef HOTKEY_OPEN_NEW_WINDOW
       if (HOTKEY_OPEN_NEW_WINDOW) {
+#if TAB_NEW_PATH_EQUAL_OLD
+        char new_window_str[512];
+        default_directory = g_file_read_link(g_strdup_printf("/proc/%d/cwd", ((struct terminal*)g_object_get_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), (gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook))))), "current_tab"))->pid), NULL);
+        g_snprintf(new_window_str, sizeof(new_window_str), "cd '%s' ; %s &", default_directory, PROGRAM_NAME);
+        system(new_window_str);
+#endif
+#if !TAB_NEW_PATH_EQUAL_OLD
         system(PROGRAM_NAME " &");
+#endif
         return TRUE;
       }
 #endif
