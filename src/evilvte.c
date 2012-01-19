@@ -320,6 +320,8 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #if !GTK_CHECK_VERSION(2,13,0)
 #undef HOTKEY_MIMIC_SCROLL_UP
 #undef HOTKEY_MIMIC_SCROLL_DOWN
+#undef HOTKEY_SCROLL_ONE_PAGE_UP
+#undef HOTKEY_SCROLL_ONE_PAGE_DOWN
 #undef ONLY_ONE_MENU_ITEM
 #endif
 
@@ -2835,6 +2837,22 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
 #ifdef HOTKEY_TAB_LAST
       if (HOTKEY_TAB_LAST) {
         gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) - 1);
+        return TRUE;
+      }
+#endif
+
+#ifdef HOTKEY_SCROLL_ONE_PAGE_UP
+      if (HOTKEY_SCROLL_ONE_PAGE_UP) {
+        GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+        gtk_test_widget_send_key(term->vte, GDK_Page_Up, GDK_SHIFT_MASK);
+        return TRUE;
+      }
+#endif
+
+#ifdef HOTKEY_SCROLL_ONE_PAGE_DOWN
+      if (HOTKEY_SCROLL_ONE_PAGE_DOWN) {
+        GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+        gtk_test_widget_send_key(term->vte, GDK_Page_Down, GDK_SHIFT_MASK);
         return TRUE;
       }
 #endif
