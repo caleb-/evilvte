@@ -139,13 +139,12 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #undef VTE_TERMINAL
 #define VTE_TERMINAL (VteTerminal*)
 #define gdk_color_parse (*p_gdk_color_parse)
-#define gdk_device_get_position (*p_gdk_device_get_position)
 #define gdk_device_warp (*p_gdk_device_warp)
 #define gdk_disable_multidevice (*p_gdk_disable_multidevice)
 #define gdk_display_get_default (*p_gdk_display_get_default)
 #define gdk_display_get_default_screen (*p_gdk_display_get_default_screen)
-#define gdk_display_get_pointer (*p_gdk_display_get_pointer)
 #define gdk_display_warp_pointer (*p_gdk_display_warp_pointer)
+#define gdk_window_get_display (*p_gdk_window_get_display)
 #define gdk_screen_get_rgba_colormap (*p_gdk_screen_get_rgba_colormap)
 #define gdk_screen_get_rgba_visual (*p_gdk_screen_get_rgba_visual)
 #define gtk_box_pack_start (*p_gtk_box_pack_start)
@@ -176,7 +175,6 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_font_selection_dialog_get_font_name (*p_gtk_font_selection_dialog_get_font_name)
 #define gtk_font_selection_dialog_new (*p_gtk_font_selection_dialog_new)
 #define gtk_font_selection_dialog_set_font_name (*p_gtk_font_selection_dialog_set_font_name)
-#define gtk_get_current_event_device (*p_gtk_get_current_event_device)
 #define gtk_hbox_new (*p_gtk_hbox_new)
 #define gtk_hscale_new_with_range (*p_gtk_hscale_new_with_range)
 #define gtk_image_menu_item_new_from_stock (*p_gtk_image_menu_item_new_from_stock)
@@ -378,7 +376,6 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 
 #if !RULE_THEM_ALL && !GTK_CHECK_VERSION(2,99,0)
 #define gdk_device_warp(w,x,y,z) gdk_display_warp_pointer(display,x,y,z)
-#define gdk_device_get_position(w,x,y,z) gdk_display_get_pointer(display,x,y,z,NULL)
 #endif
 
 #if !RULE_THEM_ALL && GTK_CHECK_VERSION(3,1,6) && !defined(USE_GTK_GRID) && defined(GTK_DISABLE_DEPRECATED)
@@ -1226,13 +1223,12 @@ struct terminal *term;
 #define GET_VTE_TWO (p_hdl_vte = dlopen("libvte.so.9", RTLD_LAZY|RTLD_LOCAL))
 #define GET_VTE_THREE (p_hdl_vte = dlopen("libvte2_90.so.9", RTLD_LAZY|RTLD_LOCAL))
 gboolean (*p_gdk_color_parse)(const gchar *spec, GdkColor *color);
-void (*p_gdk_device_get_position)(GdkDevice *device, GdkScreen **screen, gint *x, gint *y);
 void (*p_gdk_device_warp)(GdkDevice *device, GdkScreen *screen, gint x, gint y);
 void (*p_gdk_disable_multidevice)(void);
 GdkDisplay* (*p_gdk_display_get_default)(void);
 GdkScreen* (*p_gdk_display_get_default_screen)(GdkDisplay *display);
-void (*p_gdk_display_get_pointer)(GdkDisplay *display, GdkScreen **screen, gint *x, gint *y, GdkModifierType *mask);
 void (*p_gdk_display_warp_pointer)(GdkDisplay *display, GdkScreen *screen, gint x, gint y);
+GdkDisplay* (*p_gdk_window_get_display)(GdkWindow *window);
 GdkColormap* (*p_gdk_screen_get_rgba_colormap)(GdkScreen *screen);
 GdkVisual* (*p_gdk_screen_get_rgba_visual)(GdkScreen *screen);
 void (*p_gtk_box_pack_start)(GtkBox *box, GtkWidget *child, gboolean expand, gboolean fill, guint padding);
@@ -1263,7 +1259,6 @@ void (*p_gtk_entry_set_text)(GtkEntry *entry, const gchar *text);
 gchar* (*p_gtk_font_selection_dialog_get_font_name)(GtkFontSelectionDialog *fsd);
 GtkWidget* (*p_gtk_font_selection_dialog_new)(const gchar *title);
 gboolean (*p_gtk_font_selection_dialog_set_font_name)(GtkFontSelectionDialog *fsd, const gchar *fontname);
-GdkDevice* (*p_gtk_get_current_event_device)(void);
 GtkWidget* (*p_gtk_hbox_new)(gboolean homogeneous, gint spacing);
 GtkWidget* (*p_gtk_hscale_new_with_range)(gdouble min, gdouble max, gdouble step);
 GtkWidget* (*p_gtk_image_menu_item_new_from_stock)(const gchar *stock_id, GtkAccelGroup *accel_group);
@@ -1572,19 +1567,8 @@ bool menu_popup(GtkWidget *widget, GdkEventButton *event)
 #if BELL_URGENT
   gtk_window_set_urgency_hint(GTK_WINDOW(main_window), FALSE);
 #endif
-#ifdef ONLY_ONE_MENU_ITEM
-  int x = 0;
-  int y = 0;
-#endif
-#if defined(ONLY_ONE_MENU_ITEM) && (RULE_THEM_ALL || GTK_CHECK_VERSION(2,99,0))
-  GdkDevice *device;
-#if RULE_THEM_ALL
-  if (with_gtk == 3)
-#endif
-    device = gtk_get_current_event_device();
-#endif
 #if defined(ONLY_ONE_MENU_ITEM) || MENU_PASTE
-  GdkDisplay *display = gdk_display_get_default();
+  GdkDisplay *display = gdk_window_get_display(event->window);
 #endif
 
 #if defined(MENU_MATCH_STRING_EXEC) || defined(MATCH_STRING_L) || defined(MATCH_STRING_M)
@@ -1659,20 +1643,14 @@ bool menu_popup(GtkWidget *widget, GdkEventButton *event)
           gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
 #ifdef ONLY_ONE_MENU_ITEM
         if (menu_item_success == 1) {
-#if RULE_THEM_ALL
-          if (with_gtk == 2)
-            gdk_display_get_pointer(display, NULL, &x, &y, NULL);
-          else
-#endif
-            gdk_device_get_position(device, NULL, &x, &y);
           gtk_test_widget_send_key(menu, GDK_Down, 0);
           gtk_test_widget_send_key(menu, GDK_Return, 0);
 #if RULE_THEM_ALL
           if (with_gtk == 2)
-            gdk_display_warp_pointer(display, gdk_display_get_default_screen(display), x, y);
+            gdk_display_warp_pointer(display, gdk_display_get_default_screen(display), event->x_root, event->y_root);
           else
 #endif
-            gdk_device_warp(device, gdk_display_get_default_screen(display), x, y);
+            gdk_device_warp(event->device, gdk_display_get_default_screen(display), event->x_root, event->y_root);
         }
 #endif
 #ifdef MENU_MATCH_STRING_EXEC
@@ -3321,6 +3299,7 @@ bool at_dock_mode = FALSE;
   *(void **)(&p_gdk_color_parse) = dlsym(p_hdl_gtk, "gdk_color_parse");
   *(void **)(&p_gdk_display_get_default) = dlsym(p_hdl_gtk, "gdk_display_get_default");
   *(void **)(&p_gdk_display_get_default_screen) = dlsym(p_hdl_gtk, "gdk_display_get_default_screen");
+  *(void **)(&p_gdk_window_get_display) = dlsym(p_hdl_gtk, "gdk_window_get_display");
   *(void **)(&p_gtk_box_pack_start) = dlsym(p_hdl_gtk, "gtk_box_pack_start");
   *(void **)(&p_gtk_button_new) = dlsym(p_hdl_gtk, "gtk_button_new");
   *(void **)(&p_gtk_button_set_focus_on_click) = dlsym(p_hdl_gtk, "gtk_button_set_focus_on_click");
@@ -3470,7 +3449,6 @@ bool at_dock_mode = FALSE;
   *(void **)(&p_vte_terminal_set_word_chars) = dlsym(p_hdl_vte, "vte_terminal_set_word_chars");
 
   if (with_gtk == 2) {
-    *(void **)(&p_gdk_display_get_pointer) = dlsym(p_hdl_gtk, "gdk_display_get_pointer");
     *(void **)(&p_gdk_display_warp_pointer) = dlsym(p_hdl_gtk, "gdk_display_warp_pointer");
     *(void **)(&p_gdk_screen_get_rgba_colormap) = dlsym(p_hdl_gtk, "gdk_screen_get_rgba_colormap");
     *(void **)(&p_gtk_hscale_new_with_range) = dlsym(p_hdl_gtk, "gtk_hscale_new_with_range");
@@ -3485,13 +3463,11 @@ bool at_dock_mode = FALSE;
   }
 
   if (with_gtk == 3) {
-    *(void **)(&p_gdk_device_get_position) = dlsym(p_hdl_gtk, "gdk_device_get_position");
     *(void **)(&p_gdk_device_warp) = dlsym(p_hdl_gtk, "gdk_device_warp");
     *(void **)(&p_gdk_disable_multidevice) = dlsym(p_hdl_gtk, "gdk_disable_multidevice");
     *(void **)(&p_gdk_screen_get_rgba_visual) = dlsym(p_hdl_gtk, "gdk_screen_get_rgba_visual");
     *(void **)(&p_gtk_css_provider_load_from_data) = dlsym(p_hdl_gtk, "gtk_css_provider_load_from_data");
     *(void **)(&p_gtk_css_provider_new) = dlsym(p_hdl_gtk, "gtk_css_provider_new");
-    *(void **)(&p_gtk_get_current_event_device) = dlsym(p_hdl_gtk, "gtk_get_current_event_device");
     *(void **)(&p_gtk_scale_new_with_range) = dlsym(p_hdl_gtk, "gtk_scale_new_with_range");
     *(void **)(&p_gtk_scrollable_get_vadjustment) = dlsym(p_hdl_gtk, "gtk_scrollable_get_vadjustment");
     *(void **)(&p_gtk_scrollbar_new) = dlsym(p_hdl_gtk, "gtk_scrollbar_new");
