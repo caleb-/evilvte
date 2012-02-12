@@ -147,9 +147,9 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gdk_display_get_default (*p_gdk_display_get_default)
 #define gdk_display_get_default_screen (*p_gdk_display_get_default_screen)
 #define gdk_display_warp_pointer (*p_gdk_display_warp_pointer)
-#define gdk_window_get_display (*p_gdk_window_get_display)
 #define gdk_screen_get_rgba_colormap (*p_gdk_screen_get_rgba_colormap)
 #define gdk_screen_get_rgba_visual (*p_gdk_screen_get_rgba_visual)
+#define gdk_window_get_display (*p_gdk_window_get_display)
 #define gtk_box_pack_start (*p_gtk_box_pack_start)
 #define gtk_button_new (*p_gtk_button_new)
 #define gtk_button_set_focus_on_click (*p_gtk_button_set_focus_on_click)
@@ -1227,9 +1227,9 @@ void (*p_gdk_disable_multidevice)(void);
 GdkDisplay* (*p_gdk_display_get_default)(void);
 GdkScreen* (*p_gdk_display_get_default_screen)(GdkDisplay *display);
 void (*p_gdk_display_warp_pointer)(GdkDisplay *display, GdkScreen *screen, gint x, gint y);
-GdkDisplay* (*p_gdk_window_get_display)(GdkWindow *window);
 GdkColormap* (*p_gdk_screen_get_rgba_colormap)(GdkScreen *screen);
 GdkVisual* (*p_gdk_screen_get_rgba_visual)(GdkScreen *screen);
+GdkDisplay* (*p_gdk_window_get_display)(GdkWindow *window);
 void (*p_gtk_box_pack_start)(GtkBox *box, GtkWidget *child, gboolean expand, gboolean fill, guint padding);
 GtkWidget* (*p_gtk_button_new)(void);
 void (*p_gtk_button_set_focus_on_click)(GtkButton *button, gboolean focus_on_click);

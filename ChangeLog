@@ -1,4 +1,4 @@
-UNRELEASED
+0.5.1~pre3
  * New hotkey definition method, support Alt and Shift, closes #2.
    The new behavior breaks old hotkey definitions.
    If you have old conffiles, please update them to latest format.
