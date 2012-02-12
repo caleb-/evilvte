@@ -113,57 +113,57 @@
 
 /* Use || for multiple hotkeys.
  *
- * CTRL GDK_A || CTRL GDK_a || CTRL GDK_b
+ * CTRL(GDK_A) || CTRL(GDK_a) || ALT(GDK_b) || CTRL_ALT(GDK_c) || SHIFT(GDK_d)
  *
- * CTRL GDK_a = "Ctrl + a"
- * CTRL GDK_A = "Ctrl + Shift + a"
+ * CTRL(GDK_a)     = "Ctrl + a"
+ * CTRL(GDK_A)     = "Ctrl + Shift + a"
+ * ALT(GDK_A)      = "Alt  + Shift + a"
+ * CTRL_ALT(GDK_A) = "Ctrl + Alt + Shift + a"
  *
- * See /usr/include/gtk-?.0/gdk/gdkkeysyms.h for GDK_* definitions.
- *
- * If you enable "CTRL_ALT", all hotkeys will become Ctrl + Alt + hotkey(s).  */
+ * See /usr/include/gtk-?.0/gdk/gdkkeysyms.h for GDK_* definitions.           */
 
 #define    HOTKEY                       TRUE
-// #define CTRL_ALT                     TRUE
-// #define HOTKEY_COPY                  CTRL GDK_C
-// #define HOTKEY_PASTE                 CTRL GDK_V
-// #define HOTKEY_SELECT_ALL            CTRL GDK_S
-// #define HOTKEY_COLOR_BACKGROUND      CTRL GDK_B
-// #define HOTKEY_EDIT_ENCODING         CTRL GDK_U
-// #define HOTKEY_FONT_BIGGER           CTRL GDK_KP_Add
-// #define HOTKEY_FONT_SMALLER          CTRL GDK_KP_Subtract
-// #define HOTKEY_FONT_DEFAULT_SIZE     CTRL GDK_KP_Insert
-// #define HOTKEY_FONT_SELECT           CTRL GDK_F
-// #define HOTKEY_MIMIC_SCROLL_UP       CTRL GDK_K
-// #define HOTKEY_MIMIC_SCROLL_DOWN     CTRL GDK_J
-// #define HOTKEY_OPEN_NEW_WINDOW       CTRL GDK_N
-// #define HOTKEY_RESET_TERMINAL        CTRL GDK_R
-// #define HOTKEY_RESET_AND_CLEAR       CTRL GDK_A
-// #define HOTKEY_SATURATION_DIALOG     CTRL GDK_X
-// #define HOTKEY_SATURATION_MORE       CTRL GDK_KP_Multiply
-// #define HOTKEY_SATURATION_LESS       CTRL GDK_KP_Divide
-// #define HOTKEY_SCROLL_ONE_PAGE_UP    CTRL GDK_k
-// #define HOTKEY_SCROLL_ONE_PAGE_DOWN  CTRL GDK_j
-// #define HOTKEY_SEARCH_STRING         CTRL GDK_Q
-// #define HOTKEY_SEARCH_PREVIOUS       CTRL GDK_G
-// #define HOTKEY_SEARCH_NEXT           CTRL GDK_g
+// #define HOTKEY_COPY                  CTRL(GDK_C)
+// #define HOTKEY_PASTE                 CTRL(GDK_V)
+// #define HOTKEY_SELECT_ALL            CTRL(GDK_S)
+// #define HOTKEY_COLOR_BACKGROUND      CTRL(GDK_B)
+// #define HOTKEY_EDIT_ENCODING         CTRL(GDK_U)
+// #define HOTKEY_FONT_BIGGER           CTRL(GDK_KP_Add)
+// #define HOTKEY_FONT_SMALLER          CTRL(GDK_KP_Subtract)
+// #define HOTKEY_FONT_DEFAULT_SIZE     CTRL(GDK_KP_Insert)
+// #define HOTKEY_FONT_SELECT           CTRL(GDK_F)
+// #define HOTKEY_MIMIC_SCROLL_UP       CTRL(GDK_K)
+// #define HOTKEY_MIMIC_SCROLL_DOWN     CTRL(GDK_J)
+// #define HOTKEY_OPEN_NEW_WINDOW       CTRL(GDK_N)
+// #define HOTKEY_RESET_TERMINAL        CTRL(GDK_R)
+// #define HOTKEY_RESET_AND_CLEAR       CTRL(GDK_A)
+// #define HOTKEY_SATURATION_DIALOG     CTRL(GDK_X)
+// #define HOTKEY_SATURATION_MORE       CTRL(GDK_KP_Multiply)
+// #define HOTKEY_SATURATION_LESS       CTRL(GDK_KP_Divide)
+// #define HOTKEY_SCROLL_ONE_PAGE_UP    CTRL(GDK_k)
+// #define HOTKEY_SCROLL_ONE_PAGE_DOWN  CTRL(GDK_j)
+// #define HOTKEY_SEARCH_STRING         CTRL(GDK_Q)
+// #define HOTKEY_SEARCH_PREVIOUS       CTRL(GDK_G)
+// #define HOTKEY_SEARCH_NEXT           CTRL(GDK_g)
 // #define        SEARCH_CASE_SENSITIVE TRUE
-#define    HOTKEY_TAB_ADD               CTRL GDK_T
-#define    HOTKEY_TAB_REMOVE            CTRL GDK_W
-#define    HOTKEY_TAB_PREVIOUS          CTRL GDK_Page_Up
-#define    HOTKEY_TAB_NEXT              CTRL GDK_Page_Down
-// #define HOTKEY_TAB_FIRST             CTRL GDK_Home
-// #define HOTKEY_TAB_LAST              CTRL GDK_End
-// #define HOTKEY_TAB_GO_TO_NUMBER      TRUE
-// #define HOTKEY_TAB_EDIT_LABEL        CTRL GDK_E
-// #define HOTKEY_TOGGLE_ANTI_ALIAS     CTRL GDK_L
-// #define HOTKEY_TOGGLE_DECORATED      CTRL GDK_Left
-// #define HOTKEY_TOGGLE_FULLSCREEN     CTRL GDK_M
-// #define HOTKEY_TOGGLE_HOTKEYS        CTRL GDK_quoteleft
-// #define HOTKEY_TOGGLE_ON_TOP         CTRL GDK_O
-// #define HOTKEY_TOGGLE_SCROLLBAR      CTRL GDK_Right
-// #define HOTKEY_TOGGLE_STATUS_BAR     CTRL GDK_Down
-// #define HOTKEY_TOGGLE_TABBAR         CTRL GDK_Up
-// #define HOTKEY_TOGGLE_BACKGROUND     CTRL GDK_KP_Delete
+#define    HOTKEY_TAB_ADD               CTRL(GDK_T)
+#define    HOTKEY_TAB_REMOVE            CTRL(GDK_W)
+#define    HOTKEY_TAB_PREVIOUS          CTRL(GDK_Page_Up)
+#define    HOTKEY_TAB_NEXT              CTRL(GDK_Page_Down)
+// #define HOTKEY_TAB_FIRST             CTRL(GDK_Home)
+// #define HOTKEY_TAB_LAST              CTRL(GDK_End)
+// #define ALT_NUMBER_GO_TO_TAB_NUMBER  TRUE
+// #define CTRL_NUMBER_GO_TO_TAB_NUMBER TRUE
+// #define HOTKEY_TAB_EDIT_LABEL        CTRL(GDK_E)
+// #define HOTKEY_TOGGLE_ANTI_ALIAS     CTRL(GDK_L)
+// #define HOTKEY_TOGGLE_DECORATED      CTRL(GDK_Left)
+// #define HOTKEY_TOGGLE_FULLSCREEN     CTRL(GDK_M)
+// #define HOTKEY_TOGGLE_HOTKEYS        CTRL(GDK_quoteleft)
+// #define HOTKEY_TOGGLE_ON_TOP         CTRL(GDK_O)
+// #define HOTKEY_TOGGLE_SCROLLBAR      CTRL(GDK_Right)
+// #define HOTKEY_TOGGLE_STATUS_BAR     CTRL(GDK_Down)
+// #define HOTKEY_TOGGLE_TABBAR         CTRL(GDK_Up)
+// #define HOTKEY_TOGGLE_BACKGROUND     CTRL(GDK_KP_Delete)
 // #define TOGGLE_BG_ORDER    "Image", "Transparent", "No background", "Opacity"
 
 // #define LABEL_DEFAULT_ENCODING       "_Default Encoding"

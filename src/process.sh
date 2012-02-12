@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2008-2011  Wen-Yen Chuang <caleb AT calno DOT com>
+# Copyright (C) 2008-2012  Wen-Yen Chuang <caleb AT calno DOT com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,12 +26,18 @@ TOGGLE_BG_ORDER_SIZE=`grep    TOGGLE_BG_ORDER    src/custom.h | tr '\t' ' ' | se
 MENU_CUSTOM_SIZE=`grep        MENU_CUSTOM        src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | grep '"' | wc -l`
 UPPER_PROGRAM_NAME=`grep      PROGRAM_NAME       src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | cut -d '"' -f 2 | sed 's/\b\(.\)/\u\1/'`
 GTK3_CSS_USE_BOX=`grep        GTK3_CSS           src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep "Gtk.Box"`
+HOTKEY_TAB_GO_TO_NUMBER=`grep HOTKEY_TAB_GO_TO_NUMBER src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1`
 [ "$MENU_DEFAULT_ENCODING" != "" ]    && echo \#define MENU_DEFAULT_ENCODING   1                        >> $CONFFILE
 [ "$MENU_ENCODING_LIST_SIZE" != "0" ] && echo \#define MENU_ENCODING_LIST_SIZE $MENU_ENCODING_LIST_SIZE >> $CONFFILE
 [ "$TOGGLE_BG_ORDER_SIZE" != "0" ]    && echo \#define TOGGLE_BG_ORDER_SIZE    $TOGGLE_BG_ORDER_SIZE    >> $CONFFILE
 [ "$MENU_CUSTOM_SIZE" != "0" ]        && echo \#define MENU_CUSTOM_SIZE        $MENU_CUSTOM_SIZE        >> $CONFFILE
 [ "$UPPER_PROGRAM_NAME" != "" ]       && echo \#define UPPER_PROGRAM_NAME   '"'$UPPER_PROGRAM_NAME'"'   >> $CONFFILE
 [ "$GTK3_CSS_USE_BOX" != "" ]         && echo \#define GTK3_CSS_USE_BOX        1                        >> $CONFFILE
+if [ "$HOTKEY_TAB_GO_TO_NUMBER" != "" ]; then
+  echo "[1m[31mWarning! HOTKEY_TAB_GO_TO_NUMBER is obsolete.[m"
+  echo "[1m[31m         Please use ALT_NUMBER_GO_TO_TAB_NUMBER or[m"
+  echo "[1m[31m                    CTRL_NUMBER_GO_TO_TAB_NUMBER.[m"
+fi
 
 DEFAULT_TERMINAL_SIZE_DEFINE=`grep DEFAULT_TERMINAL_SIZE src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1`
 if [ "$DEFAULT_TERMINAL_SIZE_DEFINE" != "" ]; then
@@ -226,4 +232,4 @@ if [ "$1" = "-v" ]; then
   echo showvte, version $SHOWVTE_VERSION
   exit
 fi
-grep ^#define $0 | sed -e 's/$/[m/' -e 's/"/[1m[32m"/' -e 's/ 0/[1m[32m 0/' -e 's/ 1/[1m[32m 1/' -e 's/ 2/[1m[32m 2/' -e 's/ 3/[1m[32m 3/' -e 's/ 4/[1m[32m 4/' -e 's/ 5/[1m[32m 5/' -e 's/ 6/[1m[32m 6/' -e 's/ 7/[1m[32m 7/' -e 's/ 8/[1m[32m 8/' -e 's/ 9/[1m[32m 9/' -e 's/TRUE/[1m[32mTRUE/' -e 's/FALSE/[1m[31mFALSE/' -e 's/ AUTO/[1m[32m AUTO/' -e 's/ ERASE_TTY/[1m[32m ERASE_TTY/' -e 's/ BLOCK/[1m[32m BLOCK/' -e 's/ IBEAM/[1m[32m IBEAM/' -e 's/ UNDERLINE/[1m[32m UNDERLINE/' -e 's/ BACKSPACE/[1m[32m BACKSPACE/g' -e 's/BACKSPACE_KEY/[mBACKSPACE_KEY/' -e 's/ DELETE/[1m[32m DELETE/g' -e 's/DELETE_KEY/[mDELETE_KEY/' -e 's/ LINUX/[1m[32m LINUX/' -e 's/ RXVT/[1m[32m RXVT/' -e 's/ TANGO/[1m[32m TANGO/' -e 's/ XTERM/[1m[32m XTERM/' -e 's/ ZENBURN/[1m[32m ZENBURN/' -e 's/ g_/[1m[32m g_/' -e 's/ RIGHT/[1m[32m RIGHT/' -e 's/ LEFT/[1m[32m LEFT/' -e 's/ OFF_R/[1m[32m OFF_R/' -e 's/ OFF_L/[1m[32m OFF_L/' -e 's/ TOP/[1m[32m TOP/' -e 's/ BOTTOM/[1m[32m BOTTOM/' -e 's/ CTRL /[1m[32m CTRL /'
+grep ^#define $0 | sed -e 's/$/[m/' -e 's/"/[1m[32m"/' -e 's/ 0/[1m[32m 0/' -e 's/ 1/[1m[32m 1/' -e 's/ 2/[1m[32m 2/' -e 's/ 3/[1m[32m 3/' -e 's/ 4/[1m[32m 4/' -e 's/ 5/[1m[32m 5/' -e 's/ 6/[1m[32m 6/' -e 's/ 7/[1m[32m 7/' -e 's/ 8/[1m[32m 8/' -e 's/ 9/[1m[32m 9/' -e 's/TRUE/[1m[32mTRUE/' -e 's/FALSE/[1m[31mFALSE/' -e 's/ AUTO/[1m[32m AUTO/' -e 's/ ERASE_TTY/[1m[32m ERASE_TTY/' -e 's/ BLOCK/[1m[32m BLOCK/' -e 's/ IBEAM/[1m[32m IBEAM/' -e 's/ UNDERLINE/[1m[32m UNDERLINE/' -e 's/ BACKSPACE/[1m[32m BACKSPACE/g' -e 's/BACKSPACE_KEY/[mBACKSPACE_KEY/' -e 's/ DELETE/[1m[32m DELETE/g' -e 's/DELETE_KEY/[mDELETE_KEY/' -e 's/ LINUX/[1m[32m LINUX/' -e 's/ RXVT/[1m[32m RXVT/' -e 's/ TANGO/[1m[32m TANGO/' -e 's/ XTERM/[1m[32m XTERM/' -e 's/ ZENBURN/[1m[32m ZENBURN/' -e 's/ g_/[1m[32m g_/' -e 's/ RIGHT/[1m[32m RIGHT/' -e 's/ LEFT/[1m[32m LEFT/' -e 's/ OFF_R/[1m[32m OFF_R/' -e 's/ OFF_L/[1m[32m OFF_L/' -e 's/ TOP/[1m[32m TOP/' -e 's/ BOTTOM/[1m[32m BOTTOM/' -e 's/ CTRL(/[1m[32m CTRL(/' -e 's/ ALT(/[1m[32m ALT(/' -e 's/ CTRL_ALT(/[1m[32m CTRL_ALT(/' -e 's/ SHIFT(/[1m[32m SHIFT(/'

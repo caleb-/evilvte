@@ -148,7 +148,10 @@ fi
       -e 's/ OFF_L/[1m[32m OFF_L/' \
       -e 's/ TOP/[1m[32m TOP/' \
       -e 's/ BOTTOM/[1m[32m BOTTOM/' \
-      -e 's/ CTRL /[1m[32m CTRL /'
+      -e 's/ CTRL(/[1m[32m CTRL(/' \
+      -e 's/ ALT(/[1m[32m ALT(/' \
+      -e 's/ CTRL_ALT(/[1m[32m CTRL_ALT(/' \
+      -e 's/ SHIFT(/[1m[32m SHIFT(/'
   $DO_ECHO
   $DO_ECHO Please edit [1m[33m$CONF_FILE[m to customize your options.
   $DO_ECHO

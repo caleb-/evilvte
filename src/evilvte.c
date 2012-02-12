@@ -1,6 +1,6 @@
 /* Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  * Copyright (C) 2006-2008  David Gómez <david@pleyades.net>
- * Copyright (C) 2008-2011  Wen-Yen Chuang <caleb AT calno DOT com>
+ * Copyright (C) 2008-2012  Wen-Yen Chuang <caleb AT calno DOT com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,10 @@
 #define OFF_L  4
 #define OFF_R  5
 
-#define CTRL event->keyval ==
+#define ALT(x) (((event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) && (event->keyval == (x)))
+#define CTRL(x) (((event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) && (event->keyval == (x)))
+#define CTRL_ALT(x) (((event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)) == (GDK_CONTROL_MASK | GDK_MOD1_MASK)) && (event->keyval == (x)))
+#define SHIFT(x) (((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK) && (event->keyval == (x)))
 
 #include "custom.h"
 #include "evilvte.h"
@@ -632,15 +635,6 @@ char *default_directory;
 #define VTE_DEFAULT_DIRECTORY DEFAULT_DIRECTORY
 #endif
 
-#define KEY_MOD_MASK GDK_CONTROL_MASK
-
-#if CTRL_ALT
-#undef HOTKEY
-#define HOTKEY TRUE
-#undef KEY_MOD_MASK
-#define KEY_MOD_MASK (GDK_CONTROL_MASK | GDK_MOD1_MASK)
-#endif
-
 #if !HOTKEY
 #undef MENU_TOGGLE_HOTKEYS
 #undef HOTKEY_COLOR_BACKGROUND
@@ -666,6 +660,10 @@ char *default_directory;
 #undef HOTKEY_TOGGLE_BACKGROUND
 #endif
 
+#if defined(HOTKEY_TAB_GO_TO_NUMBER) && !defined(CTRL_NUMBER_GO_TO_TAB_NUMBER)
+#define CTRL_NUMBER_GO_TO_TAB_NUMBER HOTKEY_TAB_GO_TO_NUMBER
+#endif
+
 #if !TAB || !HOTKEY
 #undef HOTKEY_TAB_ADD
 #undef HOTKEY_TAB_REMOVE
@@ -673,7 +671,8 @@ char *default_directory;
 #undef HOTKEY_TAB_NEXT
 #undef HOTKEY_TAB_FIRST
 #undef HOTKEY_TAB_LAST
-#undef HOTKEY_TAB_GO_TO_NUMBER
+#undef ALT_NUMBER_GO_TO_TAB_NUMBER
+#undef CTRL_NUMBER_GO_TO_TAB_NUMBER
 #undef HOTKEY_TAB_EDIT_LABEL
 #undef HOTKEY_TOGGLE_TABBAR
 #endif
@@ -1692,7 +1691,7 @@ void saturation_routine()
 bool scroll_event(GtkWidget *widget, GdkEventScroll *event)
 {
 #if HOTKEY
-  if ((event->state & KEY_MOD_MASK) == KEY_MOD_MASK) {
+  if ((event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) {
     if (event->direction == GDK_SCROLL_UP) {
       saturation_level += 0.025;
       if (saturation_level > 1)
@@ -2503,8 +2502,6 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
   gtk_window_set_urgency_hint(GTK_WINDOW(main_window), FALSE);
 #endif
 
-  if ((event->state & KEY_MOD_MASK) == KEY_MOD_MASK) {
-
 #ifdef HOTKEY_TOGGLE_HOTKEYS
     if (HOTKEY_TOGGLE_HOTKEYS) {
       hotkey_status ^= 1;
@@ -2685,46 +2682,59 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
 
-#if HOTKEY_TAB_GO_TO_NUMBER
-      if (event->keyval == GDK_1) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_2) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 1);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_3) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 2)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 2);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_4) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 3)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 3);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_5) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 4)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 4);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_6) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 5)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 5);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_7) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 6)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 6);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_8) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 7)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 7);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_9) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 8)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 8);
-        return TRUE;
-      }
-      if ((event->keyval == GDK_0) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 9)) {
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 9);
-        return TRUE;
+#if ALT_NUMBER_GO_TO_TAB_NUMBER || CTRL_NUMBER_GO_TO_TAB_NUMBER
+      int mask_is_pressed = 0;
+#endif
+#if ALT_NUMBER_GO_TO_TAB_NUMBER
+      if ((event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK)
+        mask_is_pressed = 1;
+#endif
+#if CTRL_NUMBER_GO_TO_TAB_NUMBER
+      if ((event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK)
+        mask_is_pressed = 1;
+#endif
+#if ALT_NUMBER_GO_TO_TAB_NUMBER || CTRL_NUMBER_GO_TO_TAB_NUMBER
+      if (mask_is_pressed) {
+        if (event->keyval == GDK_1) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_2) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 1)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 1);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_3) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 2)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 2);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_4) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 3)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 3);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_5) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 4)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 4);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_6) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 5)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 5);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_7) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 6)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 6);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_8) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 7)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 7);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_9) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 8)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 8);
+          return TRUE;
+        }
+        if ((event->keyval == GDK_0) && (gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) > 9)) {
+          gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 9);
+          return TRUE;
+        }
       }
 #endif
 
@@ -2891,7 +2901,6 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
       }
 #endif
     }
-  }
   return FALSE;
 }
 #endif /* HOTKEY */

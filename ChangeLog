@@ -1,8 +1,14 @@
 UNRELEASED
+ * New hotkey definition method, support Alt and Shift, closes #2.
+   The new behavior breaks old hotkey definitions.
+   If you have old conffiles, please update them to latest format.
  * Support TAB_NEW_PATH_EQUAL_OLD when open new evilvte window, closes #3.
  * Support HOTKEY_SCROLL_ONE_PAGE_*, closes #4.
  * Some distributions backports gtk_*_resize_grip to GTK+ 2.x.
    Try export CFLAGS="-DGTK_HAS_RESIZE_GRIP" and rebuild evilvte
+ * Drop old CTRL_ALT option
+ * Deprecate HOTKEY_TAB_GO_TO_NUMBER, use ALT_NUMBER_GO_TO_TAB_NUMBER or
+   CTRL_NUMBER_GO_TO_TAB_NUMBER instead
 
 0.5.1~pre2
  * Support TAB_NEW_TAB_AT_TAB_ONE, let new tab always be the first tab

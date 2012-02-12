@@ -19,7 +19,7 @@ prepare:
 	rm -f src/custom.h src/evilvte.h src/evilvte.o
 
 src/custom.h: prepare
-	cp $(CONF_FILE) src/custom.h
+	sed 's/ CTRL_ALT / CTRL_ALT_FOO /g' $(CONF_FILE) > src/custom.h
 
 src/evilvte.h: src/custom.h
 	sh src/process.sh src/$(PROG)
