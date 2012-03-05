@@ -2242,9 +2242,24 @@ static void do_menu_saturation(void)
 static void do_menu_tint_color(void)
 {
   GtkWidget *color_tint_dialog = gtk_color_selection_dialog_new(LABEL_DIALOG_BACKGROUND_TINT);
+#if RULE_THEM_ALL || !GTK_CHECK_VERSION(3,3,8)
   gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_tint_dialog))), &color_tint);
+#endif
+#if !RULE_THEM_ALL && GTK_CHECK_VERSION(3,3,8)
+  GdkRGBA rgba_tint;
+  gdk_rgba_parse(&rgba_tint, gdk_color_to_string(&color_tint));
+  gtk_color_selection_set_current_rgba(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_tint_dialog))), &rgba_tint);
+#endif
   if (GTK_RESPONSE_OK == gtk_dialog_run(GTK_DIALOG(color_tint_dialog))) {
+#if RULE_THEM_ALL || !GTK_CHECK_VERSION(3,3,8)
     gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_tint_dialog))), &color_tint);
+#endif
+#if !RULE_THEM_ALL && GTK_CHECK_VERSION(3,3,8)
+    gtk_color_selection_get_current_rgba(GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(color_tint_dialog))), &rgba_tint);
+    color_tint.red = rgba_tint.red * 65535;
+    color_tint.green = rgba_tint.green * 65535;
+    color_tint.blue = rgba_tint.blue * 65535;
+#endif
     int i = 0;
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
       GET_CURRENT_TAB(i);
