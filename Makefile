@@ -18,8 +18,10 @@ src/evilvte.o: src/evilvte.h
 prepare:
 	rm -f src/custom.h src/evilvte.h src/evilvte.o
 
-src/custom.h: prepare
-	sed 's/ CTRL_ALT / CTRL_ALT_FOO /g' $(CONF_FILE) > src/custom.h
+src/custom.h: prepare $(CONF_FILE)
+	(echo '/* This file is generated - please edit $(CONF_FILE) instead */'; \
+	grep -v '^ *//' $(CONF_FILE) \
+	| sed 's/ CTRL_ALT / CTRL_ALT_FOO /g') > src/custom.h
 
 src/evilvte.h: src/custom.h
 	sh src/process.sh src/$(PROG)
