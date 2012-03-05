@@ -2843,6 +2843,8 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
 #endif
 
 #ifdef HOTKEY_SCROLL_ONE_PAGE_UP
+      if (((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK) && (event->keyval == GDK_Page_Up))
+        return FALSE;
       if (HOTKEY_SCROLL_ONE_PAGE_UP) {
         GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
         gtk_test_widget_send_key(term->vte, GDK_Page_Up, GDK_SHIFT_MASK);
@@ -2851,6 +2853,8 @@ bool key_press_event(GtkWidget *widget, GdkEventKey *event)
 #endif
 
 #ifdef HOTKEY_SCROLL_ONE_PAGE_DOWN
+      if (((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK) && (event->keyval == GDK_Page_Down))
+        return FALSE;
       if (HOTKEY_SCROLL_ONE_PAGE_DOWN) {
         GET_CURRENT_TAB(gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
         gtk_test_widget_send_key(term->vte, GDK_Page_Down, GDK_SHIFT_MASK);

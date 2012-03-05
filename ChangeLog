@@ -1,5 +1,6 @@
 UNRELEASED
  * Support key bindings for ALT_SHIFT, CTRL_ALT_SHIFT, and CTRL_SHIFT
+ * Fix a potential bug for HOTKEY_SCROLL_ONE_PAGE_*
 
 0.5.1~pre3
  * New hotkey definition method, support Alt and Shift, closes #2.
