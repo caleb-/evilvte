@@ -40,7 +40,6 @@
 // #define CURSOR_SHAPE  /* Options: BLOCK, IBEAM, UNDERLINE                  */
 // #define DEFAULT_COMMAND        g_getenv("SHELL")
 // #define DEFAULT_DIRECTORY      g_get_current_dir()
-// #define DEFAULT_ENCODING       "UTF-8"
 // #define DEFAULT_TERMINAL_SIZE  80x24
 // #define FONT                   "Monospace 10"
 // #define FONT_ANTI_ALIAS        TRUE
@@ -49,8 +48,6 @@
 // #define MOUSE_CURSOR_AUTOHIDE  TRUE
 // #define PROGRAM_ALWAYS_ON_TOP  TRUE
 // #define PROGRAM_ICON           ".config/evilvte/icon.png"
-// #define PROGRAM_NAME           "evilvte"
-// #define PROGRAM_VERSION        "7.7.7"
 // #define PROGRAM_WM_CLASS       TRUE
 // #define RECORD_LASTLOG         TRUE
 // #define RECORD_UTMP            TRUE
