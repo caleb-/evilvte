@@ -1,3 +1,6 @@
+UNRELEASED
+ * Support key bindings for ALT_SHIFT, CTRL_ALT_SHIFT, and CTRL_SHIFT
+
 0.5.1~pre3
  * New hotkey definition method, support Alt and Shift, closes #2.
    The new behavior breaks old hotkey definitions.

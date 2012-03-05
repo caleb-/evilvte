@@ -120,6 +120,10 @@
  * ALT(GDK_A)      = "Alt  + Shift + a"
  * CTRL_ALT(GDK_A) = "Ctrl + Alt + Shift + a"
  *
+ * Also support: ALT_SHIFT(GDK_*)
+ *               CTRL_ALT_SHIFT(GDK_*)
+ *               CTRL_SHIFT(GDK_*)
+ *
  * See /usr/include/gtk-?.0/gdk/gdkkeysyms.h for GDK_* definitions.           */
 
 #define    HOTKEY                       TRUE

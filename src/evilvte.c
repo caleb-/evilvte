@@ -68,8 +68,11 @@
 #define OFF_R  5
 
 #define ALT(x) (((event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) && (event->keyval == (x)))
+#define ALT_SHIFT(x) (((event->state & (GDK_MOD1_MASK | GDK_SHIFT_MASK)) == (GDK_MOD1_MASK | GDK_SHIFT_MASK)) && (event->keyval == (x)))
 #define CTRL(x) (((event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) && (event->keyval == (x)))
 #define CTRL_ALT(x) (((event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)) == (GDK_CONTROL_MASK | GDK_MOD1_MASK)) && (event->keyval == (x)))
+#define CTRL_ALT_SHIFT(x) (((event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK | GDK_SHIFT_MASK)) == (GDK_CONTROL_MASK | GDK_MOD1_MASK | GDK_SHIFT_MASK)) && (event->keyval == (x)))
+#define CTRL_SHIFT(x) (((event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)) == (GDK_CONTROL_MASK | GDK_SHIFT_MASK)) && (event->keyval == (x)))
 #define SHIFT(x) (((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK) && (event->keyval == (x)))
 
 #include "custom.h"
