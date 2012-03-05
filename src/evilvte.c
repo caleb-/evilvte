@@ -2248,19 +2248,16 @@ void do_menu_tint_color()
 #ifdef FONT
 void calculate_font()
 {
-    const char *number_char[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
     int len = strlen(font_name) - 1;
-    unsigned int loop = 1;
-    font_size = 0;
-    unsigned int i = 0;
-    while (len > 0 && isdigit(font_name[len])) {
-      for (i = 0 ; i < 10 ; i++) {
-        if (font_name[len] == *number_char[i])
-          font_size += i * loop;
-      }
-      loop *= 10;
-      font_name[len--] = 0;
+    if (len < 1) {
+      g_snprintf(font_name, sizeof(font_name), FONT);
+      len = strlen(font_name) - 1;
     }
+    font_size = atoi(strrchr(font_name, ' '));
+    if (font_size < 1)
+      font_size = 1;
+    while (len > 0 && isdigit(font_name[len]))
+      font_name[len--] = 0;
     while (len > 0 && font_name[len] == ' ')
       font_name[len--] = 0;
 }
@@ -3259,8 +3256,6 @@ bool at_dock_mode = FALSE;
 #endif
     g_snprintf(font_name, sizeof(font_name), "%s", FONT);
   calculate_font();
-  if (font_size < 1)
-    font_size = 10;
   g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
 #if defined(HOTKEY_FONT_DEFAULT_SIZE) || MENU_FONT_DEFAULT_SIZE
   font_size_default = font_size;

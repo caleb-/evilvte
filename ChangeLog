@@ -2,6 +2,7 @@ UNRELEASED
  * Support key bindings for ALT_SHIFT, CTRL_ALT_SHIFT, and CTRL_SHIFT
  * Auto-detect gtk_*_resize_grip in dlopen() mode
  * Fix a potential bug for HOTKEY_SCROLL_ONE_PAGE_*
+ * Strict minimum font size to 1
  * Hide DEFAULT_ENCODING, PROGRAM_NAME, and PROGRAM_VERSION
 
 0.5.1~pre3
