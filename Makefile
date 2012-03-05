@@ -1,4 +1,4 @@
-include src/config.o
+include src/config.mk
 
 ifeq ($(LDFLAGS),)
 	LDFLAGS = -Wl,--as-needed
@@ -69,13 +69,13 @@ install-strip: strip
 uninstall:
 	sh src/uninstall.sh
 
-clean: src/config.o
+clean: src/config.mk
 	rm -f src/$(PROG) src/showvte src/evilvte.o src/evilvte.h misc/evilvte.? src/custom.h
 
 distclean: clean
-	rm -f src/*.o src/install.sh src/uninstall.sh
+	rm -f src/*.o src/*.mk src/install.sh src/uninstall.sh
 
-src/config.o:
+src/config.mk:
 	./configure --quiet
 
 .PHONY: evilvte prepare strip install install-strip uninstall clean distclean

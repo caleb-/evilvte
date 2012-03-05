@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -f src/*.o src/custom.h src/evilvte.h src/install.sh src/uninstall.sh
+rm -f src/*.o src/*.mk src/custom.h src/evilvte.h src/install.sh src/uninstall.sh
 
 DO_CAT=cat
 DO_ECHO=echo
@@ -55,10 +55,10 @@ PROG=`grep PROGRAM_NAME $CONF_FILE | sed -e 's/\t/ /g' -e 's/^\( \)*//g' | grep 
 [ "$PROG" = "" ] && PROG=evilvte
 
 SUSE_LD=`ld -v 2>&1 | tr A-Z a-z | grep suse`
-[ "$SUSE_LD" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.o
+[ "$SUSE_LD" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.mk
 
 ARCH_UNAME=`uname -a | grep -- '-ARCH '`
-[ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.o
+[ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.mk
 
 real_gtk=$with_gtk
 if [ "$with_gtk" != "2.0" ] && [ "$with_gtk" != "3.0" ]; then
@@ -164,22 +164,22 @@ THEME_DIR=$prefix/share/icons
 GNOME_DEF_APP=$prefix/share/gnome-control-center/default-apps
 EVILVTE_VERSION=`head -n 1 ChangeLog`
 
-echo "VTEINC=$VTEINC" >> src/config.o
-# sed -i 's/-pthread//' src/config.o
-echo "LIBS_VTE=$LIBS_VTE" >> src/config.o
-echo "LIBS_VTE_L=$LIBS_VTE_L" >> src/config.o
-echo "prefix=$prefix" >> src/config.o
-echo "bindir=\$(DESTDIR)$bindir" >> src/config.o
-echo "mandir=\$(DESTDIR)$mandir" >> src/config.o
-echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.o
-echo \#define ICON_DIR '"'$ICON_DIR'"' >> src/config.o
-echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.o
-echo "THEME_DIR=\$(DESTDIR)$THEME_DIR" >> src/config.o
-echo "GNOME_DEF_APP=\$(DESTDIR)$GNOME_DEF_APP" >> src/config.o
-echo "PROG=$PROG" >> src/config.o
-echo \#define EVILVTE_VERSION '"'$EVILVTE_VERSION'"' >> src/config.o
-[ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL 1 >> src/config.o
-echo "CONF_FILE=$CONF_FILE" >> src/config.o
+echo "VTEINC=$VTEINC" >> src/config.mk
+# sed -i 's/-pthread//' src/config.mk
+echo "LIBS_VTE=$LIBS_VTE" >> src/config.mk
+echo "LIBS_VTE_L=$LIBS_VTE_L" >> src/config.mk
+echo "prefix=$prefix" >> src/config.mk
+echo "bindir=\$(DESTDIR)$bindir" >> src/config.mk
+echo "mandir=\$(DESTDIR)$mandir" >> src/config.mk
+echo "deskdir=\$(DESTDIR)$deskdir" >> src/config.mk
+echo \#define ICON_DIR '"'$ICON_DIR'"' >> src/config.mk
+echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.mk
+echo "THEME_DIR=\$(DESTDIR)$THEME_DIR" >> src/config.mk
+echo "GNOME_DEF_APP=\$(DESTDIR)$GNOME_DEF_APP" >> src/config.mk
+echo "PROG=$PROG" >> src/config.mk
+echo \#define EVILVTE_VERSION '"'$EVILVTE_VERSION'"' >> src/config.mk
+[ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL 1 >> src/config.mk
+echo "CONF_FILE=$CONF_FILE" >> src/config.mk
 head -n 1 $0 > src/uninstall.sh
 echo "set -x" >> src/uninstall.sh
 echo "rm -f $bindir/$PROG" >> src/uninstall.sh
