@@ -1402,6 +1402,7 @@ void (*p_vte_terminal_set_word_chars)(VteTerminal *terminal, const char *spec);
 unsigned short with_gtk = 0;
 void *p_hdl_gtk = NULL;
 void *p_hdl_vte = NULL;
+bool has_resize_grip = 1;
 #endif
 
 #if CLOSE_DIALOG
@@ -2389,7 +2390,7 @@ void do_toggle_decorated()
 #if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
   if (status_bar_status) {
 #if RULE_THEM_ALL
-    if (with_gtk == 3)
+    if (has_resize_grip)
 #endif
     {
       gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
@@ -2397,7 +2398,7 @@ void do_toggle_decorated()
   } else {
     gtk_widget_hide(statusbar);
 #if RULE_THEM_ALL
-    if (with_gtk == 3)
+    if (has_resize_grip)
 #endif
     {
       gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), FALSE);
@@ -2437,7 +2438,7 @@ void do_toggle_status_bar()
   if (status_bar_status) {
     gtk_widget_show(statusbar);
 #if RULE_THEM_ALL
-    if (with_gtk == 3)
+    if (has_resize_grip)
 #endif
     {
       gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), status_bar_resize_grip);
@@ -2445,7 +2446,7 @@ void do_toggle_status_bar()
   } else {
     gtk_widget_hide(statusbar);
 #if RULE_THEM_ALL
-    if (with_gtk == 3)
+    if (has_resize_grip)
 #endif
     {
       gtk_window_set_has_resize_grip(GTK_WINDOW(main_window), FALSE);
@@ -3398,10 +3399,12 @@ bool at_dock_mode = FALSE;
   *(void **)(&p_gtk_window_new) = dlsym(p_hdl_gtk, "gtk_window_new");
   *(void **)(&p_gtk_window_parse_geometry) = dlsym(p_hdl_gtk, "gtk_window_parse_geometry");
   *(void **)(&p_gtk_window_resize) = dlsym(p_hdl_gtk, "gtk_window_resize");
-#ifdef GTK_HAS_RESIZE_GRIP
   *(void **)(&p_gtk_window_resize_grip_is_visible) = dlsym(p_hdl_gtk, "gtk_window_resize_grip_is_visible");
+  if (dlerror() != NULL)
+    has_resize_grip = 0;
   *(void **)(&p_gtk_window_set_has_resize_grip) = dlsym(p_hdl_gtk, "gtk_window_set_has_resize_grip");
-#endif
+  if (dlerror() != NULL)
+    has_resize_grip = 0;
   *(void **)(&p_gtk_window_set_decorated) = dlsym(p_hdl_gtk, "gtk_window_set_decorated");
   *(void **)(&p_gtk_window_set_focus) = dlsym(p_hdl_gtk, "gtk_window_set_focus");
   *(void **)(&p_gtk_window_set_icon_from_file) = dlsym(p_hdl_gtk, "gtk_window_set_icon_from_file");
@@ -3561,7 +3564,7 @@ bool at_dock_mode = FALSE;
   main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 #if RULE_THEM_ALL
-  if (with_gtk == 3)
+  if (has_resize_grip)
 #endif
 #if RULE_THEM_ALL || defined(GTK_HAS_RESIZE_GRIP)
   {

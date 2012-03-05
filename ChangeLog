@@ -1,5 +1,6 @@
 UNRELEASED
  * Support key bindings for ALT_SHIFT, CTRL_ALT_SHIFT, and CTRL_SHIFT
+ * Auto-detect gtk_*_resize_grip in dlopen() mode
  * Fix a potential bug for HOTKEY_SCROLL_ONE_PAGE_*
 
 0.5.1~pre3
