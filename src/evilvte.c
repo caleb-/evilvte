@@ -86,21 +86,11 @@
 #ifndef GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
 #define GTK_STYLE_PROVIDER_PRIORITY_APPLICATION 600
 #endif
-#ifndef GdkColormap
 typedef struct _GdkColormap GdkColormap;
-#endif
-#ifndef GtkCssProvider
 typedef struct _GtkCssProvider GtkCssProvider;
-#endif
-#ifndef GtkFontSelectionDialog
 typedef struct _GtkFontSelectionDialog GtkFontSelectionDialog;
-#endif
-#ifndef GtkScrollable
 typedef struct _GtkScrollable GtkScrollable;
-#endif
-#ifndef GtkStyleProvider
 typedef struct _GtkStyleProvider GtkStyleProvider;
-#endif
 #undef GTK_BOX
 #define GTK_BOX (GtkBox*)
 #undef GTK_BUTTON
