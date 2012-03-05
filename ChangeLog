@@ -4,6 +4,7 @@ UNRELEASED
  * Fix a potential bug for HOTKEY_SCROLL_ONE_PAGE_*
  * Strict minimum font size to 1
  * Hide DEFAULT_ENCODING, PROGRAM_NAME, and PROGRAM_VERSION
+ * Make everything GTK+ 3.3.16 compatible
 
 0.5.1~pre3
  * New hotkey definition method, support Alt and Shift, closes #2.
