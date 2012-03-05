@@ -27,12 +27,14 @@ MENU_CUSTOM_SIZE=`grep        MENU_CUSTOM        src/custom.h | tr '\t' ' ' | se
 UPPER_PROGRAM_NAME=`grep      PROGRAM_NAME       src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | cut -d '"' -f 2 | sed 's/\b\(.\)/\u\1/'`
 GTK3_CSS_USE_BOX=`grep        GTK3_CSS           src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep "Gtk.Box"`
 HOTKEY_TAB_GO_TO_NUMBER=`grep HOTKEY_TAB_GO_TO_NUMBER src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1`
-[ "$MENU_DEFAULT_ENCODING" != "" ]    && echo \#define MENU_DEFAULT_ENCODING   1                        >> $CONFFILE
+HOTKEY_HAS_DEFINE=`sed 's/_GO_TO_/_HOTKEY_/' src/custom.h | grep HOTKEY_ | grep -v HOTKEY_TOGGLE_HOTKEYS | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | wc -l`
+[ "$MENU_DEFAULT_ENCODING" != "" ]    && echo \#define MENU_DEFAULT_ENCODING                            >> $CONFFILE
 [ "$MENU_ENCODING_LIST_SIZE" != "0" ] && echo \#define MENU_ENCODING_LIST_SIZE $MENU_ENCODING_LIST_SIZE >> $CONFFILE
 [ "$TOGGLE_BG_ORDER_SIZE" != "0" ]    && echo \#define TOGGLE_BG_ORDER_SIZE    $TOGGLE_BG_ORDER_SIZE    >> $CONFFILE
 [ "$MENU_CUSTOM_SIZE" != "0" ]        && echo \#define MENU_CUSTOM_SIZE        $MENU_CUSTOM_SIZE        >> $CONFFILE
 [ "$UPPER_PROGRAM_NAME" != "" ]       && echo \#define UPPER_PROGRAM_NAME   '"'$UPPER_PROGRAM_NAME'"'   >> $CONFFILE
-[ "$GTK3_CSS_USE_BOX" != "" ]         && echo \#define GTK3_CSS_USE_BOX        1                        >> $CONFFILE
+[ "$GTK3_CSS_USE_BOX" != "" ]         && echo \#define GTK3_CSS_USE_BOX                                 >> $CONFFILE
+[ "$HOTKEY_HAS_DEFINE" != "0" ]       && echo \#define HOTKEY_HAS_DEFINE                                >> $CONFFILE
 if [ "$HOTKEY_TAB_GO_TO_NUMBER" != "" ]; then
   echo "[1m[31mWarning! HOTKEY_TAB_GO_TO_NUMBER is obsolete.[m"
   echo "[1m[31m         Please use ALT_NUMBER_GO_TO_TAB_NUMBER or[m"
@@ -53,10 +55,10 @@ TOGGLE_BG_IMAGE=`echo         $TOGGLE_BG_ORDER_DEFINE | grep  Image`
 TOGGLE_BG_TRANSPARENT=`echo   $TOGGLE_BG_ORDER_DEFINE | grep  Transparent`
 TOGGLE_BG_NO_BACKGROUND=`echo $TOGGLE_BG_ORDER_DEFINE | grep 'No background'`
 TOGGLE_BG_OPACITY=`echo       $TOGGLE_BG_ORDER_DEFINE | grep  Opacity`
-[ "$TOGGLE_BG_IMAGE" != "" ]         && echo \#define TOGGLE_BG_IMAGE         1 >> $CONFFILE
-[ "$TOGGLE_BG_TRANSPARENT" != "" ]   && echo \#define TOGGLE_BG_TRANSPARENT   1 >> $CONFFILE
-[ "$TOGGLE_BG_NO_BACKGROUND" != "" ] && echo \#define TOGGLE_BG_NO_BACKGROUND 1 >> $CONFFILE
-[ "$TOGGLE_BG_OPACITY" != "" ]       && echo \#define TOGGLE_BG_OPACITY       1 >> $CONFFILE
+[ "$TOGGLE_BG_IMAGE" != "" ]         && echo \#define TOGGLE_BG_IMAGE         >> $CONFFILE
+[ "$TOGGLE_BG_TRANSPARENT" != "" ]   && echo \#define TOGGLE_BG_TRANSPARENT   >> $CONFFILE
+[ "$TOGGLE_BG_NO_BACKGROUND" != "" ] && echo \#define TOGGLE_BG_NO_BACKGROUND >> $CONFFILE
+[ "$TOGGLE_BG_OPACITY" != "" ]       && echo \#define TOGGLE_BG_OPACITY       >> $CONFFILE
 
 MENU_CUSTOM_DEFINE=`grep MENU_CUSTOM src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1`
 

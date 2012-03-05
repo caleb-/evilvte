@@ -82,6 +82,10 @@
 #define USE_GTK_GRID
 #endif
 
+#ifndef RULE_THEM_ALL
+#define RULE_THEM_ALL 0
+#endif
+
 #if RULE_THEM_ALL
 #ifndef GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
 #define GTK_STYLE_PROVIDER_PRIORITY_APPLICATION 600
@@ -418,7 +422,7 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #undef VTE_FUNNY
 #endif
 
-#if (COLOR_STYLE == VTE_FIXED)
+#if defined(COLOR_STYLE) && (COLOR_STYLE == VTE_FIXED)
 #undef COLOR_STYLE
 #endif
 
@@ -432,7 +436,9 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #endif
 
 #ifndef USE_ACCESSIBLE
+#define USE_ACCESSIBLE FALSE
 #if RULE_THEM_ALL || VTE_CHECK_VERSION(0,29,0)
+#undef USE_ACCESSIBLE
 #define USE_ACCESSIBLE TRUE
 #endif
 #endif
@@ -456,14 +462,15 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #endif
 #endif
 
-#define GET_CURRENT_TAB(x) term = (struct terminal*)g_object_get_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), (x))), "current_tab")
+#ifndef VTE_COLUMNS
+#define VTE_COLUMNS 0
+#endif
 
-#if CURSOR_BLINKS
-#define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_ON
+#ifndef VTE_ROWS
+#define VTE_ROWS 0
 #endif
-#if !CURSOR_BLINKS
-#define VTE_CURSOR_BLINKS VTE_CURSOR_BLINK_OFF
-#endif
+
+#define GET_CURRENT_TAB(x) term = (struct terminal*)g_object_get_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), (x))), "current_tab")
 
 #ifndef DEFAULT_COMMAND
 #define DEFAULT_COMMAND g_getenv("SHELL")
@@ -583,8 +590,8 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define DEL_TAB_DECL(x,y) del_tab(void)
 #endif
 
-#if DEF_TAB_LABEL && !defined(TAB_LABEL)
-#define TAB_LABEL "Page %u"
+#ifndef TAB
+#define TAB 0
 #endif
 
 #if !TAB
@@ -606,6 +613,106 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #undef TABBAR_MENU_SELECT_TAB
 #define SHOW_WINDOW_BORDER FALSE
 #define TABBAR FALSE
+#endif
+
+#ifndef SHOW_WINDOW_ICON
+#define SHOW_WINDOW_ICON 0
+#endif
+#ifndef COMMAND_EXEC_PROGRAM
+#define COMMAND_EXEC_PROGRAM 0
+#endif
+#ifndef COMMAND_SHOW_OPTIONS
+#define COMMAND_SHOW_OPTIONS 0
+#endif
+#ifndef COMMAND_SHOW_VERSION
+#define COMMAND_SHOW_VERSION 0
+#endif
+#ifndef CLOSE_SAFELY
+#define CLOSE_SAFELY 0
+#endif
+#ifndef TAB_NEW_PATH_EQUAL_OLD
+#define TAB_NEW_PATH_EQUAL_OLD 0
+#endif
+#ifndef MATCH_STRING_HTTP
+#define MATCH_STRING_HTTP 0
+#endif
+#ifndef MATCH_STRING_MAIL
+#define MATCH_STRING_MAIL 0
+#endif
+#ifndef MATCH_STRING_FILE
+#define MATCH_STRING_FILE 0
+#endif
+#ifndef TAB_NEW_TAB_AT_TAB_ONE
+#define TAB_NEW_TAB_AT_TAB_ONE 0
+#endif
+#ifndef TAB_LABEL_DYNAMIC
+#define TAB_LABEL_DYNAMIC 0
+#endif
+#ifndef MOUSE_CTRL_SATURATION
+#define MOUSE_CTRL_SATURATION 0
+#endif
+#ifndef TABBAR_AUTOHIDE
+#define TABBAR_AUTOHIDE 0
+#endif
+#ifndef TAB_EXPANDED_WIDTH
+#define TAB_EXPANDED_WIDTH 0
+#endif
+#ifndef TAB_SHOW_INFO_AT_TITLE
+#define TAB_SHOW_INFO_AT_TITLE 0
+#endif
+#ifndef WINDOW_TITLE_DYNAMIC
+#define WINDOW_TITLE_DYNAMIC 0
+#endif
+#ifndef TAB_CLOSE_BUTTON
+#define TAB_CLOSE_BUTTON 0
+#endif
+#ifndef TABBAR_SCROLLABLE
+#define TABBAR_SCROLLABLE 0
+#endif
+#ifndef TABBAR_MENU_SELECT_TAB
+#define TABBAR_MENU_SELECT_TAB 0
+#endif
+#ifndef BELL_URGENT
+#define BELL_URGENT 0
+#endif
+#ifndef TAB_REORDERABLE
+#define TAB_REORDERABLE 0
+#endif
+#ifndef COMMAND_TAB_NUMBERS
+#define COMMAND_TAB_NUMBERS 0
+#endif
+#ifndef COMMAND_FULLSCREEN
+#define COMMAND_FULLSCREEN 0
+#endif
+#ifndef COMMAND_GEOMETRY
+#define COMMAND_GEOMETRY 0
+#endif
+#ifndef COMMAND_DOCK_MODE
+#define COMMAND_DOCK_MODE 0
+#endif
+#ifndef COMMAND_AT_ROOT_WINDOW
+#define COMMAND_AT_ROOT_WINDOW 0
+#endif
+#ifndef COMMAND_LOGIN_SHELL
+#define COMMAND_LOGIN_SHELL 0
+#endif
+#ifndef BACKGROUND_OPACITY
+#define BACKGROUND_OPACITY 0
+#endif
+#ifndef COMMAND_SET_TITLE
+#define COMMAND_SET_TITLE 0
+#endif
+#ifndef PROGRAM_WM_CLASS
+#define PROGRAM_WM_CLASS 0
+#endif
+#ifndef BUTTON_ORDER_BY_RCFILE
+#define BUTTON_ORDER_BY_RCFILE 0
+#endif
+#ifndef COMMAND_SHOW_HELP
+#define COMMAND_SHOW_HELP 0
+#endif
+#ifndef COMMAND_FONT
+#define COMMAND_FONT 0
 #endif
 
 #define GET_VTE_CHILD_PID NULL
@@ -638,6 +745,16 @@ char *default_directory;
 #define VTE_DEFAULT_DIRECTORY DEFAULT_DIRECTORY
 #endif
 
+#ifndef HOTKEY_HAS_DEFINE
+#undef HOTKEY_TOGGLE_HOTKEYS
+#undef MENU_TOGGLE_HOTKEYS
+#undef HOTKEY
+#endif
+
+#ifndef HOTKEY
+#define HOTKEY 0
+#endif
+
 #if !HOTKEY
 #undef MENU_TOGGLE_HOTKEYS
 #undef HOTKEY_COLOR_BACKGROUND
@@ -645,6 +762,7 @@ char *default_directory;
 #undef HOTKEY_FONT_SMALLER
 #undef HOTKEY_FONT_DEFAULT_SIZE
 #undef HOTKEY_FONT_SELECT
+#undef HOTKEY_HAS_DEFINE
 #undef HOTKEY_MIMIC_SCROLL_UP
 #undef HOTKEY_MIMIC_SCROLL_DOWN
 #undef HOTKEY_SATURATION_DIALOG
@@ -680,11 +798,22 @@ char *default_directory;
 #undef HOTKEY_TOGGLE_TABBAR
 #endif
 
+#ifndef ALT_NUMBER_GO_TO_TAB_NUMBER
+#define ALT_NUMBER_GO_TO_TAB_NUMBER 0
+#endif
+#ifndef CTRL_NUMBER_GO_TO_TAB_NUMBER
+#define CTRL_NUMBER_GO_TO_TAB_NUMBER 0
+#endif
+
 #if BUTTON_ORDER_BY_RCFILE
 bool button_order = FALSE;
 #endif
 
-#define MENU_INPUT_METHOD TRUE
+#define MENU_INPUT_METHOD
+
+#ifndef MENU
+#define MENU 0
+#endif
 
 #if !MENU
 #undef MENU_INPUT_METHOD
@@ -733,11 +862,91 @@ bool button_order = FALSE;
 #undef ONLY_ONE_MENU_ITEM
 #endif
 
+#ifndef MENU_COPY
+#define MENU_COPY 0
+#endif
+#ifndef MENU_PASTE
+#define MENU_PASTE 0
+#endif
+#ifndef MENU_SELECT_ALL
+#define MENU_SELECT_ALL 0
+#endif
+#ifndef MENU_OPEN_NEW_WINDOW
+#define MENU_OPEN_NEW_WINDOW 0
+#endif
+#ifndef MENU_QUIT
+#define MENU_QUIT 0
+#endif
+#ifndef MENU_FONT_BIGGER
+#define MENU_FONT_BIGGER 0
+#endif
+#ifndef MENU_FONT_SMALLER
+#define MENU_FONT_SMALLER 0
+#endif
+#ifndef MENU_RESET_TERMINAL
+#define MENU_RESET_TERMINAL 0
+#endif
+#ifndef MENU_RESET_AND_CLEAR
+#define MENU_RESET_AND_CLEAR 0
+#endif
+#ifndef MENU_FONT_SELECT
+#define MENU_FONT_SELECT 0
+#endif
+#ifndef MENU_TOGGLE_ON_TOP
+#define MENU_TOGGLE_ON_TOP 0
+#endif
+#ifndef MENU_TOGGLE_HOTKEYS
+#define MENU_TOGGLE_HOTKEYS 0
+#endif
+#ifndef MENU_TOGGLE_SCROLLBAR
+#define MENU_TOGGLE_SCROLLBAR 0
+#endif
+#ifndef MENU_TOGGLE_STATUS_BAR
+#define MENU_TOGGLE_STATUS_BAR 0
+#endif
+#ifndef MENU_TOGGLE_DECORATED
+#define MENU_TOGGLE_DECORATED 0
+#endif
+#ifndef MENU_TOGGLE_FULLSCREEN
+#define MENU_TOGGLE_FULLSCREEN 0
+#endif
+#ifndef MENU_CHANGE_SATURATION
+#define MENU_CHANGE_SATURATION 0
+#endif
+#ifndef MENU_SEPARATOR
+#define MENU_SEPARATOR 0
+#endif
+#ifndef SUBMENU_ENCODING_LIST
+#define SUBMENU_ENCODING_LIST 0
+#endif
+#ifndef SUBMENU_INPUT_METHOD
+#define SUBMENU_INPUT_METHOD 0
+#endif
+#ifndef STATUS_BAR
+#define STATUS_BAR 0
+#endif
+#ifndef SCROLLBAR
+#define SCROLLBAR OFF_R
+#endif
+
 #if !TAB || !defined(MENU_CUSTOM)
 #undef MENU_TAB_ADD
 #undef MENU_TAB_REMOVE
 #undef MENU_TAB_EDIT_LABEL
 #undef MENU_TOGGLE_TABBAR
+#endif
+
+#ifndef MENU_TAB_ADD
+#define MENU_TAB_ADD 0
+#endif
+#ifndef MENU_TAB_REMOVE
+#define MENU_TAB_REMOVE 0
+#endif
+#ifndef MENU_TAB_EDIT_LABEL
+#define MENU_TAB_EDIT_LABEL 0
+#endif
+#ifndef MENU_TOGGLE_TABBAR
+#define MENU_TOGGLE_TABBAR 0
 #endif
 
 #if defined(HOTKEY_TOGGLE_ON_TOP) || MENU_TOGGLE_ON_TOP
@@ -762,9 +971,13 @@ char *encoding[] = { MENU_ENCODING_LIST };
 GtkWidget *encoding_item;
 #endif
 
-#if TOGGLE_BG_ORDER_SIZE == 1
+#if defined(TOGGLE_BG_ORDER_SIZE) && (TOGGLE_BG_ORDER_SIZE == 1)
 #undef HOTKEY_TOGGLE_BACKGROUND
 #undef MENU_TOGGLE_BACKGROUND
+#endif
+
+#ifndef MENU_TOGGLE_BACKGROUND
+#define MENU_TOGGLE_BACKGROUND 0
 #endif
 
 #if defined(HOTKEY_TOGGLE_BACKGROUND) || MENU_TOGGLE_BACKGROUND
@@ -773,16 +986,13 @@ GtkWidget *encoding_item;
 #endif
 #ifndef TOGGLE_BG_ORDER
 #define TOGGLE_BG_ORDER "Image", "Transparent", "No background", "Opacity"
+#undef TOGGLE_BG_ORDER_SIZE
 #define TOGGLE_BG_ORDER_SIZE 4
-#define TOGGLE_BG_OPACITY TRUE
-#define TOGGLE_BG_IMAGE TRUE
-#define TOGGLE_BG_TRANSPARENT TRUE
-#define TOGGLE_BG_NO_BACKGROUND TRUE
+#define TOGGLE_BG_OPACITY
+#define TOGGLE_BG_IMAGE
+#define TOGGLE_BG_TRANSPARENT
+#define TOGGLE_BG_NO_BACKGROUND
 #endif
-#if TOGGLE_BG_OPACITY
-#define INIT_OPACITY TRUE
-#endif
-#define DO_TOGGLE_BACKGROUND TRUE
 const char *background_order[] = { TOGGLE_BG_ORDER };
 unsigned short background_status = 0;
 #endif
@@ -795,8 +1005,12 @@ char imgstr[sizeof(BACKGROUND_IMAGE) + 64];
 char iconstr[sizeof(PROGRAM_ICON) + 64];
 #endif
 
-#if defined(BACKGROUND_IMAGE) || BACKGROUND_TRANSPARENT || TOGGLE_BG_TRANSPARENT
-#define BACKGROUND_EXIST TRUE
+#if defined(BACKGROUND_IMAGE) || (defined(BACKGROUND_TRANSPARENT) && BACKGROUND_TRANSPARENT) || defined(TOGGLE_BG_TRANSPARENT)
+#define BACKGROUND_EXIST
+#endif
+
+#ifndef MENU_COLOR_BACKGROUND
+#define MENU_COLOR_BACKGROUND 0
 #endif
 
 #if defined(HOTKEY_COLOR_BACKGROUND) || MENU_COLOR_BACKGROUND
@@ -805,7 +1019,7 @@ char iconstr[sizeof(PROGRAM_ICON) + 64];
 #endif
 #endif
 
-#if defined(BACKGROUND_TINT_COLOR) && BACKGROUND_EXIST
+#if defined(BACKGROUND_TINT_COLOR) && defined(BACKGROUND_EXIST)
 GdkColor color_tint;
 #endif
 
@@ -829,7 +1043,7 @@ bool scrollbar_status = (SCROLLBAR < 3);
 
 #if defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
 #ifndef STATUS_BAR
-#define STATUS_BAR TRUE
+#define STATUS_BAR FALSE
 #endif
 bool status_bar_status = STATUS_BAR;
 bool status_bar_resize_grip = FALSE;
@@ -852,6 +1066,10 @@ bool window_fullscreen_status = FALSE;
 #undef FONT_ANTI_ALIAS
 #undef HOTKEY_TOGGLE_ANTI_ALIAS
 #undef MENU_TOGGLE_ANTI_ALIAS
+#endif
+
+#ifndef MENU_TOGGLE_ANTI_ALIAS
+#define MENU_TOGGLE_ANTI_ALIAS 0
 #endif
 
 #if defined(HOTKEY_TOGGLE_ANTI_ALIAS) || MENU_TOGGLE_ANTI_ALIAS
@@ -961,16 +1179,19 @@ GtkWidget *notebook;
 #define VTE_LABEL label
 #endif
 
-#if GTK3_CSS_USE_BOX && GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID)
+#if defined(GTK3_CSS_USE_BOX) && GTK_CHECK_VERSION(2,91,2) && defined(USE_GTK_GRID)
 #if CLOSE_DIALOG || TAB_CLOSE_BUTTON || defined(SCROLLBAR) || STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR
 #warning "You are using GtkGrid but your GTK3_CSS defined GtkHBox or GtkVBox."
 #endif
 #endif
 
-#if TAB_CLOSE_BUTTON
+#if defined(DEF_TAB_LABEL) || TAB_CLOSE_BUTTON
 #ifndef TAB_LABEL
 #define TAB_LABEL "Page %u"
 #endif
+#endif
+
+#if TAB_CLOSE_BUTTON
 #undef VTE_LABEL
 #define VTE_LABEL term->label
 #ifndef GTK3_CSS
@@ -1111,6 +1332,10 @@ const GdkColor color_style[16] = {
 #if !MENU_FONT_BIGGER && !MENU_FONT_SMALLER && !MENU_FONT_SELECT && !defined(HOTKEY_FONT_BIGGER) && !defined(HOTKEY_FONT_SMALLER) && !defined(HOTKEY_FONT_SELECT)
 #undef MENU_FONT_DEFAULT_SIZE
 #undef HOTKEY_FONT_DEFAULT_SIZE
+#endif
+
+#ifndef MENU_FONT_DEFAULT_SIZE
+#define MENU_FONT_DEFAULT_SIZE 0
 #endif
 
 #ifdef FONT
@@ -1666,21 +1891,21 @@ static bool menu_popup(GtkWidget *widget, GdkEventButton *event)
 }
 #endif
 
-#ifdef BACKGROUND_SATURATION
+#if defined(HOTKEY_SATURATION_MORE) || defined(HOTKEY_SATURATION_LESS) || MOUSE_CTRL_SATURATION || defined(HOTKEY_SATURATION_DIALOG) || MENU_CHANGE_SATURATION
 static void do_saturation_routine(void)
 {
   vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
 #if BACKGROUND_OPACITY
   vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
 #endif
-#if DO_TOGGLE_BACKGROUND && TOGGLE_BG_OPACITY
+#if (defined(HOTKEY_TOGGLE_BACKGROUND) || MENU_TOGGLE_BACKGROUND) && defined(TOGGLE_BG_OPACITY)
   if (!strncmp(background_order[background_status], "Opacity", 8))
     vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
 #endif
 }
 #endif
 
-#ifdef BACKGROUND_SATURATION
+#if defined(HOTKEY_SATURATION_MORE) || defined(HOTKEY_SATURATION_LESS) || MOUSE_CTRL_SATURATION || defined(HOTKEY_SATURATION_DIALOG) || MENU_CHANGE_SATURATION
 static void saturation_routine(void)
 {
   int i = 0;
@@ -1743,6 +1968,20 @@ static void hide_scrollbar(void)
 
 static void add_tab(void)
 {
+#if defined(TAB_LABEL) || defined(TAB_LABEL_CUSTOM)
+  GtkWidget *label;
+#endif
+#if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
+  bool label_exist;
+#endif
+#if USE_ACCESSIBLE && RULE_THEM_ALL
+  bool use_accessible;
+#endif
+#if !VTE_FORK_CMD_OLD
+  char **evilvte_argv;
+#endif
+  int index;
+
   term = g_malloc(sizeof(struct terminal));
 #if defined(HOTKEY_SEARCH_STRING) || defined(HOTKEY_SEARCH_PREVIOUS) || defined(HOTKEY_SEARCH_NEXT)
   term->search_string = gtk_entry_new();
@@ -1750,11 +1989,7 @@ static void add_tab(void)
 #endif
 
 #if defined(HOTKEY_TAB_EDIT_LABEL) || MENU_TAB_EDIT_LABEL
-  bool label_exist = FALSE;
-#endif
-
-#if defined(TAB_LABEL) || defined(TAB_LABEL_CUSTOM)
-  GtkWidget *label;
+  label_exist = FALSE;
 #endif
 
 #ifdef TAB_LABEL
@@ -1812,7 +2047,7 @@ static void add_tab(void)
 #endif
 
 #if !VTE_FORK_CMD_OLD
-  char **evilvte_argv = NULL;
+  evilvte_argv = NULL;
 #if COMMAND_EXEC_PROGRAM
   if (login_shell_flag & 2)
     evilvte_argv = default_argv;
@@ -1837,7 +2072,7 @@ static void add_tab(void)
 
 #if USE_ACCESSIBLE
 #if RULE_THEM_ALL
-  int use_accessible = ((GTK_MAJOR_VERSION == 2) || VTE_CHECK_VERSION(0,29,0));
+  use_accessible = ((GTK_MAJOR_VERSION == 2) || VTE_CHECK_VERSION(0,29,0));
   if (g_getenv("USE_ACCESSIBLE"))
     use_accessible = strncmp(g_getenv("USE_ACCESSIBLE"), "0", 2);
   if ((with_gtk == 3) && use_accessible)
@@ -1884,11 +2119,11 @@ static void add_tab(void)
   vte_terminal_set_opacity(VTE_TERMINAL(term->vte), (1 - saturation_level) * 65535);
 #endif
 
-#if defined(BACKGROUND_TINT_COLOR) && BACKGROUND_EXIST
+#if defined(BACKGROUND_TINT_COLOR) && defined(BACKGROUND_EXIST)
   vte_terminal_set_background_tint_color(VTE_TERMINAL(term->vte), &color_tint);
 #endif
 
-#if defined(BACKGROUND_SATURATION) && BACKGROUND_EXIST
+#if defined(BACKGROUND_SATURATION) && defined(BACKGROUND_EXIST)
   vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
 #endif
 
@@ -1951,7 +2186,12 @@ static void add_tab(void)
 #endif
 
 #if defined(CURSOR_BLINKS) && VTE_CHECK_VERSION(0,17,1)
-  vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINKS);
+#if CURSOR_BLINKS
+  vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINK_ON);
+#endif
+#if !CURSOR_BLINKS
+  vte_terminal_set_cursor_blink_mode(VTE_TERMINAL(term->vte), VTE_CURSOR_BLINK_OFF);
+#endif
 #endif
 
 #if defined(CURSOR_SHAPE) && VTE_CHECK_VERSION(0,19,1)
@@ -2007,10 +2247,10 @@ static void add_tab(void)
   gtk_widget_show_all(VTE_HBOX);
 
 #if TAB_NEW_TAB_AT_TAB_ONE
-  int index = gtk_notebook_prepend_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
+  index = gtk_notebook_prepend_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
 #endif
 #if !TAB_NEW_TAB_AT_TAB_ONE
-  int index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
+  index = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), VTE_HBOX, VTE_LABEL);
 #endif
   g_object_set_data(G_OBJECT(gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), index)), "current_tab", term);
 
@@ -2040,27 +2280,27 @@ static void add_tab(void)
   gtk_widget_set_can_focus(notebook, FALSE);
 #endif
 
-#if DO_TOGGLE_BACKGROUND
-#if TOGGLE_BG_TRANSPARENT
+#if defined(HOTKEY_TOGGLE_BACKGROUND) || MENU_TOGGLE_BACKGROUND
+#ifdef TOGGLE_BG_TRANSPARENT
   if (!strncmp(background_order[background_status], "Transparent", 12))
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), TRUE);
 #endif
-#if TOGGLE_BG_IMAGE
+#ifdef TOGGLE_BG_IMAGE
   if (!strncmp(background_order[background_status], "Image", 6)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), FALSE);
     vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), imgstr);
   }
 #endif
-#if TOGGLE_BG_NO_BACKGROUND
+#ifdef TOGGLE_BG_NO_BACKGROUND
   if (!strncmp(background_order[background_status], "No background", 14)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), FALSE);
     vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-#if INIT_OPACITY || BACKGROUND_OPACITY
+#if defined(TOGGLE_BG_OPACITY) || BACKGROUND_OPACITY
     vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
   }
 #endif
-#if TOGGLE_BG_OPACITY
+#ifdef TOGGLE_BG_OPACITY
   if (!strncmp(background_order[background_status], "Opacity", 8)) {
     vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), FALSE);
     vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
@@ -2344,7 +2584,7 @@ static void do_toggle_bg(void)
   background_status++;
   if (background_status >= TOGGLE_BG_ORDER_SIZE)
     background_status = 0;
-#if TOGGLE_BG_TRANSPARENT
+#ifdef TOGGLE_BG_TRANSPARENT
   if (!strncmp(background_order[background_status], "Transparent", 12)) {
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
       GET_CURRENT_TAB(i);
@@ -2352,7 +2592,7 @@ static void do_toggle_bg(void)
     }
   }
 #endif
-#if TOGGLE_BG_IMAGE
+#ifdef TOGGLE_BG_IMAGE
   if (!strncmp(background_order[background_status], "Image", 6)) {
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
       GET_CURRENT_TAB(i);
@@ -2361,19 +2601,19 @@ static void do_toggle_bg(void)
     }
   }
 #endif
-#if TOGGLE_BG_NO_BACKGROUND
+#ifdef TOGGLE_BG_NO_BACKGROUND
   if (!strncmp(background_order[background_status], "No background", 14)) {
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
       GET_CURRENT_TAB(i);
       vte_terminal_set_background_transparent(VTE_TERMINAL(term->vte), FALSE);
       vte_terminal_set_background_image_file(VTE_TERMINAL(term->vte), "/dev/null");
-#if INIT_OPACITY || BACKGROUND_OPACITY
+#if defined(TOGGLE_BG_OPACITY) || BACKGROUND_OPACITY
       vte_terminal_set_opacity(VTE_TERMINAL(term->vte), 65535);
 #endif
     }
   }
 #endif
-#if TOGGLE_BG_OPACITY
+#ifdef TOGGLE_BG_OPACITY
   if (!strncmp(background_order[background_status], "Opacity", 8)) {
     for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
       GET_CURRENT_TAB(i);
@@ -2511,7 +2751,7 @@ static void do_zoom_out(void)
 }
 #endif
 
-#if HOTKEY
+#ifdef HOTKEY_HAS_DEFINE
 static bool key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
 #if BELL_URGENT
@@ -2699,7 +2939,7 @@ static bool key_press_event(GtkWidget *widget, GdkEventKey *event)
 #endif
 
 #if ALT_NUMBER_GO_TO_TAB_NUMBER || CTRL_NUMBER_GO_TO_TAB_NUMBER
-      int mask_is_pressed = 0;
+      bool mask_is_pressed = 0;
 #endif
 #if ALT_NUMBER_GO_TO_TAB_NUMBER
       if ((event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK)
@@ -2923,7 +3163,7 @@ static bool key_press_event(GtkWidget *widget, GdkEventKey *event)
     }
   return FALSE;
 }
-#endif /* HOTKEY */
+#endif /* HOTKEY_HAS_DEFINE */
 
 #if CLOSE_DIALOG
 static bool delete_event(void) {
@@ -3567,7 +3807,7 @@ bool at_dock_mode = FALSE;
   g_object_get(gtk_settings_get_default(), "gtk-alternative-button-order", &button_order, NULL);
 #endif
 
-#if defined(BACKGROUND_TINT_COLOR) && BACKGROUND_EXIST
+#if defined(BACKGROUND_TINT_COLOR) && defined(BACKGROUND_EXIST)
   gdk_color_parse(BACKGROUND_TINT_COLOR, &color_tint);
 #endif
 
@@ -3657,7 +3897,7 @@ bool at_dock_mode = FALSE;
 
   gtk_widget_set_can_focus(notebook, FALSE);
 
-#if INIT_OPACITY || BACKGROUND_OPACITY
+#if defined(TOGGLE_BG_OPACITY) || BACKGROUND_OPACITY
 #if RULE_THEM_ALL
   if (with_gtk == 3)
     gtk_widget_set_visual(main_window, gdk_screen_get_rgba_visual(gtk_widget_get_screen(main_window)));
@@ -3704,7 +3944,7 @@ bool at_dock_mode = FALSE;
 
   g_signal_connect(main_window, "delete_event", G_CALLBACK(delete_event), NULL);
 
-#if HOTKEY
+#ifdef HOTKEY_HAS_DEFINE
   g_signal_connect(main_window, "key-press-event", G_CALLBACK(key_press_event), NULL);
 #endif
 
@@ -4052,7 +4292,7 @@ bool at_dock_mode = FALSE;
     {
       GtkWidget *encoding_item[MENU_ENCODING_LIST_SIZE];
       for (i = 0 ; i < MENU_ENCODING_LIST_SIZE ; i++) {
-#if MENU_DEFAULT_ENCODING
+#ifdef MENU_DEFAULT_ENCODING
         if (!strncmp(encoding[i], "Default Encoding", 17)) {
           encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term->vte));
 #ifndef MENU_CUSTOM
@@ -4094,7 +4334,7 @@ bool at_dock_mode = FALSE;
 #ifdef MENU_CUSTOM
     if (!strncmp(menu_custom[j], "Input method", 13))
 #endif
-#if MENU_INPUT_METHOD
+#ifdef MENU_INPUT_METHOD
     {
 #if COMMAND_TAB_NUMBERS
       GET_CURRENT_TAB(0);
@@ -4116,7 +4356,7 @@ bool at_dock_mode = FALSE;
 #ifdef MENU_ENCODING_LIST
       GtkWidget *encoding_sub[MENU_ENCODING_LIST_SIZE];
       for (i = 0 ; i < MENU_ENCODING_LIST_SIZE ; i++) {
-#if MENU_DEFAULT_ENCODING
+#ifdef MENU_DEFAULT_ENCODING
         if (!strncmp(encoding[i], "Default Encoding", 17)) {
           encoding[i] = (char*)vte_terminal_get_encoding(VTE_TERMINAL(term->vte));
           encoding_sub[i] = gtk_menu_item_new_with_mnemonic(LABEL_DEFAULT_ENCODING);

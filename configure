@@ -55,10 +55,10 @@ PROG=`grep PROGRAM_NAME $CONF_FILE | sed -e 's/\t/ /g' -e 's/^\( \)*//g' | grep 
 [ "$PROG" = "" ] && PROG=evilvte
 
 SUSE_LD=`ld -v 2>&1 | tr A-Z a-z | grep suse`
-[ "$SUSE_LD" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.mk
+[ "$SUSE_LD" != "" ] && echo \#define DEF_TAB_LABEL >> src/config.mk
 
 ARCH_UNAME=`uname -a | grep -- '-ARCH '`
-[ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL 1 >> src/config.mk
+[ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL >> src/config.mk
 
 real_gtk=$with_gtk
 if [ "$with_gtk" != "2.0" ] && [ "$with_gtk" != "3.0" ]; then
