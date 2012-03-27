@@ -16,7 +16,7 @@
 
 CONFFILE=src/install.sh
 
-grep '^#define' src/config.mk > $CONFFILE
+grep '^#' src/config.mk > $CONFFILE
 rm -f $1 src/evilvte.o
 
 RULE_THEM_ALL=`grep '^#define RULE_THEM_ALL 1$' $CONFFILE | wc -l`

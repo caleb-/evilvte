@@ -1140,10 +1140,6 @@ bool tabbar_status = TRUE;
 #define UPPER_PROGRAM_NAME "Evilvte"
 #endif
 
-#ifndef PROGRAM_VERSION
-#define PROGRAM_VERSION EVILVTE_VERSION
-#endif
-
 #if PROGRAM_WM_CLASS
 char *wm_class_name = PROGRAM_NAME;
 char *wm_class_class = UPPER_PROGRAM_NAME;
@@ -3843,11 +3839,9 @@ bool at_dock_mode = FALSE;
 
 #ifdef PROGRAM_ICON
   if (!gtk_window_set_icon_from_file(GTK_WINDOW(main_window), iconstr, NULL))
-    gtk_window_set_icon_from_file(GTK_WINDOW(main_window), ICON_DIR"/evilvte.png", NULL);
 #endif
-
-#if !defined(PROGRAM_ICON) && SHOW_WINDOW_ICON
-  gtk_window_set_icon_from_file(GTK_WINDOW(main_window), ICON_DIR"/evilvte.png", NULL);
+#if defined(PROGRAM_ICON) || SHOW_WINDOW_ICON
+    gtk_window_set_icon_from_file(GTK_WINDOW(main_window), ICON_DIR"/evilvte.png", NULL);
 #endif
 
 #if STATUS_BAR || defined(HOTKEY_TOGGLE_STATUS_BAR) || MENU_TOGGLE_STATUS_BAR

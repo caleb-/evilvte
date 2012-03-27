@@ -165,7 +165,7 @@ deskdir=$prefix/share/applications
 ICON_DIR=$prefix/share/pixmaps
 THEME_DIR=$prefix/share/icons
 GNOME_DEF_APP=$prefix/share/gnome-control-center/default-apps
-EVILVTE_VERSION=`head -n 1 ChangeLog`
+PROGRAM_VERSION=`head -n 1 ChangeLog`
 
 echo "VTEINC=$VTEINC" >> src/config.mk
 # sed -i 's/-pthread//' src/config.mk
@@ -180,7 +180,9 @@ echo "ICON_DIR_INSTALL=\$(DESTDIR)$ICON_DIR" >> src/config.mk
 echo "THEME_DIR=\$(DESTDIR)$THEME_DIR" >> src/config.mk
 echo "GNOME_DEF_APP=\$(DESTDIR)$GNOME_DEF_APP" >> src/config.mk
 echo "PROG=$PROG" >> src/config.mk
-echo \#define EVILVTE_VERSION '"'$EVILVTE_VERSION'"' >> src/config.mk
+echo \#ifndef PROGRAM_VERSION >> src/config.mk
+echo \#define PROGRAM_VERSION '"'$PROGRAM_VERSION'"' >> src/config.mk
+echo \#endif >> src/config.mk
 [ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL 1 >> src/config.mk
 echo "CONF_FILE=$CONF_FILE" >> src/config.mk
 head -n 1 $0 > src/uninstall.sh
