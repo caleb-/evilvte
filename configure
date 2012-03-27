@@ -183,7 +183,7 @@ echo "PROG=$PROG" >> src/config.mk
 echo \#ifndef PROGRAM_VERSION >> src/config.mk
 echo \#define PROGRAM_VERSION '"'$PROGRAM_VERSION'"' >> src/config.mk
 echo \#endif >> src/config.mk
-[ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL 1 >> src/config.mk
+[ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL >> src/config.mk
 echo "CONF_FILE=$CONF_FILE" >> src/config.mk
 head -n 1 $0 > src/uninstall.sh
 echo "set -x" >> src/uninstall.sh

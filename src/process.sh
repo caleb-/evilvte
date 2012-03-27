@@ -19,7 +19,7 @@ CONFFILE=src/install.sh
 grep '^#' src/config.mk > $CONFFILE
 rm -f $1 src/evilvte.o
 
-RULE_THEM_ALL=`grep '^#define RULE_THEM_ALL 1$' $CONFFILE | wc -l`
+RULE_THEM_ALL=`grep '^#define RULE_THEM_ALL$' $CONFFILE | wc -l`
 MENU_DEFAULT_ENCODING=`grep   MENU_ENCODING_LIST src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep 'Default Encoding'`
 MENU_ENCODING_LIST_SIZE=`grep MENU_ENCODING_LIST src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | grep '"' | wc -l`
 TOGGLE_BG_ORDER_SIZE=`grep    TOGGLE_BG_ORDER    src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | tr ',' '\n' | grep '"' | wc -l`
@@ -63,88 +63,88 @@ TOGGLE_BG_OPACITY=`echo       $TOGGLE_BG_ORDER_DEFINE | grep  Opacity`
 MENU_CUSTOM_DEFINE=`grep MENU_CUSTOM src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1`
 
 MENU_COPY=`echo $MENU_CUSTOM_DEFINE | grep Copy`
-[ "$MENU_COPY" != "" ] && echo \#define MENU_COPY 1 >> $CONFFILE
+[ "$MENU_COPY" != "" ] && echo \#define MENU_COPY >> $CONFFILE
 
 MENU_PASTE=`echo $MENU_CUSTOM_DEFINE | grep Paste`
-[ "$MENU_PASTE" != "" ] && echo \#define MENU_PASTE 1 >> $CONFFILE
+[ "$MENU_PASTE" != "" ] && echo \#define MENU_PASTE >> $CONFFILE
 
 MENU_SELECT_ALL=`echo $MENU_CUSTOM_DEFINE | grep 'Select all'`
-[ "$MENU_SELECT_ALL" != "" ] && echo \#define MENU_SELECT_ALL 1 >> $CONFFILE
+[ "$MENU_SELECT_ALL" != "" ] && echo \#define MENU_SELECT_ALL >> $CONFFILE
 
 MENU_COLOR_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Background tint'`
-[ "$MENU_COLOR_BACKGROUND" != "" ] && echo \#define MENU_COLOR_BACKGROUND 1 >> $CONFFILE
+[ "$MENU_COLOR_BACKGROUND" != "" ] && echo \#define MENU_COLOR_BACKGROUND >> $CONFFILE
 
 MENU_TAB_ADD=`echo $MENU_CUSTOM_DEFINE | grep 'Add tab'`
-[ "$MENU_TAB_ADD" != "" ] && echo \#define MENU_TAB_ADD 1 >> $CONFFILE
+[ "$MENU_TAB_ADD" != "" ] && echo \#define MENU_TAB_ADD >> $CONFFILE
 
 MENU_TAB_REMOVE=`echo $MENU_CUSTOM_DEFINE | grep 'Remove tab'`
-[ "$MENU_TAB_REMOVE" != "" ] && echo \#define MENU_TAB_REMOVE 1 >> $CONFFILE
+[ "$MENU_TAB_REMOVE" != "" ] && echo \#define MENU_TAB_REMOVE >> $CONFFILE
 
 MENU_TAB_EDIT_LABEL=`echo $MENU_CUSTOM_DEFINE | grep 'Edit label'`
-[ "$MENU_TAB_EDIT_LABEL" != "" ] && echo \#define MENU_TAB_EDIT_LABEL 1 >> $CONFFILE
+[ "$MENU_TAB_EDIT_LABEL" != "" ] && echo \#define MENU_TAB_EDIT_LABEL >> $CONFFILE
 
 MENU_OPEN_NEW_WINDOW=`echo $MENU_CUSTOM_DEFINE | grep 'New window'`
-[ "$MENU_OPEN_NEW_WINDOW" != "" ] && echo \#define MENU_OPEN_NEW_WINDOW 1 >> $CONFFILE
+[ "$MENU_OPEN_NEW_WINDOW" != "" ] && echo \#define MENU_OPEN_NEW_WINDOW >> $CONFFILE
 
 MENU_QUIT=`echo $MENU_CUSTOM_DEFINE | grep Quit`
-[ "$MENU_QUIT" != "" ] && echo \#define MENU_QUIT 1 >> $CONFFILE
+[ "$MENU_QUIT" != "" ] && echo \#define MENU_QUIT >> $CONFFILE
 
 MENU_FONT_BIGGER=`echo $MENU_CUSTOM_DEFINE | grep 'Zoom in'`
-[ "$MENU_FONT_BIGGER" != "" ] && echo \#define MENU_FONT_BIGGER 1 >> $CONFFILE
+[ "$MENU_FONT_BIGGER" != "" ] && echo \#define MENU_FONT_BIGGER >> $CONFFILE
 
 MENU_FONT_SMALLER=`echo $MENU_CUSTOM_DEFINE | grep 'Zoom out'`
-[ "$MENU_FONT_SMALLER" != "" ] && echo \#define MENU_FONT_SMALLER 1 >> $CONFFILE
+[ "$MENU_FONT_SMALLER" != "" ] && echo \#define MENU_FONT_SMALLER >> $CONFFILE
 
 MENU_FONT_DEFAULT_SIZE=`echo $MENU_CUSTOM_DEFINE | grep 'Zoom default'`
-[ "$MENU_FONT_DEFAULT_SIZE" != "" ] && echo \#define MENU_FONT_DEFAULT_SIZE 1 >> $CONFFILE
+[ "$MENU_FONT_DEFAULT_SIZE" != "" ] && echo \#define MENU_FONT_DEFAULT_SIZE >> $CONFFILE
 
 MENU_RESET_TERMINAL=`echo $MENU_CUSTOM_DEFINE | grep 'Reset terminal'`
-[ "$MENU_RESET_TERMINAL" != "" ] && echo \#define MENU_RESET_TERMINAL 1 >> $CONFFILE
+[ "$MENU_RESET_TERMINAL" != "" ] && echo \#define MENU_RESET_TERMINAL >> $CONFFILE
 
 MENU_RESET_AND_CLEAR=`echo $MENU_CUSTOM_DEFINE | grep 'Reset and clear'`
-[ "$MENU_RESET_AND_CLEAR" != "" ] && echo \#define MENU_RESET_AND_CLEAR 1 >> $CONFFILE
+[ "$MENU_RESET_AND_CLEAR" != "" ] && echo \#define MENU_RESET_AND_CLEAR >> $CONFFILE
 
 MENU_FONT_SELECT=`echo $MENU_CUSTOM_DEFINE | grep 'Select font'`
-[ "$MENU_FONT_SELECT" != "" ] && echo \#define MENU_FONT_SELECT 1 >> $CONFFILE
+[ "$MENU_FONT_SELECT" != "" ] && echo \#define MENU_FONT_SELECT >> $CONFFILE
 
 MENU_SEPARATOR=`echo $MENU_CUSTOM_DEFINE | grep Separator`
-[ "$MENU_SEPARATOR" != "" ] && echo \#define MENU_SEPARATOR 1 >> $CONFFILE
+[ "$MENU_SEPARATOR" != "" ] && echo \#define MENU_SEPARATOR >> $CONFFILE
 
 SUBMENU_ENCODING_LIST=`echo $MENU_CUSTOM_DEFINE | grep 'Submenu encoding list'`
-[ "$SUBMENU_ENCODING_LIST" != "" ] && echo \#define SUBMENU_ENCODING_LIST 1 >> $CONFFILE
+[ "$SUBMENU_ENCODING_LIST" != "" ] && echo \#define SUBMENU_ENCODING_LIST >> $CONFFILE
 
 SUBMENU_INPUT_METHOD=`echo $MENU_CUSTOM_DEFINE | grep 'Submenu input method'`
-[ "$SUBMENU_INPUT_METHOD" != "" ] && echo \#define SUBMENU_INPUT_METHOD 1 >> $CONFFILE
+[ "$SUBMENU_INPUT_METHOD" != "" ] && echo \#define SUBMENU_INPUT_METHOD >> $CONFFILE
 
 MENU_TOGGLE_BACKGROUND=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle background'`
-[ "$MENU_TOGGLE_BACKGROUND" != "" ] && echo \#define MENU_TOGGLE_BACKGROUND 1 >> $CONFFILE
+[ "$MENU_TOGGLE_BACKGROUND" != "" ] && echo \#define MENU_TOGGLE_BACKGROUND >> $CONFFILE
 
 MENU_TOGGLE_HOTKEYS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle hotkeys locking'`
-[ "$MENU_TOGGLE_HOTKEYS" != "" ] && echo \#define MENU_TOGGLE_HOTKEYS 1 >> $CONFFILE
+[ "$MENU_TOGGLE_HOTKEYS" != "" ] && echo \#define MENU_TOGGLE_HOTKEYS >> $CONFFILE
 
 MENU_TOGGLE_ON_TOP=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle always on top'`
-[ "$MENU_TOGGLE_ON_TOP" != "" ] && echo \#define MENU_TOGGLE_ON_TOP 1 >> $CONFFILE
+[ "$MENU_TOGGLE_ON_TOP" != "" ] && echo \#define MENU_TOGGLE_ON_TOP >> $CONFFILE
 
 MENU_TOGGLE_SCROLLBAR=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle scrollbar'`
-[ "$MENU_TOGGLE_SCROLLBAR" != "" ] && echo \#define MENU_TOGGLE_SCROLLBAR 1 >> $CONFFILE
+[ "$MENU_TOGGLE_SCROLLBAR" != "" ] && echo \#define MENU_TOGGLE_SCROLLBAR >> $CONFFILE
 
 MENU_TOGGLE_STATUS_BAR=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle status bar'`
-[ "$MENU_TOGGLE_STATUS_BAR" != "" ] && echo \#define MENU_TOGGLE_STATUS_BAR 1 >> $CONFFILE
+[ "$MENU_TOGGLE_STATUS_BAR" != "" ] && echo \#define MENU_TOGGLE_STATUS_BAR >> $CONFFILE
 
 MENU_TOGGLE_TABBAR=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle tabbar'`
-[ "$MENU_TOGGLE_TABBAR" != "" ] && echo \#define MENU_TOGGLE_TABBAR 1 >> $CONFFILE
+[ "$MENU_TOGGLE_TABBAR" != "" ] && echo \#define MENU_TOGGLE_TABBAR >> $CONFFILE
 
 MENU_TOGGLE_DECORATED=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle window decorated'`
-[ "$MENU_TOGGLE_DECORATED" != "" ] && echo \#define MENU_TOGGLE_DECORATED 1 >> $CONFFILE
+[ "$MENU_TOGGLE_DECORATED" != "" ] && echo \#define MENU_TOGGLE_DECORATED >> $CONFFILE
 
 MENU_TOGGLE_FULLSCREEN=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle fullscreen'`
-[ "$MENU_TOGGLE_FULLSCREEN" != "" ] && echo \#define MENU_TOGGLE_FULLSCREEN 1 >> $CONFFILE
+[ "$MENU_TOGGLE_FULLSCREEN" != "" ] && echo \#define MENU_TOGGLE_FULLSCREEN >> $CONFFILE
 
 MENU_TOGGLE_ANTI_ALIAS=`echo $MENU_CUSTOM_DEFINE | grep 'Toggle anti-alias'`
-[ "$MENU_TOGGLE_ANTI_ALIAS" != "" ] && echo \#define MENU_TOGGLE_ANTI_ALIAS 1 >> $CONFFILE
+[ "$MENU_TOGGLE_ANTI_ALIAS" != "" ] && echo \#define MENU_TOGGLE_ANTI_ALIAS >> $CONFFILE
 
 MENU_CHANGE_SATURATION=`echo $MENU_CUSTOM_DEFINE | grep 'Adjust saturation'`
-[ "$MENU_CHANGE_SATURATION" != "" ] && echo \#define MENU_CHANGE_SATURATION 1 >> $CONFFILE
+[ "$MENU_CHANGE_SATURATION" != "" ] && echo \#define MENU_CHANGE_SATURATION >> $CONFFILE
 
 ONLY_ONE_MENU_ITEM=`echo $MENU_CUSTOM_DEFINE | grep '"Auto-click"'`
 [ "$ONLY_ONE_MENU_ITEM" != "" ] && echo \#define ONLY_ONE_MENU_ITEM >> $CONFFILE
