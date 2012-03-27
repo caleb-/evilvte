@@ -1,4 +1,4 @@
-UNRELEASED
+0.5.1
  * Better compatibility with some compilers and CFLAGS
    Thanks to Daniel Richard G. <skunk AT iSKUNK DOT ORG>
  * Support key bindings for ALT_SHIFT, CTRL_ALT_SHIFT, and CTRL_SHIFT
@@ -6,10 +6,10 @@ UNRELEASED
  * Fix a potential bug for HOTKEY_SCROLL_ONE_PAGE_*
  * Strict minimum font size to 1
  * Hide DEFAULT_ENCODING, PROGRAM_NAME, and PROGRAM_VERSION
- * Make everything GTK+ 3.3.16 compatible
+ * Make everything GTK+ 3.4.0 compatible
 
 0.5.1~pre3
- * New hotkey definition method, support Alt and Shift, closes #2.
+ * New hotkey definition method, support ALT and SHIFT, closes #2.
    The new behavior breaks old hotkey definitions.
    If you have old conffiles, please update them to latest format.
  * Support TAB_NEW_PATH_EQUAL_OLD when open new evilvte window, closes #3.
