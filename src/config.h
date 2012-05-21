@@ -19,7 +19,8 @@
 // #define COLOR_BACKGROUND       "white"
 // #define COLOR_FOREGROUND       "#000000"
 // #define COLOR_STYLE   /* Options: LINUX, RXVT, TANGO, XTERM, ZENBURN,      */
-                         /*          ZENBURN_DARK                             */
+                         /*          ZENBURN_DARK, SOLARIZED_DARK,            */
+                         /*          SOLARIZED_LIGHT                          */
 // #define COLOR_TEXT_BOLD        "red"
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"

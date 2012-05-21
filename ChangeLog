@@ -1,3 +1,6 @@
+UNRELEASED
+ * New COLOR_STYLE option: SOLARIZED_DARK and SOLARIZED_LIGHT
+
 0.5.1
  * Better compatibility with some compilers and CFLAGS
    Thanks to Daniel Richard G. <skunk AT iSKUNK DOT ORG>
