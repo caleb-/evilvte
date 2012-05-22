@@ -1,5 +1,6 @@
 UNRELEASED
- * New COLOR_STYLE option: SOLARIZED_DARK and SOLARIZED_LIGHT
+ * New COLOR_STYLE option: SOLARIZED_DARK and SOLARIZED_LIGHT, closes #8.
+ * Fix COLOR_STYLE data according to xterm-279 and linux console in qemu
 
 0.5.1
  * Better compatibility with some compilers and CFLAGS
