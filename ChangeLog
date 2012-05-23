@@ -1,4 +1,6 @@
 UNRELEASED
+ * Support EXPORT_WINDOWID, like what xterm and rxvt do.
+   Thanks to Peter Bui <peter DOT j DOT bui AT gmail DOT com>
  * New COLOR_STYLE option: SOLARIZED_DARK and SOLARIZED_LIGHT, closes #8.
  * Fix COLOR_STYLE data according to xterm-279 and linux console in qemu
  * Workaround for Caps lock problem by changing hotkey settings, issue #7.

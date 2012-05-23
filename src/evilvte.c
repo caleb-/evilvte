@@ -27,6 +27,7 @@
 #include <gdk/gdkkeysyms-compat.h>
 #endif
 #include <gdk/gdkkeysyms.h>
+#include <gdk/gdkx.h>
 #include <libintl.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -89,6 +90,7 @@
 #define GTK_STYLE_PROVIDER_PRIORITY_APPLICATION 600
 #endif
 typedef struct _GdkColormap GdkColormap;
+typedef struct _GdkDrawable GdkDrawable;
 typedef struct _GtkCssProvider GtkCssProvider;
 typedef struct _GtkFontSelectionDialog GtkFontSelectionDialog;
 typedef struct _GtkScrollable GtkScrollable;
@@ -145,6 +147,8 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gdk_screen_get_rgba_colormap (*p_gdk_screen_get_rgba_colormap)
 #define gdk_screen_get_rgba_visual (*p_gdk_screen_get_rgba_visual)
 #define gdk_window_get_display (*p_gdk_window_get_display)
+#define gdk_x11_drawable_get_xid (*p_gdk_x11_drawable_get_xid)
+#define gdk_x11_window_get_xid (*p_gdk_x11_window_get_xid)
 #define gtk_box_pack_start (*p_gtk_box_pack_start)
 #define gtk_button_new (*p_gtk_button_new)
 #define gtk_button_set_focus_on_click (*p_gtk_button_set_focus_on_click)
@@ -230,7 +234,9 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_vscrollbar_new (*p_gtk_vscrollbar_new)
 #define gtk_widget_destroy (*p_gtk_widget_destroy)
 #define gtk_widget_get_screen (*p_gtk_widget_get_screen)
+#define gtk_widget_get_window (*p_gtk_widget_get_window)
 #define gtk_widget_hide (*p_gtk_widget_hide)
+#define gtk_widget_realize (*p_gtk_widget_realize)
 #define gtk_widget_set_can_focus (*p_gtk_widget_set_can_focus)
 #define gtk_widget_set_colormap (*p_gtk_widget_set_colormap)
 #define gtk_widget_set_hexpand (*p_gtk_widget_set_hexpand)
@@ -370,6 +376,16 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define gtk_hbox_new(x,y) gtk_grid_new()
 #define gtk_vbox_new(x,y) gtk_grid_new()
 #define gtk_box_pack_start(v,w,x,y,z) gtk_container_add(GTK_CONTAINER(v),w)
+#endif
+
+#if !defined(RULE_THEM_ALL) && GTK_CHECK_VERSION(2,91,6)
+#define gdk_x11_drawable_get_xid gdk_x11_window_get_xid
+#endif
+
+#define EVILVTE_GET_WINDOW gtk_widget_get_window
+#ifdef RULE_THEM_ALL
+#undef EVILVTE_GET_WINDOW
+#define EVILVTE_GET_WINDOW (GdkDrawable*)gtk_widget_get_window
 #endif
 
 #if !defined(RULE_THEM_ALL) && !GTK_CHECK_VERSION(2,99,0)
@@ -629,6 +645,9 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #endif
 #ifndef CLOSE_SAFELY
 #define CLOSE_SAFELY 0
+#endif
+#ifndef EXPORT_WINDOWID
+#define EXPORT_WINDOWID 0
 #endif
 #ifndef TAB_NEW_PATH_EQUAL_OLD
 #define TAB_NEW_PATH_EQUAL_OLD 0
@@ -1393,6 +1412,8 @@ void (*p_gdk_display_warp_pointer)(GdkDisplay *display, GdkScreen *screen, gint 
 GdkColormap* (*p_gdk_screen_get_rgba_colormap)(GdkScreen *screen);
 GdkVisual* (*p_gdk_screen_get_rgba_visual)(GdkScreen *screen);
 GdkDisplay* (*p_gdk_window_get_display)(GdkWindow *window);
+XID (*p_gdk_x11_drawable_get_xid)(GdkDrawable *drawable);
+Window (*p_gdk_x11_window_get_xid)(GdkWindow *window);
 void (*p_gtk_box_pack_start)(GtkBox *box, GtkWidget *child, gboolean expand, gboolean fill, guint padding);
 GtkWidget* (*p_gtk_button_new)(void);
 void (*p_gtk_button_set_focus_on_click)(GtkButton *button, gboolean focus_on_click);
@@ -1478,7 +1499,9 @@ GtkWidget* (*p_gtk_vbox_new)(gboolean homogeneous, gint spacing);
 GtkWidget* (*p_gtk_vscrollbar_new)(GtkAdjustment *adjustment);
 void (*p_gtk_widget_destroy)(GtkWidget *widget);
 GdkScreen* (*p_gtk_widget_get_screen)(GtkWidget *widget);
+GdkWindow* (*p_gtk_widget_get_window)(GtkWidget *widget);
 void (*p_gtk_widget_hide)(GtkWidget *widget);
+void (*p_gtk_widget_realize)(GtkWidget *widget);
 void (*p_gtk_widget_set_can_focus)(GtkWidget *widget, gboolean can_focus);
 void (*p_gtk_widget_set_colormap)(GtkWidget *widget, GdkColormap *colormap);
 void (*p_gtk_widget_set_hexpand)(GtkWidget *widget, gboolean expand);
@@ -3575,7 +3598,9 @@ bool at_dock_mode = FALSE;
   *(void **)(&p_gtk_vbox_new) = dlsym(p_hdl_gtk, "gtk_vbox_new");
   *(void **)(&p_gtk_widget_destroy) = dlsym(p_hdl_gtk, "gtk_widget_destroy");
   *(void **)(&p_gtk_widget_get_screen) = dlsym(p_hdl_gtk, "gtk_widget_get_screen");
+  *(void **)(&p_gtk_widget_get_window) = dlsym(p_hdl_gtk, "gtk_widget_get_window");
   *(void **)(&p_gtk_widget_hide) = dlsym(p_hdl_gtk, "gtk_widget_hide");
+  *(void **)(&p_gtk_widget_realize) = dlsym(p_hdl_gtk, "gtk_widget_realize");
   *(void **)(&p_gtk_widget_set_can_focus) = dlsym(p_hdl_gtk, "gtk_widget_set_can_focus");
   *(void **)(&p_gtk_widget_set_sensitive) = dlsym(p_hdl_gtk, "gtk_widget_set_sensitive");
   *(void **)(&p_gtk_widget_show) = dlsym(p_hdl_gtk, "gtk_widget_show");
@@ -3655,6 +3680,7 @@ bool at_dock_mode = FALSE;
   if (with_gtk == 2) {
     *(void **)(&p_gdk_display_warp_pointer) = dlsym(p_hdl_gtk, "gdk_display_warp_pointer");
     *(void **)(&p_gdk_screen_get_rgba_colormap) = dlsym(p_hdl_gtk, "gdk_screen_get_rgba_colormap");
+    *(void **)(&p_gdk_x11_drawable_get_xid) = dlsym(p_hdl_gtk, "gdk_x11_drawable_get_xid");
     *(void **)(&p_gtk_hscale_new_with_range) = dlsym(p_hdl_gtk, "gtk_hscale_new_with_range");
     *(void **)(&p_gtk_notebook_set_tab_border) = dlsym(p_hdl_gtk, "gtk_notebook_set_tab_border");
     *(void **)(&p_gtk_notebook_set_tab_hborder) = dlsym(p_hdl_gtk, "gtk_notebook_set_tab_hborder");
@@ -3670,6 +3696,7 @@ bool at_dock_mode = FALSE;
     *(void **)(&p_gdk_device_warp) = dlsym(p_hdl_gtk, "gdk_device_warp");
     *(void **)(&p_gdk_disable_multidevice) = dlsym(p_hdl_gtk, "gdk_disable_multidevice");
     *(void **)(&p_gdk_screen_get_rgba_visual) = dlsym(p_hdl_gtk, "gdk_screen_get_rgba_visual");
+    *(void **)(&p_gdk_x11_window_get_xid) = dlsym(p_hdl_gtk, "gdk_x11_window_get_xid");
     *(void **)(&p_gtk_css_provider_load_from_data) = dlsym(p_hdl_gtk, "gtk_css_provider_load_from_data");
     *(void **)(&p_gtk_css_provider_new) = dlsym(p_hdl_gtk, "gtk_css_provider_new");
     *(void **)(&p_gtk_scale_new_with_range) = dlsym(p_hdl_gtk, "gtk_scale_new_with_range");
@@ -3842,6 +3869,18 @@ bool at_dock_mode = FALSE;
 #if COMMAND_EXEC_PROGRAM && !VTE_FORK_CMD_OLD
   if (change_command)
     default_argv[0] = default_command;
+#endif
+
+#if EXPORT_WINDOWID
+  gtk_widget_realize(main_window);
+  char windowid[16];
+#ifdef RULE_THEM_ALL
+  if (with_gtk == 3)
+    g_snprintf(windowid, 16, "%d", (int)gdk_x11_window_get_xid(gtk_widget_get_window(main_window)));
+  else
+#endif
+    g_snprintf(windowid, 16, "%d", (int)gdk_x11_drawable_get_xid(EVILVTE_GET_WINDOW(main_window)));
+  setenv("WINDOWID", windowid, TRUE);
 #endif
 
   add_tab();
