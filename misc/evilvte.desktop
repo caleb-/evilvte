@@ -38,4 +38,4 @@ Comment[vi]=Trình giả lập Terminal
 Comment[zh_TW]=終端機程式
 Icon=evilvte
 Exec=evilvte
-Categories=Utility;TerminalEmulator;
+Categories=System;Utility;TerminalEmulator;
