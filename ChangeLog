@@ -1,4 +1,4 @@
-UNRELEASED
+0.5.2~pre1
  * Support command line options: -fg, -bg, -sa
    Thanks to Globe Trotter <itsme_410 AT yahoo DOT com>
  * Support EXPORT_WINDOWID, like what xterm and rxvt do.
