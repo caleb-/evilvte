@@ -177,6 +177,9 @@ fi
 tail -n 6 $0 | grep ^grep >> src/showvte
 
 COMMAND_AT_ROOT_WINDOW=`grep COMMAND_AT_ROOT_WINDOW src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
+COMMAND_COLOR_FG=`grep       COMMAND_COLOR_FG       src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
+COMMAND_COLOR_BG=`grep       COMMAND_COLOR_BG       src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
+COMMAND_SATURATION=`grep     COMMAND_SATURATION     src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
 COMMAND_DOCK_MODE=`grep      COMMAND_DOCK_MODE      src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
 COMMAND_EXEC_PROGRAM=`grep   COMMAND_EXEC_PROGRAM   src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
 COMMAND_FULLSCREEN=`grep     COMMAND_FULLSCREEN     src/custom.h | tr '\t' ' ' | sed 's/^\( \)*//g' | grep -v ^\/\/ | tail -n 1 | grep -v -i FALSE | grep -v 0`
@@ -195,6 +198,9 @@ head -n 10 misc/manpage.1 > misc/evilvte.1
 [ "$COMMAND_DOCK_MODE" != "" ]      && grep '^.\\" D ' misc/manpage.1 | sed 's/^.\\" D //' >> misc/evilvte.1
 [ "$COMMAND_EXEC_PROGRAM" != "" ]   && grep '^.\\" E ' misc/manpage.1 | sed 's/^.\\" E //' >> misc/evilvte.1
 [ "$COMMAND_FULLSCREEN" != "" ]     && grep '^.\\" F ' misc/manpage.1 | sed 's/^.\\" F //' >> misc/evilvte.1
+[ "$COMMAND_COLOR_FG" != "" ]       && grep '^.\\" 3 ' misc/manpage.1 | sed 's/^.\\" 3 //' >> misc/evilvte.1
+[ "$COMMAND_COLOR_BG" != "" ]       && grep '^.\\" 4 ' misc/manpage.1 | sed 's/^.\\" 4 //' >> misc/evilvte.1
+[ "$COMMAND_SATURATION" != "" ]     && grep '^.\\" 5 ' misc/manpage.1 | sed 's/^.\\" 5 //' >> misc/evilvte.1
 [ "$COMMAND_FONT" != "" ]           && grep '^.\\" 7 ' misc/manpage.1 | sed 's/^.\\" 7 //' >> misc/evilvte.1
 [ "$COMMAND_GEOMETRY" != "" ]       && grep '^.\\" G ' misc/manpage.1 | sed 's/^.\\" G //' >> misc/evilvte.1
 [ "$COMMAND_SHOW_HELP" != "" ]      && grep '^.\\" H ' misc/manpage.1 | sed 's/^.\\" H //' >> misc/evilvte.1

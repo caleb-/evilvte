@@ -733,6 +733,15 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #ifndef COMMAND_FONT
 #define COMMAND_FONT 0
 #endif
+#ifndef COMMAND_COLOR_FG
+#define COMMAND_COLOR_FG 0
+#endif
+#ifndef COMMAND_COLOR_BG
+#define COMMAND_COLOR_BG 0
+#endif
+#ifndef COMMAND_SATURATION
+#define COMMAND_SATURATION 0
+#endif
 
 #define GET_VTE_CHILD_PID NULL
 #if VTE_FORK_CMD_OLD
@@ -1088,6 +1097,14 @@ char *program_name = PROGRAM_NAME;
 char *command_font = NULL;
 #endif
 
+#if COMMAND_COLOR_BG
+char *command_color_bg = NULL;
+#endif
+
+#if COMMAND_COLOR_FG
+char *command_color_fg = NULL;
+#endif
+
 #if COMMAND_GEOMETRY
 char *command_geometry = NULL;
 #endif
@@ -1320,7 +1337,7 @@ char *login_shell[] = { "-", NULL };
 unsigned short login_shell_flag = 0;
 #endif
 
-#if defined(HOTKEY_SATURATION_MORE) || defined(HOTKEY_SATURATION_LESS) || MOUSE_CTRL_SATURATION || BACKGROUND_OPACITY || defined(HOTKEY_SATURATION_DIALOG) || defined(MENU_CHANGE_SATURATION) || defined(HOTKEY_TOGGLE_BACKGROUND) || defined(MENU_TOGGLE_BACKGROUND)
+#if defined(HOTKEY_SATURATION_MORE) || defined(HOTKEY_SATURATION_LESS) || MOUSE_CTRL_SATURATION || BACKGROUND_OPACITY || defined(HOTKEY_SATURATION_DIALOG) || defined(MENU_CHANGE_SATURATION) || defined(HOTKEY_TOGGLE_BACKGROUND) || defined(MENU_TOGGLE_BACKGROUND) || COMMAND_SATURATION
 #ifndef BACKGROUND_SATURATION
 #define BACKGROUND_SATURATION 0.4
 #endif
@@ -2081,7 +2098,7 @@ static void add_tab(void)
   vte_terminal_set_background_tint_color(VTE_TERMINAL(term->vte), &color_tint);
 #endif
 
-#if defined(BACKGROUND_SATURATION) && defined(BACKGROUND_EXIST)
+#if (defined(BACKGROUND_SATURATION) || COMMAND_SATURATION) && defined(BACKGROUND_EXIST)
   vte_terminal_set_background_saturation(VTE_TERMINAL(term->vte), saturation_level);
 #endif
 
@@ -2101,16 +2118,24 @@ static void add_tab(void)
   vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, color_style, 16);
 #endif
 
-#if defined(COLOR_BACKGROUND) || defined(COLOR_TEXT_BOLD) || defined(CURSOR_COLOR) || defined(COLOR_TEXT_DIM) || defined(COLOR_FOREGROUND) || defined(COLOR_TEXT_HIGHLIGHTED)
+#if defined(COLOR_BACKGROUND) || defined(COLOR_TEXT_BOLD) || defined(CURSOR_COLOR) || defined(COLOR_TEXT_DIM) || defined(COLOR_FOREGROUND) || defined(COLOR_TEXT_HIGHLIGHTED) || COMMAND_COLOR_FG || COMMAND_COLOR_BG
 #ifndef COLOR_STYLE
   vte_terminal_set_default_colors(VTE_TERMINAL(term->vte));
 #endif
 #endif
 
-#ifdef COLOR_BACKGROUND
+#if defined(COLOR_BACKGROUND) || COMMAND_COLOR_BG
   GdkColor color_bg;
+#endif
+#ifdef COLOR_BACKGROUND
   gdk_color_parse(COLOR_BACKGROUND, &color_bg);
-  vte_terminal_set_color_background(VTE_TERMINAL(term->vte), &color_bg);
+#endif
+#if COMMAND_COLOR_BG
+  gdk_color_parse(command_color_bg, &color_bg);
+  if (command_color_bg)
+#endif
+#if defined(COLOR_BACKGROUND) || COMMAND_COLOR_BG
+    vte_terminal_set_color_background(VTE_TERMINAL(term->vte), &color_bg);
 #endif
 
 #ifdef COLOR_TEXT_BOLD
@@ -2131,10 +2156,18 @@ static void add_tab(void)
   vte_terminal_set_color_dim(VTE_TERMINAL(term->vte), &color_dim);
 #endif
 
-#ifdef COLOR_FOREGROUND
+#if defined(COLOR_FOREGROUND) || COMMAND_COLOR_FG
   GdkColor color_fg;
+#endif
+#ifdef COLOR_FOREGROUND
   gdk_color_parse(COLOR_FOREGROUND, &color_fg);
-  vte_terminal_set_color_foreground(VTE_TERMINAL(term->vte), &color_fg);
+#endif
+#if COMMAND_COLOR_FG
+  gdk_color_parse(command_color_fg, &color_fg);
+  if (command_color_fg)
+#endif
+#if defined(COLOR_FOREGROUND) || COMMAND_COLOR_FG
+    vte_terminal_set_color_foreground(VTE_TERMINAL(term->vte), &color_fg);
 #endif
 
 #ifdef COLOR_TEXT_HIGHLIGHTED
@@ -3282,7 +3315,7 @@ bool at_dock_mode = FALSE;
 #if COMMAND_EXEC_PROGRAM || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
   int i = 0;
 #endif
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(RULE_THEM_ALL) || defined(MENU_CUSTOM)
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_COLOR_FG || COMMAND_COLOR_BG || COMMAND_SATURATION || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(RULE_THEM_ALL) || defined(MENU_CUSTOM)
   int j = 0;
 #endif
 
@@ -3323,7 +3356,7 @@ bool at_dock_mode = FALSE;
   i = 1;
 #endif
 
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(RULE_THEM_ALL)
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_COLOR_FG || COMMAND_COLOR_BG || COMMAND_SATURATION || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(RULE_THEM_ALL)
   j = 1;
   while ((j < argc) && strncmp(argv[j], "-e", 3)) {
 #if PROGRAM_WM_CLASS
@@ -3341,6 +3374,21 @@ bool at_dock_mode = FALSE;
 #if COMMAND_FONT
     if (argc > (j + 1) && !strncmp(argv[j], "-fn", 4))
       command_font = argv[j + 1];
+#endif
+
+#if COMMAND_COLOR_FG
+    if (argc > (j + 1) && !strncmp(argv[j], "-fg", 4))
+      command_color_fg = argv[j + 1];
+#endif
+
+#if COMMAND_COLOR_BG
+    if (argc > (j + 1) && !strncmp(argv[j], "-bg", 4))
+      command_color_bg = argv[j + 1];
+#endif
+
+#if COMMAND_SATURATION
+    if (argc > (j + 1) && !strncmp(argv[j], "-sa", 4))
+      saturation_level = strtod(argv[j + 1], NULL);
 #endif
 
 #if COMMAND_GEOMETRY
@@ -3365,10 +3413,10 @@ bool at_dock_mode = FALSE;
 #if COMMAND_SHOW_HELP
     if (!strncmp(argv[j], "-h", 3)) {
       printf("%s, version %s\n\nUsage:\n\t%s [options]\n\nOption%s:\n", PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_NAME,
-#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
+#if COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_EXEC_PROGRAM || COMMAND_FULLSCREEN || COMMAND_LOGIN_SHELL || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_COLOR_FG || COMMAND_COLOR_BG || COMMAND_SATURATION || COMMAND_GEOMETRY || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS
              "s");
 #endif
-#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_DOCK_MODE && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_FONT && !COMMAND_GEOMETRY && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
+#if !COMMAND_AT_ROOT_WINDOW && !COMMAND_DOCK_MODE && !COMMAND_EXEC_PROGRAM && !COMMAND_FULLSCREEN && !COMMAND_LOGIN_SHELL && !COMMAND_SET_TITLE && !COMMAND_FONT && !COMMAND_COLOR_FG && !COMMAND_COLOR_BG && !COMMAND_SATURATION && !COMMAND_GEOMETRY && !COMMAND_SHOW_OPTIONS && !COMMAND_SHOW_VERSION && !COMMAND_TAB_NUMBERS
              "");
 #endif
 #if COMMAND_DOCK_MODE
@@ -3382,6 +3430,15 @@ bool at_dock_mode = FALSE;
 #endif
 #if COMMAND_FONT
       printf("\t-fn \"[font] [size]\"   \tspecify font and font size\n");
+#endif
+#if COMMAND_COLOR_FG
+      printf("\t-fg [color]           \tspecify foreground color\n");
+#endif
+#if COMMAND_COLOR_BG
+      printf("\t-bg [color]           \tspecify background color\n");
+#endif
+#if COMMAND_SATURATION
+      printf("\t-sa [saturation]      \tspecify saturation level in [0, 1]\n");
 #endif
 #if COMMAND_GEOMETRY
       printf("\t-g +X+Y               \tspecify geometry\n");
@@ -3461,7 +3518,7 @@ bool at_dock_mode = FALSE;
 
     j++;
   }
-#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(RULE_THEM_ALL) */
+#endif /* COMMAND_AT_ROOT_WINDOW || COMMAND_DOCK_MODE || COMMAND_LOGIN_SHELL || PROGRAM_WM_CLASS || COMMAND_SET_TITLE || COMMAND_FONT || COMMAND_COLOR_FG || COMMAND_COLOR_BG || COMMAND_SATURATION || COMMAND_GEOMETRY || COMMAND_SHOW_HELP || COMMAND_SHOW_OPTIONS || COMMAND_SHOW_VERSION || COMMAND_TAB_NUMBERS || defined(RULE_THEM_ALL) */
 
 #ifdef BACKGROUND_IMAGE
   g_snprintf(imgstr, sizeof(imgstr), "%s/%s", g_getenv("HOME"), BACKGROUND_IMAGE);

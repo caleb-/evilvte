@@ -25,6 +25,9 @@
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"
 // #define COMMAND_AT_ROOT_WINDOW TRUE  /* -r option, run in root window      */
+// #define COMMAND_COLOR_FG       TRUE  /* -fg option, foreground color       */
+// #define COMMAND_COLOR_BG       TRUE  /* -bg option, background color       */
+// #define COMMAND_SATURATION     TRUE  /* -sa option, saturation level       */
 // #define COMMAND_DOCK_MODE      TRUE  /* -d option, run as a dock           */
 #define    COMMAND_EXEC_PROGRAM   TRUE  /* -e option, execute program         */
 // #define COMMAND_FULLSCREEN     TRUE  /* -f option, init in fullscreen mode */
