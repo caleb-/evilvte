@@ -62,6 +62,7 @@
 #define ZENBURN         7
 #define SOLARIZED_DARK  8
 #define SOLARIZED_LIGHT 9
+#define USER_CUSTOM     10
 
 #define LEFT   0
 #define RIGHT  1
@@ -1294,6 +1295,29 @@ const GdkColor color_style[16] = {
   { 0, 0x6c6c, 0x7171, 0xc4c4 },
   { 0, 0x5858, 0x6e6e, 0x7575 },
   { 0, 0x0000, 0x2b2b, 0x3636 }
+#endif
+#if COLOR_STYLE == USER_CUSTOM
+  #define CLR_R(x)   (((x) & 0xff0000) >> 16)
+  #define CLR_G(x)   (((x) & 0x00ff00) >>  8)
+  #define CLR_B(x)   (((x) & 0x0000ff) >>  0)
+  #define CLR_16(x)  (((x) << 8) | (x))
+  #define CLR_GDK(x) { 0, CLR_16(CLR_R(x)), CLR_16(CLR_G(x)), CLR_16(CLR_B(x)) }
+  CLR_GDK(USER_COLOR_00),
+  CLR_GDK(USER_COLOR_01),
+  CLR_GDK(USER_COLOR_02),
+  CLR_GDK(USER_COLOR_03),
+  CLR_GDK(USER_COLOR_04),
+  CLR_GDK(USER_COLOR_05),
+  CLR_GDK(USER_COLOR_06),
+  CLR_GDK(USER_COLOR_07),
+  CLR_GDK(USER_COLOR_08),
+  CLR_GDK(USER_COLOR_09),
+  CLR_GDK(USER_COLOR_10),
+  CLR_GDK(USER_COLOR_11),
+  CLR_GDK(USER_COLOR_12),
+  CLR_GDK(USER_COLOR_13),
+  CLR_GDK(USER_COLOR_14),
+  CLR_GDK(USER_COLOR_15)
 #endif
 };
 #endif
