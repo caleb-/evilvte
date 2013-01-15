@@ -20,7 +20,24 @@
 // #define COLOR_FOREGROUND       "#000000"
 // #define COLOR_STYLE   /* Options: LINUX, RXVT, TANGO, XTERM, ZENBURN,      */
                          /*          ZENBURN_DARK, SOLARIZED_DARK,            */
-                         /*          SOLARIZED_LIGHT                          */
+                         /*          SOLARIZED_LIGHT, USER_CUSTOM             */
+// #define USER_COLOR_00 0x1b1d1e /* black dark    */
+// #define USER_COLOR_08 0x505354 /* black light   */
+// #define USER_COLOR_01 0xf92672 /* red dark      */
+// #define USER_COLOR_09 0xff5995 /* red light     */
+// #define USER_COLOR_02 0x82b414 /* green dark    */
+// #define USER_COLOR_10 0xb6e354 /* green light   */
+// #define USER_COLOR_03 0xfd971f /* yellow dark   */
+// #define USER_COLOR_11 0xfeed6c /* yellow light  */
+// #define USER_COLOR_04 0x56c2d6 /* blue dark     */
+// #define USER_COLOR_12 0x8cedff /* blue light    */
+// #define USER_COLOR_05 0x8c54fe /* magenta dark  */
+// #define USER_COLOR_13 0x9e6ffe /* magenta light */
+// #define USER_COLOR_06 0x465457 /* cyan dark     */
+// #define USER_COLOR_14 0x899ca1 /* cyan light    */
+// #define USER_COLOR_07 0xccccc6 /* white dark    */
+// #define USER_COLOR_15 0xf8f8f2 /* white light   */
+
 // #define COLOR_TEXT_BOLD        "red"
 // #define COLOR_TEXT_DIM         "#FFFF00"
 // #define COLOR_TEXT_HIGHLIGHTED "green"
