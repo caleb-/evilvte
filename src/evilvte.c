@@ -1336,9 +1336,9 @@ const GdkColor color_style[16] = {
 #ifdef FONT
 char font_name[125];
 char font_str[128];
-unsigned int font_size;
+double font_size;
 #if defined(HOTKEY_FONT_DEFAULT_SIZE) || defined(MENU_FONT_DEFAULT_SIZE)
-unsigned int font_size_default;
+double font_size_default;
 #endif
 #endif
 
@@ -2543,10 +2543,10 @@ static void calculate_font(void)
       g_snprintf(font_name, sizeof(font_name), FONT);
       len = strlen(font_name) - 1;
     }
-    font_size = atoi(strrchr(font_name, ' '));
+    font_size = atof(strrchr(font_name, ' '));
     if (font_size < 1)
       font_size = 1;
-    while (len > 0 && isdigit(font_name[len]))
+    while (len > 0 && (isdigit(font_name[len]) || font_name[len] == '.' ))
       font_name[len--] = 0;
     while (len > 0 && font_name[len] == ' ')
       font_name[len--] = 0;
@@ -2556,7 +2556,7 @@ static void calculate_font(void)
 #if defined(HOTKEY_FONT_DEFAULT_SIZE) || defined(MENU_FONT_DEFAULT_SIZE) || defined(HOTKEY_FONT_BIGGER) || defined(MENU_FONT_BIGGER) || defined(HOTKEY_FONT_SMALLER) || defined(MENU_FONT_SMALLER) || defined(HOTKEY_FONT_SELECT) || defined(MENU_FONT_SELECT)
 static void do_zoom_routine(void)
 {
-  g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
+  g_snprintf(font_str, sizeof(font_str), "%s %.1f", font_name, font_size);
   int i = 0;
   for (i = 0 ; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)) ; i++) {
     GET_CURRENT_TAB(i);
@@ -3574,7 +3574,7 @@ bool at_dock_mode = FALSE;
 #endif
     g_snprintf(font_name, sizeof(font_name), "%s", FONT);
   calculate_font();
-  g_snprintf(font_str, sizeof(font_str), "%s %d", font_name, font_size);
+  g_snprintf(font_str, sizeof(font_str), "%s %.1f", font_name, font_size);
 #if defined(HOTKEY_FONT_DEFAULT_SIZE) || defined(MENU_FONT_DEFAULT_SIZE)
   font_size_default = font_size;
 #endif
