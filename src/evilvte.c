@@ -347,6 +347,10 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define GTK_FONT_SELECTION_DIALOG
 #endif
 
+#ifndef GTK_COLOR_SELECTION_DIALOG /* No, this is not typo. */
+#define GTK_COLOR_SELECTION_DIALOG (GtkColorChooserDialog*)
+#endif
+
 #if !defined(RULE_THEM_ALL) && GTK_CHECK_VERSION(2,91,0)
 #define gtk_widget_set_colormap gtk_widget_set_visual
 #define gdk_screen_get_rgba_colormap gdk_screen_get_rgba_visual
@@ -3362,7 +3366,7 @@ static void window_state_event(GtkWidget *widget, GdkEventWindowState *event)
 int main(int argc, char **argv)
 {
 #if COMMAND_DOCK_MODE
-bool at_dock_mode = FALSE;
+  bool at_dock_mode = FALSE;
 #endif
 
 #if COMMAND_EXEC_PROGRAM || COMMAND_TAB_NUMBERS || defined(MENU_ENCODING_LIST)
