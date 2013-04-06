@@ -1,4 +1,6 @@
 UNRELEASED
+ * Fix a bug for -e option with --name/--class, closes #14.
+   Thanks to Sergey Zaytsev <https://github.com/zaytsev>
  * New COLOR_STYLE option: USER_CUSTOM
    Thanks to Eric Davis <edavis@insanum.com>
  * Allow fractional font size

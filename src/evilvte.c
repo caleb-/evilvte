@@ -3354,6 +3354,14 @@ bool at_dock_mode = FALSE;
 #endif
 
 #if COMMAND_EXEC_PROGRAM
+  /* It seems gtk_init modifies content of argv when it detects
+   * --name/--class arguments and default_argv looses "-e" option parameters.
+   */
+  int gtk_argc = argc;
+  char **gtk_argv = (char**)malloc(argc * sizeof(char*));
+  int ii = 0;
+  for (ii = 0; ii < argc; ii++)
+    gtk_argv[ii] = argv[ii];
 #if !VTE_FORK_CMD_OLD
   bool change_command = 0;
 #endif
@@ -3816,7 +3824,13 @@ bool at_dock_mode = FALSE;
 #endif
 #endif
 
+#if !COMMAND_EXEC_PROGRAM
   gtk_init(&argc, &argv);
+#endif
+#if COMMAND_EXEC_PROGRAM
+  gtk_init(&gtk_argc, &gtk_argv);
+  free(gtk_argv);
+#endif
 
 #if TAB_CLOSE_BUTTON
 #ifdef RULE_THEM_ALL
