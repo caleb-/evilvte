@@ -20,7 +20,7 @@
 // #define COLOR_FOREGROUND       "#000000"
 // #define COLOR_STYLE   /* Options: LINUX, RXVT, TANGO, XTERM, ZENBURN,      */
                          /*          ZENBURN_DARK, SOLARIZED_DARK,            */
-                         /*          SOLARIZED_LIGHT, USER_CUSTOM             */
+                         /*          SOLARIZED_LIGHT, HOLO, USER_CUSTOM       */
 // #define USER_COLOR_00 0x1b1d1e /* black dark    */
 // #define USER_COLOR_08 0x505354 /* black light   */
 // #define USER_COLOR_01 0xf92672 /* red dark      */

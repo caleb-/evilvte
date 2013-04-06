@@ -53,16 +53,17 @@
 #define IBEAM     VTE_CURSOR_SHAPE_IBEAM
 #define UNDERLINE VTE_CURSOR_SHAPE_UNDERLINE
 
-#define LINUX           1
-#define RXVT            2
-#define TANGO           3
-#define VTE_FIXED       4
-#define XTERM           5
-#define ZENBURN_DARK    6
-#define ZENBURN         7
-#define SOLARIZED_DARK  8
-#define SOLARIZED_LIGHT 9
+#define LINUX            1
+#define RXVT             2
+#define TANGO            3
+#define VTE_FIXED        4
+#define XTERM            5
+#define ZENBURN_DARK     6
+#define ZENBURN          7
+#define SOLARIZED_DARK   8
+#define SOLARIZED_LIGHT  9
 #define USER_CUSTOM     10
+#define HOLO            11
 
 #define LEFT   0
 #define RIGHT  1
@@ -1318,6 +1319,24 @@ const GdkColor color_style[16] = {
   CLR_GDK(USER_COLOR_13),
   CLR_GDK(USER_COLOR_14),
   CLR_GDK(USER_COLOR_15)
+#endif
+#if COLOR_STYLE == HOLO
+  { 0, 0x0000, 0x0000, 0x0000 },
+  { 0, 0xcccc, 0x0000, 0x0000 },
+  { 0, 0x6666, 0x9999, 0x0000 },
+  { 0, 0xffff, 0x8888, 0x0000 },
+  { 0, 0x0000, 0x9999, 0xcccc },
+  { 0, 0x9999, 0x3333, 0xcccc },
+  { 0, 0x0000, 0x9999, 0xcccc },
+  { 0, 0xa8a8, 0xa8a8, 0xa8a8 },
+  { 0, 0x5757, 0x5757, 0x5757 },
+  { 0, 0xffff, 0x4444, 0x4444 },
+  { 0, 0x9999, 0xcccc, 0x0000 },
+  { 0, 0xffff, 0xbbbb, 0x3333 },
+  { 0, 0x3333, 0xb5b5, 0xe5e5 },
+  { 0, 0xaaaa, 0x6666, 0xcccc },
+  { 0, 0x3333, 0xb5b5, 0xe5e5 },
+  { 0, 0xffff, 0xffff, 0xffff }
 #endif
 };
 #endif

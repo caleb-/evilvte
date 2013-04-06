@@ -5,6 +5,8 @@ UNRELEASED
    Thanks to Eric Davis <edavis@insanum.com>
  * Allow fractional font size
    Thanks to Alex Kritikos <https://github.com/akrito>
+ * New COLOR_STYLE option: HOLO
+   Thanks to Alex Kritikos <https://github.com/akrito>
 
 0.5.2~pre1
  * Support command line options: -fg, -bg, -sa
