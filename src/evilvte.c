@@ -1,6 +1,6 @@
 /* Forked from sakura 2.0.1, http://www.pleyades.net/david/sakura.php
  * Copyright (C) 2006-2008  David Gómez <david@pleyades.net>
- * Copyright (C) 2008-2012  Wen-Yen Chuang <caleb AT calno DOT com>
+ * Copyright (C) 2008-2013  Wen-Yen Chuang <caleb AT calno DOT com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2148,18 +2148,23 @@ static void add_tab(void)
 #endif
 #endif
 
+#if COMMAND_COLOR_BG
+  if (command_color_bg) {
+#endif
 #if defined(COLOR_BACKGROUND) || COMMAND_COLOR_BG
-  GdkColor color_bg;
+    GdkColor color_bg;
 #endif
 #ifdef COLOR_BACKGROUND
-  gdk_color_parse(COLOR_BACKGROUND, &color_bg);
+    gdk_color_parse(COLOR_BACKGROUND, &color_bg);
 #endif
 #if COMMAND_COLOR_BG
-  gdk_color_parse(command_color_bg, &color_bg);
-  if (command_color_bg)
+    gdk_color_parse(command_color_bg, &color_bg);
 #endif
 #if defined(COLOR_BACKGROUND) || COMMAND_COLOR_BG
     vte_terminal_set_color_background(VTE_TERMINAL(term->vte), &color_bg);
+#endif
+#if COMMAND_COLOR_BG
+  }
 #endif
 
 #ifdef COLOR_TEXT_BOLD
@@ -2180,18 +2185,23 @@ static void add_tab(void)
   vte_terminal_set_color_dim(VTE_TERMINAL(term->vte), &color_dim);
 #endif
 
+#if COMMAND_COLOR_FG
+  if (command_color_fg) {
+#endif
 #if defined(COLOR_FOREGROUND) || COMMAND_COLOR_FG
-  GdkColor color_fg;
+    GdkColor color_fg;
 #endif
 #ifdef COLOR_FOREGROUND
-  gdk_color_parse(COLOR_FOREGROUND, &color_fg);
+    gdk_color_parse(COLOR_FOREGROUND, &color_fg);
 #endif
 #if COMMAND_COLOR_FG
-  gdk_color_parse(command_color_fg, &color_fg);
-  if (command_color_fg)
+    gdk_color_parse(command_color_fg, &color_fg);
 #endif
 #if defined(COLOR_FOREGROUND) || COMMAND_COLOR_FG
     vte_terminal_set_color_foreground(VTE_TERMINAL(term->vte), &color_fg);
+#endif
+#if COMMAND_COLOR_FG
+  }
 #endif
 
 #ifdef COLOR_TEXT_HIGHLIGHTED
@@ -3413,6 +3423,10 @@ bool at_dock_mode = FALSE;
 #if COMMAND_SATURATION
     if (argc > (j + 1) && !strncmp(argv[j], "-sa", 4))
       saturation_level = strtod(argv[j + 1], NULL);
+    if (saturation_level > 1)
+      saturation_level = 1;
+    if (saturation_level < 0)
+      saturation_level = 0;
 #endif
 
 #if COMMAND_GEOMETRY
