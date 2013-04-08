@@ -93,6 +93,8 @@
 #endif
 typedef struct _GdkColormap GdkColormap;
 typedef struct _GdkDrawable GdkDrawable;
+typedef struct _GtkColorSelection GtkColorSelection;
+typedef struct _GtkColorSelectionDialog GtkColorSelectionDialog;
 typedef struct _GtkCssProvider GtkCssProvider;
 typedef struct _GtkFontSelectionDialog GtkFontSelectionDialog;
 typedef struct _GtkScrollable GtkScrollable;
@@ -347,8 +349,8 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #define GTK_FONT_SELECTION_DIALOG
 #endif
 
-#ifndef GTK_COLOR_SELECTION_DIALOG /* No, this is not typo. */
-#define GTK_COLOR_SELECTION_DIALOG (GtkColorChooserDialog*)
+#ifndef GTK_COLOR_SELECTION_DIALOG
+#define GTK_COLOR_SELECTION_DIALOG
 #endif
 
 #if !defined(RULE_THEM_ALL) && GTK_CHECK_VERSION(2,91,0)
@@ -414,7 +416,7 @@ typedef struct _GtkStyleProvider GtkStyleProvider;
 #if !defined(RULE_THEM_ALL) && GTK_CHECK_VERSION(3,3,16)
 #undef GTK_COLOR_SELECTION
 #define GTK_COLOR_SELECTION GTK_COLOR_CHOOSER
-#define gtk_color_selection_dialog_get_color_selection GTK_COLOR_CHOOSER
+#define gtk_color_selection_dialog_get_color_selection(x) (x)
 #define gtk_color_selection_dialog_new(x) gtk_color_chooser_dialog_new(x,GTK_WINDOW(main_window))
 #define gtk_color_selection_get_current_rgba gtk_color_chooser_get_rgba
 #define gtk_color_selection_set_current_rgba gtk_color_chooser_set_rgba
