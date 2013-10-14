@@ -195,7 +195,7 @@ static void do_title_changed(void)
 #endif
 #endif
 #if WINDOW_TITLE_DYNAMIC
-  gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+  gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte))?:VTE_PROGRAM_NAME);
 #endif
 }
 #endif
@@ -1678,7 +1678,7 @@ static void switch_page(void)
   }
 #endif
 #if WINDOW_TITLE_DYNAMIC
-  gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte)));
+  gtk_window_set_title(GTK_WINDOW(main_window), vte_terminal_get_window_title(VTE_TERMINAL(term->vte))?:VTE_PROGRAM_NAME);
 #endif
 }
 
