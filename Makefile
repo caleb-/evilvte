@@ -75,7 +75,7 @@ clean: src/config.mk
 	rm -f src/$(PROG) src/showvte src/evilvte.o src/evilvte.h misc/evilvte.? src/custom.h
 
 distclean: clean
-	rm -f src/*.o src/*.mk src/install.sh src/uninstall.sh
+	rm -f src/evilvte.c src/*.o src/*.mk src/install.sh src/uninstall.sh
 
 src/config.mk:
 	./configure --quiet

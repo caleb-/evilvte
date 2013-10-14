@@ -28,7 +28,6 @@ for opt do
      echo
      echo "          --with-gtk=2.0 (default)"
      echo "          --with-gtk=3.0"
-     echo "          --with-gtk=2+3"
      echo "          --with-gtk=3+2"
      exec echo
   ;;
@@ -70,20 +69,15 @@ if [ "$with_gtk" != "2.0" ] && [ "$with_gtk" != "3.0" ]; then
   fi
 fi
 
-if [ "$real_gtk" = "3+2" ]; then
-  with_gtk=3.0
-  VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
-  if [ $? != 0 ]; then
-    VTEINC=`pkg-config --cflags vte 2> /dev/null`
-    [ $? = 0 ] && with_gtk=2.0
-  fi
-fi
+[ "$real_gtk" = "3+2" ] && with_gtk=3.0
+[ "$real_gtk" = "dev" ] && with_gtk=3.0
 
 if [ "$with_gtk" = "2.0" ]; then
   VTEINC=`pkg-config --cflags vte 2> /dev/null`
   [ $? != 0 ] && exec pkg-config --cflags vte
   LIBS_VTE="-lgdk-x11-2.0 -lgtk-x11-2.0 -lvte"
   LIBS_VTE_L=`pkg-config --libs-only-L vte 2> /dev/null`
+  ln -sf gtk2.c src/evilvte.c
 fi
 
 if [ "$with_gtk" = "3.0" ]; then
@@ -91,12 +85,16 @@ if [ "$with_gtk" = "3.0" ]; then
   [ $? != 0 ] && exec pkg-config --cflags vte-2.90
   LIBS_VTE="-lgdk-3 -lgtk-3 -lvte2_90"
   LIBS_VTE_L=`pkg-config --libs-only-L vte-2.90 2> /dev/null`
+  ln -sf gtk3.c src/evilvte.c
 fi
 
-if [ "$real_gtk" = "2+3" ] || [ "$real_gtk" = "3+2" ]; then
+if [ "$real_gtk" = "3+2" ]; then
   real_gtk="all"
   LIBS_VTE="-ldl"
+  ln -sf dlopen.c src/evilvte.c
 fi
+
+[ "$real_gtk" = "dev" ] && ln -sf gtk3dev.c src/evilvte.c
 
   $DO_ECHO
   [ "$SUSE_LD" != "" ] && $DO_ECHO "OS    :" [1m[33mSUSE[m
