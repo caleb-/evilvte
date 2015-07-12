@@ -696,193 +696,187 @@ const int label_style_size = sizeof(label_style_custom) / sizeof(label_style_cus
 #endif
 
 #ifdef COLOR_STYLE
-const GdkColor color_style[16] = {
+const GdkColor color_style[16];
+#if COLOR_STYLE != USER_CUSTOM
+  #undef USER_COLOR_00
+  #undef USER_COLOR_01
+  #undef USER_COLOR_02
+  #undef USER_COLOR_03
+  #undef USER_COLOR_04
+  #undef USER_COLOR_05
+  #undef USER_COLOR_06
+  #undef USER_COLOR_07
+  #undef USER_COLOR_08
+  #undef USER_COLOR_09
+  #undef USER_COLOR_10
+  #undef USER_COLOR_11
+  #undef USER_COLOR_12
+  #undef USER_COLOR_13
+  #undef USER_COLOR_14
+  #undef USER_COLOR_15
+#endif
 #if COLOR_STYLE == LINUX
-  { 0, 0x0000, 0x0000, 0x0000 },
-  { 0, 0xa8a8, 0x0000, 0x0000 },
-  { 0, 0x0000, 0xa8a8, 0x0000 },
-  { 0, 0xa8a8, 0x5757, 0x0000 },
-  { 0, 0x0000, 0x0000, 0xa8a8 },
-  { 0, 0xa8a8, 0x0000, 0xa8a8 },
-  { 0, 0x0000, 0xa8a8, 0xa8a8 },
-  { 0, 0xa8a8, 0xa8a8, 0xa8a8 },
-  { 0, 0x5757, 0x5757, 0x5757 },
-  { 0, 0xffff, 0x5757, 0x5757 },
-  { 0, 0x5757, 0xffff, 0x5757 },
-  { 0, 0xffff, 0xffff, 0x5757 },
-  { 0, 0x5757, 0x5757, 0xffff },
-  { 0, 0xffff, 0x5757, 0xffff },
-  { 0, 0x5757, 0xffff, 0xffff },
-  { 0, 0xffff, 0xffff, 0xffff }
+  #define USER_COLOR_00 "#000000"
+  #define USER_COLOR_01 "#a80000"
+  #define USER_COLOR_02 "#00a800"
+  #define USER_COLOR_03 "#a85700"
+  #define USER_COLOR_04 "#0000a8"
+  #define USER_COLOR_05 "#a800a8"
+  #define USER_COLOR_06 "#00a8a8"
+  #define USER_COLOR_07 "#a8a8a8"
+  #define USER_COLOR_08 "#575757"
+  #define USER_COLOR_09 "#ff5757"
+  #define USER_COLOR_10 "#57ff57"
+  #define USER_COLOR_11 "#ffff57"
+  #define USER_COLOR_12 "#5757ff"
+  #define USER_COLOR_13 "#ff57ff"
+  #define USER_COLOR_14 "#57ffff"
+  #define USER_COLOR_15 "#ffffff"
 #endif
 #if COLOR_STYLE == RXVT
-  { 0, 0x0000, 0x0000, 0x0000 },
-  { 0, 0xcdcd, 0x0000, 0x0000 },
-  { 0, 0x0000, 0xcdcd, 0x0000 },
-  { 0, 0xcdcd, 0xcdcd, 0x0000 },
-  { 0, 0x0000, 0x0000, 0xcdcd },
-  { 0, 0xcdcd, 0x0000, 0xcdcd },
-  { 0, 0x0000, 0xcdcd, 0xcdcd },
-  { 0, 0xfafa, 0xebeb, 0xd7d7 },
-  { 0, 0x4040, 0x4040, 0x4040 },
-  { 0, 0xffff, 0x0000, 0x0000 },
-  { 0, 0x0000, 0xffff, 0x0000 },
-  { 0, 0xffff, 0xffff, 0x0000 },
-  { 0, 0x0000, 0x0000, 0xffff },
-  { 0, 0xffff, 0x0000, 0xffff },
-  { 0, 0x0000, 0xffff, 0xffff },
-  { 0, 0xffff, 0xffff, 0xffff }
+  #define USER_COLOR_00 "#000000"
+  #define USER_COLOR_01 "#cd0000"
+  #define USER_COLOR_02 "#00cd00"
+  #define USER_COLOR_03 "#cdcd00"
+  #define USER_COLOR_04 "#0000cd"
+  #define USER_COLOR_05 "#cd00cd"
+  #define USER_COLOR_06 "#00cdcd"
+  #define USER_COLOR_07 "#faebd7"
+  #define USER_COLOR_08 "#404040"
+  #define USER_COLOR_09 "#ff0000"
+  #define USER_COLOR_10 "#00ff00"
+  #define USER_COLOR_11 "#ffff00"
+  #define USER_COLOR_12 "#0000ff"
+  #define USER_COLOR_13 "#ff00ff"
+  #define USER_COLOR_14 "#00ffff"
+  #define USER_COLOR_15 "#ffffff"
 #endif
 #if COLOR_STYLE == TANGO
-  { 0, 0x2e2e, 0x3434, 0x3636 },
-  { 0, 0xcccc, 0x0000, 0x0000 },
-  { 0, 0x4e4e, 0x9a9a, 0x0606 },
-  { 0, 0xc4c4, 0xa0a0, 0x0000 },
-  { 0, 0x3434, 0x6565, 0xa4a4 },
-  { 0, 0x7575, 0x5050, 0x7b7b },
-  { 0, 0x0606, 0x9898, 0x9a9a },
-  { 0, 0xd3d3, 0xd7d7, 0xcfcf },
-  { 0, 0x5555, 0x5757, 0x5353 },
-  { 0, 0xefef, 0x2929, 0x2929 },
-  { 0, 0x8a8a, 0xe2e2, 0x3434 },
-  { 0, 0xfcfc, 0xe9e9, 0x4f4f },
-  { 0, 0x7272, 0x9f9f, 0xcfcf },
-  { 0, 0xadad, 0x7f7f, 0xa8a8 },
-  { 0, 0x3434, 0xe2e2, 0xe2e2 },
-  { 0, 0xeeee, 0xeeee, 0xecec }
+  #define USER_COLOR_00 "#2e3436"
+  #define USER_COLOR_01 "#cc0000"
+  #define USER_COLOR_02 "#4e9a06"
+  #define USER_COLOR_03 "#c4a000"
+  #define USER_COLOR_04 "#3465a4"
+  #define USER_COLOR_05 "#75507b"
+  #define USER_COLOR_06 "#06989a"
+  #define USER_COLOR_07 "#d3d7cf"
+  #define USER_COLOR_08 "#555753"
+  #define USER_COLOR_09 "#ef2929"
+  #define USER_COLOR_10 "#8ae234"
+  #define USER_COLOR_11 "#fce94f"
+  #define USER_COLOR_12 "#729fcf"
+  #define USER_COLOR_13 "#ad7fa8"
+  #define USER_COLOR_14 "#34e2e2"
+  #define USER_COLOR_15 "#eeeeec"
 #endif
 #if COLOR_STYLE == XTERM
-  { 0, 0x0000, 0x0000, 0x0000 },
-  { 0, 0xcdcd, 0x0000, 0x0000 },
-  { 0, 0x0000, 0xcdcd, 0x0000 },
-  { 0, 0xcdcd, 0xcdcd, 0x0000 },
-  { 0, 0x0000, 0x0000, 0xeeee },
-  { 0, 0xcdcd, 0x0000, 0xcdcd },
-  { 0, 0x0000, 0xcdcd, 0xcdcd },
-  { 0, 0xe5e5, 0xe5e5, 0xe5e5 },
-  { 0, 0x7f7f, 0x7f7f, 0x7f7f },
-  { 0, 0xffff, 0x0000, 0x0000 },
-  { 0, 0x0000, 0xffff, 0x0000 },
-  { 0, 0xffff, 0xffff, 0x0000 },
-  { 0, 0x5c5c, 0x5c5c, 0xffff },
-  { 0, 0xffff, 0x0000, 0xffff },
-  { 0, 0x0000, 0xffff, 0xffff },
-  { 0, 0xffff, 0xffff, 0xffff }
+  #define USER_COLOR_00 "#000000"
+  #define USER_COLOR_01 "#cd0000"
+  #define USER_COLOR_02 "#00cd00"
+  #define USER_COLOR_03 "#cdcd00"
+  #define USER_COLOR_04 "#0000ee"
+  #define USER_COLOR_05 "#cd00cd"
+  #define USER_COLOR_06 "#00cdcd"
+  #define USER_COLOR_07 "#e5e5e5"
+  #define USER_COLOR_08 "#7f7f7f"
+  #define USER_COLOR_09 "#ff0000"
+  #define USER_COLOR_10 "#00ff00"
+  #define USER_COLOR_11 "#ffff00"
+  #define USER_COLOR_12 "#5c5cff"
+  #define USER_COLOR_13 "#ff00ff"
+  #define USER_COLOR_14 "#00ffff"
+  #define USER_COLOR_15 "#ffffff"
 #endif
 #if COLOR_STYLE == ZENBURN_DARK
-  { 0, 0x0000, 0x0000, 0x0000 },
-  { 0, 0x9e9e, 0x1818, 0x2828 },
-  { 0, 0xaeae, 0xcece, 0x9292 },
-  { 0, 0x9696, 0x8a8a, 0x3838 },
-  { 0, 0x4141, 0x4141, 0x7171 },
-  { 0, 0x9696, 0x3c3c, 0x5959 },
-  { 0, 0x4141, 0x8181, 0x7979 },
-  { 0, 0xbebe, 0xbebe, 0xbebe },
-  { 0, 0x6666, 0x6666, 0x6666 },
-  { 0, 0xcfcf, 0x6161, 0x7171 },
-  { 0, 0xc5c5, 0xf7f7, 0x7979 },
-  { 0, 0xffff, 0xf7f7, 0x9696 },
-  { 0, 0x4141, 0x8686, 0xbebe },
-  { 0, 0xcfcf, 0x9e9e, 0xbebe },
-  { 0, 0x7171, 0xbebe, 0xbebe },
-  { 0, 0xffff, 0xffff, 0xffff }
+  #define USER_COLOR_00 "#000000"
+  #define USER_COLOR_01 "#9e1828"
+  #define USER_COLOR_02 "#aece92"
+  #define USER_COLOR_03 "#968a38"
+  #define USER_COLOR_04 "#414171"
+  #define USER_COLOR_05 "#963c59"
+  #define USER_COLOR_06 "#418179"
+  #define USER_COLOR_07 "#bebebe"
+  #define USER_COLOR_08 "#666666"
+  #define USER_COLOR_09 "#cf6171"
+  #define USER_COLOR_10 "#c5f779"
+  #define USER_COLOR_11 "#fff796"
+  #define USER_COLOR_12 "#4186be"
+  #define USER_COLOR_13 "#cf9ebe"
+  #define USER_COLOR_14 "#71bebe"
+  #define USER_COLOR_15 "#ffffff"
 #endif
 #if COLOR_STYLE == ZENBURN
-  { 0, 0x3f3f, 0x3f3f, 0x3f3f },
-  { 0, 0x7070, 0x5050, 0x5050 },
-  { 0, 0x6060, 0xb4b4, 0x8a8a },
-  { 0, 0xdfdf, 0xafaf, 0x8f8f },
-  { 0, 0x5050, 0x6060, 0x7070 },
-  { 0, 0xdcdc, 0x8c8c, 0xc3c3 },
-  { 0, 0x8c8c, 0xd0d0, 0xd3d3 },
-  { 0, 0xdcdc, 0xdcdc, 0xcccc },
-  { 0, 0x7070, 0x9090, 0x8080 },
-  { 0, 0xdcdc, 0xa3a3, 0xa3a3 },
-  { 0, 0xc3c3, 0xbfbf, 0x9f9f },
-  { 0, 0xf0f0, 0xdfdf, 0xafaf },
-  { 0, 0x9494, 0xbfbf, 0xf3f3 },
-  { 0, 0xecec, 0x9393, 0xd3d3 },
-  { 0, 0x9393, 0xe0e0, 0xe3e3 },
-  { 0, 0xffff, 0xffff, 0xffff }
+  #define USER_COLOR_00 "#3f3f3f"
+  #define USER_COLOR_01 "#705050"
+  #define USER_COLOR_02 "#60b48a"
+  #define USER_COLOR_03 "#dfaf8f"
+  #define USER_COLOR_04 "#506070"
+  #define USER_COLOR_05 "#dc8cc3"
+  #define USER_COLOR_06 "#8cd0d3"
+  #define USER_COLOR_07 "#dcdccc"
+  #define USER_COLOR_08 "#709080"
+  #define USER_COLOR_09 "#dca3a3"
+  #define USER_COLOR_10 "#c3bf9f"
+  #define USER_COLOR_11 "#f0dfaf"
+  #define USER_COLOR_12 "#94bff3"
+  #define USER_COLOR_13 "#ec93d3"
+  #define USER_COLOR_14 "#93e0e3"
+  #define USER_COLOR_15 "#ffffff"
 #endif
 #if COLOR_STYLE == SOLARIZED_DARK
-  { 0, 0x0707, 0x3636, 0x4242 },
-  { 0, 0xdcdc, 0x3232, 0x2f2f },
-  { 0, 0x8585, 0x9999, 0x0000 },
-  { 0, 0xb5b5, 0x8989, 0x0000 },
-  { 0, 0x2626, 0x8b8b, 0xd2d2 },
-  { 0, 0xd3d3, 0x3636, 0x8282 },
-  { 0, 0x2a2a, 0xa1a1, 0x9898 },
-  { 0, 0xeeee, 0xe8e8, 0xd5d5 },
-  { 0, 0x0000, 0x2b2b, 0x3636 },
-  { 0, 0xcbcb, 0x4b4b, 0x1616 },
-  { 0, 0x5858, 0x6e6e, 0x7575 },
-  { 0, 0x6565, 0x7b7b, 0x8383 },
-  { 0, 0x8383, 0x9494, 0x9696 },
-  { 0, 0x6c6c, 0x7171, 0xc4c4 },
-  { 0, 0x9393, 0xa1a1, 0xa1a1 },
-  { 0, 0xfdfd, 0xf6f6, 0xe3e3 }
+  #define USER_COLOR_00 "#073642"
+  #define USER_COLOR_01 "#dc322f"
+  #define USER_COLOR_02 "#859900"
+  #define USER_COLOR_03 "#b58900"
+  #define USER_COLOR_04 "#268bd2"
+  #define USER_COLOR_05 "#d33682"
+  #define USER_COLOR_06 "#2aa198"
+  #define USER_COLOR_07 "#eee8d5"
+  #define USER_COLOR_08 "#002b36"
+  #define USER_COLOR_09 "#cb4b16"
+  #define USER_COLOR_10 "#586e75"
+  #define USER_COLOR_11 "#657b83"
+  #define USER_COLOR_12 "#839496"
+  #define USER_COLOR_13 "#6c71c4"
+  #define USER_COLOR_14 "#93a1a1"
+  #define USER_COLOR_15 "#fdf6e3"
 #endif
-#if COLOR_STYLE == SOLARIZED_LIGHT
-  { 0, 0xeeee, 0xe8e8, 0xd5d5 },
-  { 0, 0xdcdc, 0x3232, 0x2f2f },
-  { 0, 0x8585, 0x9999, 0x0000 },
-  { 0, 0xb5b5, 0x8989, 0x0000 },
-  { 0, 0x2626, 0x8b8b, 0xd2d2 },
-  { 0, 0xd3d3, 0x3636, 0x8282 },
-  { 0, 0x2a2a, 0xa1a1, 0x9898 },
-  { 0, 0x0707, 0x3636, 0x4242 },
-  { 0, 0xfdfd, 0xf6f6, 0xe3e3 },
-  { 0, 0xcbcb, 0x4b4b, 0x1616 },
-  { 0, 0x9393, 0xa1a1, 0xa1a1 },
-  { 0, 0x8383, 0x9494, 0x9696 },
-  { 0, 0x6565, 0x7b7b, 0x8383 },
-  { 0, 0x6c6c, 0x7171, 0xc4c4 },
-  { 0, 0x5858, 0x6e6e, 0x7575 },
-  { 0, 0x0000, 0x2b2b, 0x3636 }
-#endif
-#if COLOR_STYLE == USER_CUSTOM
-  #define CLR_R(x)   (((x) & 0xff0000) >> 16)
-  #define CLR_G(x)   (((x) & 0x00ff00) >>  8)
-  #define CLR_B(x)   (((x) & 0x0000ff) >>  0)
-  #define CLR_16(x)  (((x) << 8) | (x))
-  #define CLR_GDK(x) { 0, CLR_16(CLR_R(x)), CLR_16(CLR_G(x)), CLR_16(CLR_B(x)) }
-  CLR_GDK(USER_COLOR_00),
-  CLR_GDK(USER_COLOR_01),
-  CLR_GDK(USER_COLOR_02),
-  CLR_GDK(USER_COLOR_03),
-  CLR_GDK(USER_COLOR_04),
-  CLR_GDK(USER_COLOR_05),
-  CLR_GDK(USER_COLOR_06),
-  CLR_GDK(USER_COLOR_07),
-  CLR_GDK(USER_COLOR_08),
-  CLR_GDK(USER_COLOR_09),
-  CLR_GDK(USER_COLOR_10),
-  CLR_GDK(USER_COLOR_11),
-  CLR_GDK(USER_COLOR_12),
-  CLR_GDK(USER_COLOR_13),
-  CLR_GDK(USER_COLOR_14),
-  CLR_GDK(USER_COLOR_15)
+#if COLOR_STYLE == SOLARIZED_LIGH
+  #define USER_COLOR_00 "#eee8d5"
+  #define USER_COLOR_01 "#dc322f"
+  #define USER_COLOR_02 "#859900"
+  #define USER_COLOR_03 "#b58900"
+  #define USER_COLOR_04 "#268bd2"
+  #define USER_COLOR_05 "#d33682"
+  #define USER_COLOR_06 "#2aa198"
+  #define USER_COLOR_07 "#073642"
+  #define USER_COLOR_08 "#fdf6e3"
+  #define USER_COLOR_09 "#cb4b16"
+  #define USER_COLOR_10 "#93a1a1"
+  #define USER_COLOR_11 "#839496"
+  #define USER_COLOR_12 "#657b83"
+  #define USER_COLOR_13 "#6c71c4"
+  #define USER_COLOR_14 "#586e75"
+  #define USER_COLOR_15 "#002b36"
 #endif
 #if COLOR_STYLE == HOLO
-  { 0, 0x0000, 0x0000, 0x0000 },
-  { 0, 0xcccc, 0x0000, 0x0000 },
-  { 0, 0x6666, 0x9999, 0x0000 },
-  { 0, 0xffff, 0x8888, 0x0000 },
-  { 0, 0x0000, 0x9999, 0xcccc },
-  { 0, 0x9999, 0x3333, 0xcccc },
-  { 0, 0x0000, 0x9999, 0xcccc },
-  { 0, 0xa8a8, 0xa8a8, 0xa8a8 },
-  { 0, 0x5757, 0x5757, 0x5757 },
-  { 0, 0xffff, 0x4444, 0x4444 },
-  { 0, 0x9999, 0xcccc, 0x0000 },
-  { 0, 0xffff, 0xbbbb, 0x3333 },
-  { 0, 0x3333, 0xb5b5, 0xe5e5 },
-  { 0, 0xaaaa, 0x6666, 0xcccc },
-  { 0, 0x3333, 0xb5b5, 0xe5e5 },
-  { 0, 0xffff, 0xffff, 0xffff }
+  #define USER_COLOR_00 "#000000"
+  #define USER_COLOR_01 "#cc0000"
+  #define USER_COLOR_02 "#669900"
+  #define USER_COLOR_03 "#ff8800"
+  #define USER_COLOR_04 "#0099cc"
+  #define USER_COLOR_05 "#9933cc"
+  #define USER_COLOR_06 "#0099cc"
+  #define USER_COLOR_07 "#a8a8a8"
+  #define USER_COLOR_08 "#575757"
+  #define USER_COLOR_09 "#ff4444"
+  #define USER_COLOR_10 "#99cc00"
+  #define USER_COLOR_11 "#ffbb33"
+  #define USER_COLOR_12 "#33b5e5"
+  #define USER_COLOR_13 "#aa66cc"
+  #define USER_COLOR_14 "#33b5e5"
+  #define USER_COLOR_15 "#ffffff"
 #endif
-};
 #endif
 
 #if defined(FONT_ANTI_ALIAS) || defined(MENU_FONT_BIGGER) || defined(MENU_FONT_SMALLER) || defined(MENU_FONT_SELECT) || defined(MENU_TOGGLE_ANTI_ALIAS) || defined(HOTKEY_TOGGLE_ANTI_ALIAS) || defined(HOTKEY_FONT_BIGGER) || defined(HOTKEY_FONT_SMALLER) || defined(HOTKEY_FONT_SELECT) || COMMAND_FONT

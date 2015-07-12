@@ -572,6 +572,22 @@ static void add_tab(void)
 #endif
 
 #ifdef COLOR_STYLE
+  gdk_color_parse(USER_COLOR_00, &color_style[0]);
+  gdk_color_parse(USER_COLOR_01, &color_style[1]);
+  gdk_color_parse(USER_COLOR_02, &color_style[2]);
+  gdk_color_parse(USER_COLOR_03, &color_style[3]);
+  gdk_color_parse(USER_COLOR_04, &color_style[4]);
+  gdk_color_parse(USER_COLOR_05, &color_style[5]);
+  gdk_color_parse(USER_COLOR_06, &color_style[6]);
+  gdk_color_parse(USER_COLOR_07, &color_style[7]);
+  gdk_color_parse(USER_COLOR_08, &color_style[8]);
+  gdk_color_parse(USER_COLOR_09, &color_style[9]);
+  gdk_color_parse(USER_COLOR_10, &color_style[10]);
+  gdk_color_parse(USER_COLOR_11, &color_style[11]);
+  gdk_color_parse(USER_COLOR_12, &color_style[12]);
+  gdk_color_parse(USER_COLOR_13, &color_style[13]);
+  gdk_color_parse(USER_COLOR_14, &color_style[14]);
+  gdk_color_parse(USER_COLOR_15, &color_style[15]);
   vte_terminal_set_colors(VTE_TERMINAL(term->vte), NULL, NULL, color_style, 16);
 #endif
 
