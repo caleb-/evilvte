@@ -841,7 +841,7 @@ const GdkColor color_style[16];
   #define USER_COLOR_14 "#93a1a1"
   #define USER_COLOR_15 "#fdf6e3"
 #endif
-#if COLOR_STYLE == SOLARIZED_LIGH
+#if COLOR_STYLE == SOLARIZED_LIGHT
   #define USER_COLOR_00 "#eee8d5"
   #define USER_COLOR_01 "#dc322f"
   #define USER_COLOR_02 "#859900"
