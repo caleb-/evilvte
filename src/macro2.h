@@ -607,7 +607,7 @@ bool tabbar_status = TRUE;
 #define VTE_ANTI_ALIAS VTE_ANTI_ALIAS_USE_DEFAULT
 #endif
 
-#define EVILVTE_SET_FONT(x,y,z) vte_terminal_set_font_from_string(x,y)
+#define EVILVTE_SET_FONT(x,y,z)
 #if defined(FONT_ANTI_ALIAS) || defined(MENU_TOGGLE_ANTI_ALIAS) || defined(HOTKEY_TOGGLE_ANTI_ALIAS)
 #undef EVILVTE_SET_FONT
 #define EVILVTE_SET_FONT vte_terminal_set_font_from_string_full
