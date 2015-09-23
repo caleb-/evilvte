@@ -9,8 +9,6 @@ CONF_FILE="src/config.h"
 
 for opt do
   case "$opt" in
-  --with-gtk=*) with_gtk=`echo $opt | cut -d '=' -f 2`
-  ;;
   --quiet) DO_CAT=true
            DO_ECHO=true
   ;;
@@ -25,10 +23,6 @@ for opt do
      echo
      echo "          --config=src/config.h (default)"
      echo '          --config=$HOME/.config/evilvte/config.h'
-     echo
-     echo "          --with-gtk=2.0 (default)"
-     echo "          --with-gtk=3.0"
-     echo "          --with-gtk=3+2"
      exec echo
   ;;
   *)
@@ -59,49 +53,16 @@ SUSE_LD=`ld -v 2>&1 | tr A-Z a-z | grep suse`
 ARCH_UNAME=`uname -a | grep -- '-ARCH '`
 [ "$ARCH_UNAME" != "" ] && echo \#define DEF_TAB_LABEL >> src/config.mk
 
-real_gtk=$with_gtk
-if [ "$with_gtk" != "2.0" ] && [ "$with_gtk" != "3.0" ]; then
-  with_gtk=2.0
-  VTEINC=`pkg-config --cflags vte 2> /dev/null`
-  if [ $? != 0 ]; then
-    VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
-    [ $? = 0 ] && with_gtk=3.0
-  fi
-fi
-
-[ "$real_gtk" = "3+2" ] && with_gtk=3.0
-[ "$real_gtk" = "dev" ] && with_gtk=3.0
-
-if [ "$with_gtk" = "2.0" ]; then
-  VTEINC=`pkg-config --cflags vte 2> /dev/null`
-  [ $? != 0 ] && exec pkg-config --cflags vte
-  LIBS_VTE="-lgdk-x11-2.0 -lgtk-x11-2.0 -lvte"
-  LIBS_VTE_L=`pkg-config --libs-only-L vte 2> /dev/null`
-  ln -sf gtk2.c src/evilvte.c
-fi
-
-if [ "$with_gtk" = "3.0" ]; then
-  VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
-  [ $? != 0 ] && exec pkg-config --cflags vte-2.90
-  LIBS_VTE="-lgdk-3 -lgtk-3 -lvte2_90"
-  LIBS_VTE_L=`pkg-config --libs-only-L vte-2.90 2> /dev/null`
-  ln -sf gtk3.c src/evilvte.c
-fi
-
-if [ "$real_gtk" = "3+2" ]; then
-  real_gtk="all"
-  LIBS_VTE="-ldl"
-  ln -sf dlopen.c src/evilvte.c
-fi
-
-[ "$real_gtk" = "dev" ] && ln -sf gtk3dev.c src/evilvte.c
+VTEINC=`pkg-config --cflags vte-2.90 2> /dev/null`
+[ $? != 0 ] && exec pkg-config --cflags vte-2.90
+LIBS_VTE="-lgdk-3 -lgtk-3 -lvte2_90"
+LIBS_VTE_L=`pkg-config --libs-only-L vte-2.90 2> /dev/null`
 
   $DO_ECHO
   [ "$SUSE_LD" != "" ] && $DO_ECHO "OS    :" [1m[33mSUSE[m
   [ "$ARCH_UNAME" != "" ] && $DO_ECHO "OS    :" [1m[33mArch Linux[m
-  [ "$with_gtk" = "2.0" ] && $DO_ECHO "VTE   :" [1m[33m`pkg-config --modversion vte`[m
-  [ "$with_gtk" = "3.0" ] && $DO_ECHO "VTE   :" [1m[33m`pkg-config --modversion vte-2.90`[m
-  $DO_ECHO "GTK+  :" [1m[33m`pkg-config --modversion gtk+-$with_gtk`[m
+  $DO_ECHO "VTE   :" [1m[33m`pkg-config --modversion vte-2.90`[m
+  $DO_ECHO "GTK+  :" [1m[33m`pkg-config --modversion gtk+-3.0`[m
   $DO_ECHO Prefix: [1m[33m$prefix[m
   $DO_ECHO -n "Configuration: "
   DEFINE_LINES=`cat $CONF_FILE | tr '\t' ' ' | tr -s ' ' ' ' | sed -e 's/^ //' -e 's~/\*~\n~g' | grep ^\#define | wc -l`
@@ -181,7 +142,6 @@ echo "PROG=$PROG" >> src/config.mk
 echo \#ifndef PROGRAM_VERSION >> src/config.mk
 echo \#define PROGRAM_VERSION '"'$PROGRAM_VERSION'"' >> src/config.mk
 echo \#endif >> src/config.mk
-[ "$real_gtk" = "all" ] && echo \#define RULE_THEM_ALL >> src/config.mk
 echo "CONF_FILE=$CONF_FILE" >> src/config.mk
 head -n 1 $0 > src/uninstall.sh
 echo "set -x" >> src/uninstall.sh
